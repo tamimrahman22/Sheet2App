@@ -1,5 +1,6 @@
 var express = require('express');
 const mongoose = require("mongoose");
+var appRouter = require("./routes/apps")
 
 var app = express();
 
@@ -15,3 +16,9 @@ db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", function () {
   console.log("Connected successfully");
 });
+
+app.listen(3000, function() {
+	console.log('Server Started...');
+});
+
+app.use('/app', appRouter);

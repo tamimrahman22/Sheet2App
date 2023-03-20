@@ -6,16 +6,16 @@ const userSchema = new mongoose.Schema({
 	},
 	apps: [
 		{
-			type: Schema.Types.ObjectId,
+			type: mongoose.Schema.Types.ObjectId,
 			ref: 'App',
 		},
 	],
-	// views: [
-	// 	{
-	// 		type: Schema.Types.ObjectId,
-	// 		ref: 'View',
-	// 	},
-	// ],
+	views: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'View',
+		},
+	],
 });
 
 const User = mongoose.model("User", userSchema);

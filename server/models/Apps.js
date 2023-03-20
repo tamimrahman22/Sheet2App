@@ -8,18 +8,18 @@ const appSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	// dataSources: [
-	// 	{
-	// 		type: Schema.Types.ObjectId,
-	// 		ref: 'Table',
-	// 	},
-	// ],
-	// views: [
-	// 	{
-	// 		type: Schema.Types.ObjectId,
-	// 		ref: 'View',
-	// 	},
-	// ],
+	dataSources: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'DataSource',
+		},
+	],
+	views: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'View',
+		},
+	],
 	roleMembershipSheet: {
 		type: String,
 		required: true,
@@ -30,5 +30,5 @@ const appSchema = new mongoose.Schema({
 	}
 });
 
-const App = mongoose.model("App", userSchema);
+const App = mongoose.model("App", appSchema);
 module.exports = App;
