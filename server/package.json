@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
-    "mongoose": "^7.0.1"
+    "googleapis": "^113.0.0",
+    "mongoose": "^7.0.1",
+    "nodemon": "^2.0.21"
   }
 }

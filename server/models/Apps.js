@@ -27,7 +27,19 @@ const appSchema = new mongoose.Schema({
 	published: {
 		type: Boolean,
 		default: false,
-	}
+	},
+	roles: [
+		{
+			name: {
+				type: String,
+				required: true
+			},
+			role: {
+				type: String,
+				required: true
+			}
+		}
+	]
 });
 
 const App = mongoose.model("App", appSchema);

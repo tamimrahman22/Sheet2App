@@ -12,10 +12,12 @@ const dataSourceSchema = new mongoose.Schema({
 		type: Number,
 		required: true,
 	},
-	keys: {
-		type: Number,
-		required: true,
-	},
+	keys: [
+		{
+			type: mongoose.Schema.Types.Mixed,
+			required: true,
+		}
+	],
     columns: [
         {
             name: {
