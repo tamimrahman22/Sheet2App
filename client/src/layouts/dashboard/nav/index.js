@@ -41,11 +41,16 @@ export default function Nav({ openNav, onCloseNav }) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: 300,
+    height: 300,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    borderRadius: '20px',
+    alignItems: "center",
+    textAlign: "center",
+    justifyContent: "center"
   };
 
   const account = {
@@ -87,17 +92,17 @@ export default function Nav({ openNav, onCloseNav }) {
         '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
       }}
     >
-      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
+      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }} justifyContent="center" display="flex" alignItems="center">
         <Logo />
       </Box>
 
-      <Box sx={{ mb: 5, mx: 2.5 }}> 
+      <Box sx={{ mb: 5, mx: 2.5 }} justifyContent="center" display="flex" alignItems="center"> 
         <Button variant="contained" onClick={showCreateAppModal}>Create App</Button>
       </Box>
 
       <NavSection data={navConfig} />
 
-      <Box sx={{ flexGrow: 1 }} />
+      <Box sx={{ flexGrow: 1 }} justifyContent="center" display="flex" alignItems="center"/>
     </Scrollbar>
   );
 
@@ -143,13 +148,21 @@ export default function Nav({ openNav, onCloseNav }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Create App
-          </Typography>
-          <TextField id="standard-basic" label="App Name" variant="standard" />
-          <TextField id="standard-basic" label="Roles Sheet" variant="standard" />
-          <Button variant="contained" onClick={handleCreateApp}>Create</Button>
+        <Box sx={style} justifyContent="center" alignItems="center">
+          <Box>
+            <Typography id="modal-modal-title" variant="h5" component="h2">
+              Create App
+            </Typography>
+          </Box>
+          <Box paddingTop={1}>
+            <TextField id="standard-basic" label="App Name" variant="standard"/>
+          </Box>
+          <Box paddingTop={2}>
+            <TextField id="standard-basic" label="Roles Sheet" variant="standard" />
+          </Box>
+          <Box paddingTop={5}>
+            <Button variant="contained" onClick={handleCreateApp}>Create</Button>
+          </Box>
         </Box>
       </Modal>
     </Box>
