@@ -6,7 +6,7 @@ import AppsIcon from '@mui/icons-material/Apps';
 const navConfig = [
   {
     title: 'apps',
-    path: '/dashboard',
+    path: '/dashboard/app',
     icon: <AppsIcon/>,
   },
 ];

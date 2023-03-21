@@ -20,8 +20,8 @@ export default function AccountPopover() {
   };
 
   const handleClose = () => {
-    setOpen(null);
     navigate('/', { replace: true });
+    setOpen(null);
   };
 
   return (
