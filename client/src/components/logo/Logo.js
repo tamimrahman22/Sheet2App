@@ -21,7 +21,7 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   );
 
   return (
-    <Link to="/" component={RouterLink} sx={{ display: 'contents' }}>
+    <Link to="/dashboard/app" component={RouterLink} sx={{ display: 'contents' }}>
       {logo}
     </Link>
   );
