@@ -2,8 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
-import { styled, alpha } from '@mui/material/styles';
-import { Box, Link, Drawer, Typography, Avatar, Button, Modal, TextField } from '@mui/material';
+import { Box, Drawer, Typography, Button, Modal, TextField } from '@mui/material';
 // mock
 // hooks
 import useResponsive from '../../../useResponsive';
@@ -18,14 +17,6 @@ import axios from 'axios';
 // ----------------------------------------------------------------------
 
 const NAV_WIDTH = 280;
-
-const StyledAccount = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(2, 2.5),
-  borderRadius: Number(theme.shape.borderRadius) * 1.5,
-  backgroundColor: alpha(theme.palette.grey[500], 0.12),
-}));
 
 // ----------------------------------------------------------------------
 
@@ -53,11 +44,7 @@ export default function Nav({ openNav, onCloseNav }) {
     p: 4,
   };
 
-  const account = {
-    displayName: 'Jaydon Frankie',
-    email: 'demo@minimals.cc',
-    photoURL: '/assets/images/avatars/avatar_default.jpg',
-  };
+
 
   useEffect(() => {
     if (openNav) {

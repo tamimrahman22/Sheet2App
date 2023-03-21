@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from '../logo/Logo';
-import { pink, blueGrey } from '@mui/material/colors';
+import { blueGrey } from '@mui/material/colors';
 
 const pages = ['Nav Option 1', 'Nav Option 2', 'Nav Option 3'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];

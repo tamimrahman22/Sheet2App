@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 // @mui
 // import { useTheme } from '@mui/material/styles';
-import { Container, Typography, List, Stack, Box, Link, Divider } from '@mui/material';
+import { Container, Typography, List, Stack, Box, Link } from '@mui/material';
 // components
 // import Iconify from '../components/iconify';
 // sections
@@ -39,7 +39,7 @@ export default function DashboardAppPage() {
     }
     getLists();
     console.log(list);
-  }, []);
+  }, [list]);
 
   return (
     <>
@@ -54,7 +54,7 @@ export default function DashboardAppPage() {
         <List sx={{ width: '100%' }}>
             {
                 list.map((app) => (
-                  <Box component="span" sx={{ p: 2, border: '1px dashed grey' }}>
+                  <Box component="span" sx={{ p: 2 }}>
                     <Stack direction="row" alignItems="center" spacing={2} key={app._id}>
                       {/* <Box component="img" alt={title} src={image} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} /> */}
                 

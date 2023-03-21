@@ -1,12 +1,10 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
-import { styled } from '@mui/material/styles';
-import { Link, Container, Typography, Divider, Stack, Button, TextField, FormControlLabel, Checkbox, Grid, CssBaseline, Paper, Box, Avatar } from '@mui/material';
+import { Typography, Grid, CssBaseline, Box } from '@mui/material';
 // hooks
-import useResponsive from '../useResponsive';
+// import useResponsive from '../useResponsive';
 // components
-import Logo from '../components/logo';
-import Navbar from '../components/navbar/Navbar';
+// import Navbar from '../components/navbar/Navbar';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwt_decode from "jwt-decode";
@@ -14,45 +12,18 @@ import jwt_decode from "jwt-decode";
 
 // ----------------------------------------------------------------------
 
-const StyledRoot = styled('div')(({ theme }) => ({
-  [theme.breakpoints.up('md')]: {
-    display: 'flex',
-  },
-}));
-
-const StyledSection = styled('div')(({ theme }) => ({
-  width: '100%',
-  maxWidth: 1000,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  boxShadow: theme.customShadows.card,
-  backgroundColor: theme.palette.background.default,
-}));
-
-const StyledContent = styled('div')(({ theme }) => ({
-  maxWidth: 480,
-  margin: 'auto',
-  minHeight: '100vh',
-  display: 'flex',
-  justifyContent: 'center',
-  flexDirection: 'column',
-  padding: theme.spacing(12, 0),
-}));
-
-// ----------------------------------------------------------------------
-
 export default function LoginPage() {
-  const mdUp = useResponsive('up', 'md');
+  // const mdUp = useResponsive('up', 'md');
   const navigate = useNavigate();
 
   const [ user, setUser ] = useState({});
 
   function handleInitalizeCallback(response) {
     console.log("TOKEN: " + response.credential);
-    var user = jwt_decode(response.credential);
+    var userData = jwt_decode(response.credential);
+    console.log(userData);
+    setUser(userData);
     console.log(user);
-    setUser(user);
     document.getElementById("signInDiv").hidden = true;
     navigate('/dashboard', { replace: true });
   }
