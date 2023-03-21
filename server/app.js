@@ -2,6 +2,7 @@ var express = require('express');
 const mongoose = require("mongoose");
 var appRouter = require("./routes/apps")
 var dataSourceRouter = require("./routes/dataSource")
+var viewsRouter = require("./routes/views")
 var cors = require('cors');
 
 var app = express();
@@ -30,3 +31,4 @@ app.listen(4000, function() {
 
 app.use('/app', appRouter);
 app.use('/datasource', dataSourceRouter);
+app.use('/views', viewsRouter);
