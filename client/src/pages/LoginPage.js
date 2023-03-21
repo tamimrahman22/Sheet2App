@@ -54,9 +54,9 @@ export default function LoginPage() {
 
       {/* <Navbar/> */}
 
-      <Grid container sx={{ height: '95%' }}>
+      <Grid container sx={{ height: '100%' }}>
         <CssBaseline />
-        <Grid item sm={4} md={7}>
+        <Grid item sm={4} md={7} paddingTop={15}>
           <Box justifyContent="center" display="flex" alignItems="center">
             <Box
               component="img"
