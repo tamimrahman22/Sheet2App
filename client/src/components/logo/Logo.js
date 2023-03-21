@@ -21,8 +21,8 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   const logo = (
     <Box
       component="img"
-      src="../../public/s2a.png"
-      sx={{ width: 40, height: 40, cursor: 'pointer', ...sx }}
+      src="/assets/logo/s2a_logo.png"
+      sx={{ width: 150, cursor: 'pointer' }}
     />
   );
 
@@ -74,9 +74,9 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   //   </Box>
   // );
 
-  if (disabledLink) {
-    return <>{logo}</>;
-  }
+  // if (disabledLink) {
+  //   return <>{logo}</>;
+  // }
 
   return (
     <Link to="/" component={RouterLink} sx={{ display: 'contents' }}>

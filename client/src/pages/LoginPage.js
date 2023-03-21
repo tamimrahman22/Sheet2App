@@ -1,11 +1,12 @@
 import { Helmet } from 'react-helmet-async';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Link, Container, Typography, Divider, Stack, Button } from '@mui/material';
+import { Link, Container, Typography, Divider, Stack, Button, TextField, FormControlLabel, Checkbox, Grid, CssBaseline, Paper, Box, Avatar } from '@mui/material';
 // hooks
 import useResponsive from '../useResponsive';
 // components
 import Logo from '../components/logo';
+import Navbar from '../components/navbar/Navbar';
 import Iconify from '../components/iconify';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -81,36 +82,46 @@ export default function LoginPage() {
         <title> S2A Login </title>
       </Helmet>
 
-      <StyledRoot>
-        <Logo
+      <Navbar/>
+
+      <Grid container sx={{ height: '95%' }}>
+        <CssBaseline />
+        <Grid item sm={4} md={7}>
+          <Box justifyContent="center" display="flex" alignItems="center">
+            <Box
+              component="img"
+              src="/assets/logo/s2a_logo_large.png"
+              width={300}
+              paddingTop={5}
+            />
+          </Box>
+          <Typography component="h2" variant="h4" align="center" paddingTop={5}>
+            Welcome to S2A!
+          </Typography>
+          <Typography component="h2" variant="h4" align="center" >
+            This application allows you to create Apps from Google Sheets. 
+          </Typography>
+          <Typography component="h2" variant="h4" align="center" >
+            Please use your Google Account to get started!
+          </Typography>
+          <Box 
+            justifyContent="center" 
+            display="flex" 
+            alignItems="center" 
+            id="signInDiv" 
+            paddingTop={5}
+          />
+        </Grid>
+        <Grid item xs={12} sm={8} md={5}
           sx={{
-            position: 'fixed',
-            top: { xs: 16, sm: 24, md: 40 },
-            left: { xs: 16, sm: 24, md: 40 },
-          }}
-        />
+              backgroundImage: 'url(https://source.unsplash.com/random)',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+          }}>
+        </Grid>
+      </Grid>
 
-        {mdUp && (  
-          <StyledSection>
-            <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
-              Hi, Welcome Back
-            </Typography>
-            <img src="/assets/illustrations/illustration_login.png" alt="login" />
-          </StyledSection>
-        )}
-
-        <Container maxWidth="sm">
-          <StyledContent>
-            <Typography variant="h4" gutterBottom>
-              Sign in to S2A
-            </Typography>
-
-            <Stack direction="row" spacing={2}>
-              <div id="signInDiv"></div>
-            </Stack>
-          </StyledContent>
-        </Container>
-      </StyledRoot>
     </>
   );
 }
