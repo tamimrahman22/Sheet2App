@@ -5,7 +5,7 @@ import { Box, Stack, AppBar, Toolbar, IconButton } from '@mui/material';
 // utils
 import { bgBlur } from '../../../utils/cssStyles';
 // components
-import Iconify from '../../../components/iconify';
+import MenuIcon from '@mui/icons-material/Menu';
 //
 import AccountPopover from './AccountPopover';
 
@@ -51,7 +51,7 @@ export default function Header({ onOpenNav }) {
             display: { lg: 'none' },
           }}
         >
-          <Iconify icon="eva:menu-2-fill" />
+          <MenuIcon />
         </IconButton>
 
         <Box sx={{ flexGrow: 1 }} />
