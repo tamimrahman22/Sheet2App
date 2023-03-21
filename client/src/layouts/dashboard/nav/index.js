@@ -13,6 +13,7 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
 import navConfig from './config';
+import axios from 'axios';
 
 // ----------------------------------------------------------------------
 
@@ -69,8 +70,19 @@ export default function Nav({ openNav, onCloseNav }) {
     setOpen(true);
   }
 
-  function handleCreateApp() {
-    setOpen(true);
+  async function handleCreateApp() {
+    axios.defaults.withCredentials = true;
+    const api = axios.create({
+      baseURL: 'http://localhost:4000/app',
+    });
+    let payload = {
+      name: "appname",
+      creator: "jonathan",
+      roleMembershipSheet: "https://docs.google.com/spreadsheets/d/1K1RoF5WRKtu_UDOVMTAMlr_tfCGv0rTi3qQBIwRCvrY/edit#gid=0",
+    };
+    const response = await api.post('/create', payload);
+    console.log(response);
+    setOpen(false);
   }
 
   const renderContent = (
