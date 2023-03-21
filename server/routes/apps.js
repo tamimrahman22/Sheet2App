@@ -3,12 +3,7 @@ var router = express.Router();
 const appModel = require('../models/Apps');
 // const dataSourceModel = require('../models/DataSource');
 const { google } = require("googleapis");
-// const keys = require("../keys.json");
 
-// const auth = new google.auth.GoogleAuth({
-// 	keyFile: "./keys.json",
-// 	scopes: "https://www.googleapis.com/auth/spreadsheets"
-// });
 const auth = new google.auth.GoogleAuth({
 	// keyFile: "./keys.json",
 	keyFile: "keys.json",
