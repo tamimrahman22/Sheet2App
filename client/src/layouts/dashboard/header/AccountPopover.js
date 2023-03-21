@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useContext} from 'react';
+import AuthContext from '../../../components/context/AuthContext';
 // @mui
 import { Box, Divider, Typography, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
@@ -9,15 +11,22 @@ import { Box, Divider, Typography, MenuItem, Avatar, IconButton, Popover } from 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
   const navigate = useNavigate();
+  const auth = useContext(AuthContext)
+
+  console.log('[ACCT Popover] AUTH', auth)
   const account = {
-    displayName: 'Jaydon Frankie',
-    email: 'demo@minimals.cc',
-    photoURL: '/assets/images/avatars/avatar_default.jpg',
+    displayName: auth.user ? auth.user.given_name + ' ' + auth.user.family_name : '',
+    email: auth.user ? auth.user.email : '',
+    photoURL: auth.user ? auth.user.picture.replace(/['"]+/g, '') : '',
   };
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
   };
+
+  const handleLogout = () => {
+    auth.logout();
+  }
 
   const handleClose = () => {
     setOpen(null);
@@ -85,7 +94,7 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
           Logout
         </MenuItem>
       </Popover>

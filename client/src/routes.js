@@ -12,6 +12,7 @@ import Page404 from './pages/Page404';
 import DashboardAppPage from './pages/DashboardAppPage';
 import DataSourcesPage from './pages/DataSourcesPage';
 import ViewsPage from './pages/ViewsPage';
+import { AuthContextProvider } from './components/context/AuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -23,7 +24,10 @@ export default function Router() {
     },
     {
       path: '/dashboard',
-      element: <DashboardLayout />,
+      element: 
+      <AuthContextProvider>
+        <DashboardLayout />
+      </AuthContextProvider>,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
@@ -48,6 +52,11 @@ export default function Router() {
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
+      path: '/',
+      element: 
+      <AuthContextProvider>
+        <LoginPage />
+      </AuthContextProvider>,
     },
     {
       path: '*',

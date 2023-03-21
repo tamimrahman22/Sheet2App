@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { Box, Drawer, Typography, Button, Modal, TextField } from '@mui/material';
@@ -14,6 +14,7 @@ import NavSection from '../../../components/nav-section';
 import navConfig from './config';
 import axios from 'axios';
 
+import AuthContext from '../../../components/context/AuthContext';
 // ----------------------------------------------------------------------
 
 const NAV_WIDTH = 280;
@@ -27,6 +28,9 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const auth = useContext(AuthContext)
+
+  console.log('[NAV] User is: ', auth.user)
 
   const isDesktop = useResponsive('up', 'lg');
   const [open, setOpen] = useState(false);
@@ -44,7 +48,11 @@ export default function Nav({ openNav, onCloseNav }) {
     p: 4,
   };
 
-
+  const account = {
+    displayName: auth.user ? auth.user.given_name + ' ' + auth.user.family_name : '',
+    email: auth.user ? auth.user.email : '',
+    photoURL: auth.user ? auth.user.picture.replace(/['"]+/g, '') : '',
+  };
 
   useEffect(() => {
     if (openNav) {
