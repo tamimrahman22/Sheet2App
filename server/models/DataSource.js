@@ -32,8 +32,8 @@ const dataSourceSchema = new mongoose.Schema({
 				required: true,
 			},
 			reference: {
-				type: mongoose.Schema.Types.Mixed,
-				ref: 'Table',
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'DataSource',
 			},
 			type: {
 				type: String,

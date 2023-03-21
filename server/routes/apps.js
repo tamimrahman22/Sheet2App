@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const appModel = require('../models/Apps');
+const dataSourceModel = require('../models/Datasource');
 const { google } = require("googleapis");
 // const keys = require("../keys.json");
 
@@ -61,11 +62,84 @@ router.post('/create', async(req, res) => {
 			roles: roles
 		});
         console.log(newApp);
-		res.status(201).json({ message: `${name} app created` });
+		// res.status(201).json({ message: `${name} app created` });
+		res.send(newApp);
     }
     catch (error) {
 		console.error('Error: ', error);
 		res.status(400).json({ message: `Error in app creation for app ${name}` });
+	}
+});
+
+router.post('/addDataSource', async (req, res) => {
+	const { appId, url, sheetIndex, keys } = req.body;
+
+	// get all column names
+	const authClientObject = await auth.getClient();
+	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+
+	try {
+		const regex = /\/d\/(.*?)\/edit/;
+		const match = url.match(regex);
+		const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+		const response = await googleSheetsInstance.spreadsheets.get({
+			spreadsheetId,
+			auth,
+		});
+		for(let i = 0; i < response.data.sheets.length; i++){
+			if(response.data.sheets[i].properties.index == sheetIndex){
+				let columns = [];
+				let name = response.data.sheets[i].properties.title;
+				
+				// get column names
+				const readColumns = await googleSheetsInstance.spreadsheets.values.get({
+					auth, //auth object
+					spreadsheetId, // spreadsheet id
+					range: `${name}!1:1`, //range of cells to read from.
+				})
+
+				// get type for each column
+				const readData = await googleSheetsInstance.spreadsheets.values.get({
+					auth, //auth object
+					spreadsheetId, // spreadsheet id
+					range: `${name}!2:2`, //range of cells to read from.
+					valueRenderOption: 'UNFORMATTED_VALUE',
+    				dateTimeRenderOption: 'SERIAL_NUMBER'
+				})
+				const newDataSource = await dataSourceModel.create({
+					name: name,
+					url: url,
+					sheetIndex: sheetIndex,
+					keys: keys,
+					// columns: columns
+				});
+				let columnNames = readColumns.data.values[0];
+				let columnFirstValues = readData.data.values[0];
+
+				let referenceId = newDataSource.id;
+				for(let j = 0; j < columnNames.length; j++){
+					columns.push({
+						name: columnNames[j],
+						label: false,
+						reference: referenceId,
+						type: typeof columnFirstValues[j]
+					})
+				}
+				
+				const updatedUser = await dataSourceModel.findOneAndUpdate(
+					{ _id: referenceId },
+					{"columns": columns},
+				);
+				console.log(updatedUser);
+			}
+		}
+		console.log(response.data.sheets);
+		res.send(response)
+		
+	}
+	catch (error){
+		console.error('Error: ', error);
+		res.status(400).json({ message: `Error in reading membership sheet information for app ${name}` });
 	}
 });
 
