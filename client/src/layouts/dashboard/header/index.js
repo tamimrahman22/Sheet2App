@@ -8,7 +8,6 @@ import { bgBlur } from '../../../utils/cssStyles';
 import MenuIcon from '@mui/icons-material/Menu';
 //
 import AccountPopover from './AccountPopover';
-
 // ----------------------------------------------------------------------
 
 const NAV_WIDTH = 280;

@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 // import Page404 from './pages/Page404';
 // import ProductsPage from './pages/ProductsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
+import { AuthContextProvider } from './components/context/AuthContext';
 
 // ----------------------------------------------------------------------
 
@@ -16,7 +17,10 @@ export default function Router() {
   const routes = useRoutes([
     {
       path: '/dashboard',
-      element: <DashboardLayout />,
+      element: 
+      <AuthContextProvider>
+        <DashboardLayout />
+      </AuthContextProvider>,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
@@ -27,7 +31,10 @@ export default function Router() {
     },
     {
       path: '/',
-      element: <LoginPage />,
+      element: 
+      <AuthContextProvider>
+        <LoginPage />
+      </AuthContextProvider>,
     },
     // {
     //   element: <SimpleLayout />,
