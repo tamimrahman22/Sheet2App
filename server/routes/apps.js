@@ -95,6 +95,20 @@ router.get('/list', async(req, res) => {
 	}
 });
 
+router.post('/get', async(req, res) => {
+	// get application
+	const { appId } = req.body;
+	try {
+		const currentApp = await appModel.find({ _id: appId });
+		console.log(currentApp);
+		res.send(currentApp);
+	}
+	catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in getting apps` });
+	}
+});
+
 router.post('/published-end-user', async(req, res) => {
 	// list all published applications where current user is end user
 	// need user
