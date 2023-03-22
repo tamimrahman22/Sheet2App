@@ -34,6 +34,10 @@ export default function Nav({ openNav, onCloseNav }) {
 
   const isDesktop = useResponsive('up', 'lg');
   const [open, setOpen] = useState(false);
+
+  const [appName, setAppName] = useState('');
+  const [roleSheet, setRoleSheet] = useState ('');
+
   const handleClose = () => setOpen(false);
 
   const style = {
@@ -70,16 +74,21 @@ export default function Nav({ openNav, onCloseNav }) {
     setOpen(true);
   }
 
-  async function handleCreateApp() {
+  async function handleCreateApp(event) {
     axios.defaults.withCredentials = true;
     const api = axios.create({
       baseURL: 'http://localhost:4000/app',
     });
     let payload = {
-      name: "appname",
-      creator: "jonathan",
-      roleMembershipSheet: "https://docs.google.com/spreadsheets/d/1K1RoF5WRKtu_UDOVMTAMlr_tfCGv0rTi3qQBIwRCvrY/edit#gid=0",
+      // Get the name of the app
+      name: appName,
+      // Using who is logged in, use the email of the user as the creator of this application 
+      creator: auth.user.email,
+      // This is the URL to that is going to be used to define the roles of the sheet. 
+      roleMembershipSheet: roleSheet,
     };
+    //console.log(payload)
+    // Send the request with the payload and wait for a response back. 
     const response = await api.post('/create', payload);
     console.log(response);
     setOpen(false);
@@ -155,10 +164,10 @@ export default function Nav({ openNav, onCloseNav }) {
             </Typography>
           </Box>
           <Box paddingTop={1}>
-            <TextField id="standard-basic" label="App Name" variant="standard"/>
+            <TextField id="standard-basic" label="App Name" variant="standard" onChange={(e) => setAppName(e.target.value)}/>
           </Box>
           <Box paddingTop={2}>
-            <TextField id="standard-basic" label="Roles Sheet" variant="standard" />
+            <TextField id="standard-basic" label="Roles Sheet" variant="standard" onChange={(e) => setRoleSheet(e.target.value)}/>
           </Box>
           <Box paddingTop={5}>
             <Button variant="contained" onClick={handleCreateApp}>Create</Button>
