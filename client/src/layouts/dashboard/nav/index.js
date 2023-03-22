@@ -75,6 +75,7 @@ export default function Nav({ openNav, onCloseNav }) {
   }
 
   async function handleCreateApp(event) {
+    setOpen(false);
     axios.defaults.withCredentials = true;
     const api = axios.create({
       baseURL: 'http://localhost:4000/app',

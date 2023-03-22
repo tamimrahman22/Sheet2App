@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
 // @mui
 // import { useTheme } from '@mui/material/styles';
@@ -56,6 +57,7 @@ export default function DashboardAppPage() {
                 list.map((app) => (
                   <Box component="span" sx={{ p: 2 }} >
                     <Card>
+                    <Link to="/editor" component={RouterLink} sx={{ display: 'contents' }}>
                     <CardContent>
                     <Stack direction="row" alignItems="center" spacing={2} key={app._id}>
                       {/* <Box component="img" alt={title} src={image} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} /> */}
@@ -76,6 +78,7 @@ export default function DashboardAppPage() {
                       
                     </Stack>
                     </CardContent>
+                    </Link>
                     </Card>
                   </Box>
                 ))
