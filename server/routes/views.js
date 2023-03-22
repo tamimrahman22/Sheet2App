@@ -34,7 +34,16 @@ router.post('/create', async (req, res) => {
             roles: roles
         });
 
-        res.send(currentApp);
+        // add views to the respective application
+        // const currentApp = await appModel.findById( { _id: appId } );
+        let currentViews = currentApp.views;
+        currentViews.push(newViews);
+        const updatedApp = await appModel.findOneAndUpdate(
+            { _id: appId },
+            {views: currentViews},
+        );
+
+        res.send(updatedApp);
     }
     catch(err) {
         console.error('Error: ', err);

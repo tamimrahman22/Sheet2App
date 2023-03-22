@@ -78,5 +78,35 @@ router.get('/list', async(req, res) => {
 	}
 });
 
+router.post('/publish', async(req, res) => {
+	const { appId } = req.body;
+	try {
+		const updatedApp = await appModel.findOneAndUpdate(
+			{ _id: appId },
+			{ published: true },
+		);
+		res.send(updatedApp);
+	}
+	catch (err) {
+		console.error('Error: ', error);
+		res.status(400).json({ message: `Error in publishing app` });
+	}
+});
+
+router.post('/unpublish', async(req, res) => {
+	const { appId } = req.body;
+	try {
+		const updatedApp = await appModel.findOneAndUpdate(
+			{ _id: appId },
+			{ published: false },
+		);
+		res.send(updatedApp);
+	}
+	catch (err) {
+		console.error('Error: ', error);
+		res.status(400).json({ message: `Error in unpublishing app` });
+	}
+});
+
 
 module.exports = router;
