@@ -90,7 +90,32 @@ router.get('/list', async(req, res) => {
 		res.send(list);
 	}
 	catch (err) {
-		console.error('Error: ', error);
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in getting apps` });
+	}
+});
+
+router.post('/published-end-user', async(req, res) => {
+	// list all published applications where current user is end user
+	// need user
+	const { user } = req.body;
+	try {
+		const list = await appModel.find({ published: true });
+		// console.log(list);
+		// res.send(list);
+		let finalList = []
+		for(let i = 0; i < list.length; i++){
+			for(let j = 0; j < list[i].roles.length; j++){
+				if(list[i].roles[j].name == user && list[i].roles[j].role == 'End User'){
+					finalList.push(list[i]);
+				}
+			}
+		}
+		console.log(finalList);
+		res.send(finalList);
+	}
+	catch (err) {
+		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in getting apps` });
 	}
 });
