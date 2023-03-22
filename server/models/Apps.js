@@ -10,28 +10,31 @@ const appSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	// array of dataSource object ids, can be found in dataSource schema
+	// array of dataSource object ids, can be referenced in dataSource collection
 	dataSources: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'DataSource',
 		},
 	],
-	
+	// array of view object ids, can be referenced in views collection
 	views: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'View',
 		},
 	],
+	// url with roles for users for this application
 	roleMembershipSheet: {
 		type: String,
 		required: true,
 	},
+	// if app is published for end-user
 	published: {
 		type: Boolean,
 		default: false,
 	},
+	// roles, developer or end-user, get from roleMembershipSheet
 	roles: [
 		{
 			name: {
