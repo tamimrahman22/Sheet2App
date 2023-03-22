@@ -13,7 +13,10 @@ export function AuthContextProvider({children}) {
 
     // FUNCTION TO LOGOUT THE USER! 
     const logout = function(){
-        setUser(null)
+        // Remove the user's credentials from localStorage
+        localStorage.removeItem('user');
+        // Set the authenticated user in the AuthContext to null
+        setUser(null);
         // NAVIGATE BACK TO THE LOGIN PAGE! 
         navigate('/', { replace: true })
     }

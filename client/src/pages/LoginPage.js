@@ -26,11 +26,13 @@ export default function LoginPage() {
 
   function handleCallBackResponse(response){
     //console.log("TOKEN IS: ", response.credential);
-    var userObjcet = jwt_decode(response.credential);
-    //console.log(userObjcet)
+    var userObject = jwt_decode(response.credential);
+
+    // Store the user credentials in localStorage
+    localStorage.setItem('user', JSON.stringify(userObject));
     
     //Set the Auth Context with the info of the user since they are logged in!
-    setUser(userObjcet);
+    setUser(userObject);
   }
 
   // Dynamically load in the Google Button so we can have the use login with their Google Account 
@@ -40,6 +42,14 @@ export default function LoginPage() {
       client_id: "382110346041-m240qc561dnte39gobhn1f0int19uusr.apps.googleusercontent.com",
       callback: handleCallBackResponse
     });
+
+     // Check for stored user credentials
+     const storedUser = JSON.parse(localStorage.getItem('user'));
+  
+     // Set the authenticated user in the AuthContext if user credentials are found
+     if (storedUser) {
+       setUser(storedUser);
+     }
 
     google.accounts.id.renderButton(
       document.getElementById("signInDiv"),
