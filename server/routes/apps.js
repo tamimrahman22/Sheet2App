@@ -10,6 +10,10 @@ const auth = new google.auth.GoogleAuth({
 	scopes: "https://www.googleapis.com/auth/spreadsheets"
 });
 
+router.get('/test', async(req, res) => {
+	return res.status(200).send("Testing 1 2 3");
+})
+
 // route to create application, broken up into two routes, this one (/app/create) and a datasource route (/datasource/add)
 // first route is used to create application and add roles, second route is used to add datasource tables
 router.post('/create', async(req, res) => {
@@ -45,7 +49,7 @@ router.post('/create', async(req, res) => {
 	}
 	catch (error){
 		console.error('Error: ', error);
-		res.status(400).json({ message: `Error in reading membership sheet information for app ${name}` });
+		return res.status(400).json({ message: `Error in reading membership sheet information for app ${name}` });
 	}
 	
 	console.log(req.body);
@@ -91,7 +95,7 @@ router.get('/list', async(req, res) => {
 	}
 	catch (err) {
 		console.error('Error: ', err);
-		res.status(400).json({ message: `Error in getting apps` });
+		res.status(400).json({ message: `Error in getting app` });
 	}
 });
 
@@ -105,7 +109,7 @@ router.post('/get', async(req, res) => {
 	}
 	catch (err) {
 		console.error('Error: ', err);
-		res.status(400).json({ message: `Error in getting apps` });
+		res.status(400).json({ message: `Error in getting app` });
 	}
 });
 
@@ -141,11 +145,12 @@ router.post('/publish', async(req, res) => {
 		const updatedApp = await appModel.findOneAndUpdate(
 			{ _id: appId },
 			{ published: true },
+			{ new: true },
 		);
 		res.send(updatedApp);
 	}
 	catch (err) {
-		console.error('Error: ', error);
+		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in publishing app` });
 	}
 });
@@ -157,11 +162,12 @@ router.post('/unpublish', async(req, res) => {
 		const updatedApp = await appModel.findOneAndUpdate(
 			{ _id: appId },
 			{ published: false },
+			{ new: true },
 		);
 		res.send(updatedApp);
 	}
 	catch (err) {
-		console.error('Error: ', error);
+		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in unpublishing app` });
 	}
 });
