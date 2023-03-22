@@ -49,13 +49,14 @@ export function GlobalContextProvider({children}){
                 // This is the URL to that is going to be used to define the roles of the app. 
                 roleMembershipSheet: roleSheet,
             };
-            console.log(payload)
+            console.log('[STORE] Creating application... sending: ',payload)
             // Send the request with the payload and wait for a response back. 
             const response = await api.post('/create', payload);
-            loadAppList();
+            console.log('[STORE] Created application...', response)
+            // After application has been created, reload the app list. 
+            navigate('/dashboard', { replace: true })
         }
         createApplication(appName, userEmail, roleSheet)
-        // After application has been created, reload the app list. 
     }
 
     return(

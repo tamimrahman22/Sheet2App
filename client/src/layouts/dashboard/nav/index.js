@@ -77,7 +77,8 @@ export default function Nav({ openNav, onCloseNav }) {
     setOpen(true);
   }
 
-  async function handleCreateApp() {
+  async function handleCreateApp(event) {
+    event.stopPropagation()
     setOpen(false);
     store.createApp(appName, auth.user.email, roleSheet);
   }
