@@ -89,15 +89,15 @@ router.post('/add', async (req, res) => {
 				);
 
 				console.log(currentApp);
+				res.send(updatedDataSource)
 			}
 		}
 		console.log(response.data.sheets);
-		res.send(response)
 		
 	}
 	catch (error){
 		console.error('Error: ', error);
-		res.status(400).json({ message: `Error in reading membership sheet information for app ${name}` });
+		res.status(400).json({ message: `Error in adding data source for app ${appId}` });
 	}
 });
 
