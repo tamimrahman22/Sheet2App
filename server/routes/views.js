@@ -10,6 +10,7 @@ router.post('/create', async (req, res) => {
     // get name, table, columns, and roles from appId, 
     const { appId, tableId, viewType } = req.body;
     try{
+        // get necessary information for views
         const currentApp = await appModel.findById( { _id: appId } );
         const table = await dataSourceModel.findById( { _id: tableId });
         console.log(currentApp);
@@ -19,12 +20,15 @@ router.post('/create', async (req, res) => {
         const allowedActions = [];
         const roles = currentApp.roles;
 
+        // add the proper allowed actions based on the viewType
         if(viewType == 'Table'){
             allowedActions.push('addRecord');
         }
         else{
             allowedActions.push('editRecord');
         }
+
+        // create a view
         const newViews = await viewsModel.create({
             name: name,
             table: tableId,
@@ -35,7 +39,6 @@ router.post('/create', async (req, res) => {
         });
 
         // add views to the respective application
-        // const currentApp = await appModel.findById( { _id: appId } );
         let currentViews = currentApp.views;
         currentViews.push(newViews);
         const updatedApp = await appModel.findOneAndUpdate(
@@ -53,6 +56,7 @@ router.post('/create', async (req, res) => {
 });
 
 router.get('/list', async(req, res) => {
+    // get list of all views
 	try {
 		const list = await viewsModel.find({ });
 		console.log(list);

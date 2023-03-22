@@ -10,14 +10,16 @@ const auth = new google.auth.GoogleAuth({
 	scopes: "https://www.googleapis.com/auth/spreadsheets"
 });
 
+// add data sources to application that was created, need id of application (created by mongo when app is created), url to sheet, 
+// sheet index (which sheet is being looked at), and keys
 router.post('/add', async (req, res) => {
 	const { appId, url, sheetIndex, keys } = req.body;
 
-	// get all column names
 	const authClientObject = await auth.getClient();
 	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
 
 	try {
+		// get spreadsheet Id of dataSource
 		const regex = /\/d\/(.*?)\/edit/;
 		const match = url.match(regex);
 		const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
@@ -26,11 +28,13 @@ router.post('/add', async (req, res) => {
 			auth,
 		});
 		for(let i = 0; i < response.data.sheets.length; i++){
+			// parse through sheets, find spreadsheet that is the same index and get the name of that sheet
 			if(response.data.sheets[i].properties.index == sheetIndex){
 				let columns = [];
+				// name of sheet in spreadsheet
 				let name = response.data.sheets[i].properties.title;
 				
-				// get column names
+				// get column names in sheet
 				const readColumns = await googleSheetsInstance.spreadsheets.values.get({
 					auth, //auth object
 					spreadsheetId, // spreadsheet id
@@ -45,6 +49,7 @@ router.post('/add', async (req, res) => {
 					valueRenderOption: 'UNFORMATTED_VALUE',
     				dateTimeRenderOption: 'SERIAL_NUMBER'
 				})
+				// create dataSource, need to add columns next
 				const newDataSource = await dataSourceModel.create({
 					name: name,
 					url: url,
@@ -52,6 +57,8 @@ router.post('/add', async (req, res) => {
 					keys: keys,
 					// columns: columns
 				});
+
+				// get column names, and look at first value in order to get the type of the values in the column
 				let columnNames = readColumns.data.values[0];
 				let columnFirstValues = readData.data.values[0];
 
