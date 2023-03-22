@@ -13,6 +13,7 @@ import DashboardAppPage from './pages/DashboardAppPage';
 import DataSourcesPage from './pages/DataSourcesPage';
 import ViewsPage from './pages/ViewsPage';
 import { AuthContextProvider } from './components/context/AuthContext';
+import { GlobalContextProvider } from './components/context/GlobalContext';
 
 // ----------------------------------------------------------------------
 
@@ -26,7 +27,9 @@ export default function Router() {
       path: '/dashboard',
       element: 
       <AuthContextProvider>
-        <DashboardLayout />
+        <GlobalContextProvider>
+          <DashboardLayout />
+        </GlobalContextProvider>
       </AuthContextProvider>,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },

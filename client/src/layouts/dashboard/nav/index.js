@@ -15,6 +15,7 @@ import navConfig from './config';
 import axios from 'axios';
 
 import AuthContext from '../../../components/context/AuthContext';
+import GlobalContext from '../../../components/context/GlobalContext';
 // ----------------------------------------------------------------------
 
 const NAV_WIDTH = 280;
@@ -29,8 +30,10 @@ Nav.propTypes = {
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
   const auth = useContext(AuthContext)
+  const store = useContext(GlobalContext)
 
   console.log('[NAV] User is: ', auth.user)
+  console.log('[NAV] Store is: ', store)
 
   const isDesktop = useResponsive('up', 'lg');
   const [open, setOpen] = useState(false);
@@ -74,25 +77,9 @@ export default function Nav({ openNav, onCloseNav }) {
     setOpen(true);
   }
 
-  async function handleCreateApp(event) {
+  async function handleCreateApp() {
     setOpen(false);
-    axios.defaults.withCredentials = true;
-    const api = axios.create({
-      baseURL: 'http://localhost:4000/app',
-    });
-    let payload = {
-      // Get the name of the app
-      name: appName,
-      // Using who is logged in, use the email of the user as the creator of this application 
-      creator: auth.user.email,
-      // This is the URL to that is going to be used to define the roles of the sheet. 
-      roleMembershipSheet: roleSheet,
-    };
-    //console.log(payload)
-    // Send the request with the payload and wait for a response back. 
-    const response = await api.post('/create', payload);
-    console.log(response);
-    setOpen(false);
+    store.createApp(appName, auth.user.email, roleSheet);
   }
 
   const renderContent = (

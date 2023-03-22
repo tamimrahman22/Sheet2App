@@ -1,10 +1,11 @@
 import { Helmet } from 'react-helmet-async';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
 // @mui
 // import { useTheme } from '@mui/material/styles';
 import { Container, Typography, List, Stack, Box, Link, Card, CardContent} from '@mui/material';
+import GlobalContext from '../components/context/GlobalContext';
 // components
 // import Iconify from '../components/iconify';
 // sections
@@ -24,23 +25,13 @@ import { Container, Typography, List, Stack, Box, Link, Card, CardContent} from 
 
 export default function DashboardAppPage() {
   // const theme = useTheme();
-  const [ list, setList ] = useState([]);
+  const store = useContext(GlobalContext);
+
+  console.log('[DASHBOARD APP PAGE] Store is: ', store);
 
   useEffect(() => {
-    async function getLists() {
-      axios.defaults.withCredentials = true;
-      const api = axios.create({
-        baseURL: 'http://localhost:4000/app',
-      });
-
-      const response = await api.get("/list");
-      console.log(response);
-      console.log(response.data);
-      setList(response.data);
-    }
-    getLists();
-    console.log(list);
-  }, [list]);
+    store.loadAppList();
+  }, []);
 
   return (
     <>
@@ -54,7 +45,7 @@ export default function DashboardAppPage() {
         </Typography>
         <List sx={{ width: '100%' }}>
             {
-                list.map((app) => (
+                store.appList.map((app) => (
                   <Box component="span" sx={{ p: 2 }} >
                     <Card>
                     <Link to="/editor" component={RouterLink} sx={{ display: 'contents' }}>
