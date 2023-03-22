@@ -3,12 +3,13 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 // import Copyright from './Copyright'
-// import AuthContext from '../auth'
-// import GlobalStoreContext from '../store'
+import AuthContext from '../components/context/AuthContext';
+import GlobalContext from '../components/context/GlobalContext';
+import { useContext } from 'react';
 
 export default function WelcomeScreen() {
-    // const { auth } = useContext(AuthContext);
-    // const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
+    const { store } = useContext(GlobalContext);
 
     return (
         <div id="welcome-screen">

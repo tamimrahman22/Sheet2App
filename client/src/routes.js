@@ -21,7 +21,10 @@ export default function Router() {
   const routes = useRoutes([
     {
       path: '/',
-      element: <LoginPage />,
+      element: 
+      <AuthContextProvider>
+        <LoginPage />
+      </AuthContextProvider>,
     },
     {
       path: '/dashboard',
@@ -41,7 +44,12 @@ export default function Router() {
     },
     {
       path: '/editor',
-      element: <EditorLayout />,
+      element: 
+      <AuthContextProvider>
+        <GlobalContextProvider>
+          <EditorLayout />
+        </GlobalContextProvider>
+      </AuthContextProvider>,
       children: [
         { element: <Navigate to="/editor/data" />, index: true },
         { path: 'data', element: <DataSourcesPage />},
