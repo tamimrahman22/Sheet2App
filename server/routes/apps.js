@@ -68,6 +68,20 @@ router.post('/create', async(req, res) => {
 	}
 });
 
+router.post('/delete', async(req, res) => {
+	const { appId } = req.body;
+	try{
+		const result = await appModel.deleteOne({ _id: appId });
+		console.log('Record deleted successfully');
+		console.log(result);
+		res.send(result);
+	}
+	catch (error) {
+		console.error('Error: ', error);
+		res.status(400).json({ message: `Error in app deletion for app ${appId}` });
+	}	
+});
+
 router.get('/list', async(req, res) => {
 	// list all applications
 	try {
