@@ -86,16 +86,31 @@ router.post('/delete', async(req, res) => {
 	}	
 });
 
-router.get('/list', async(req, res) => {
+router.post('/list', async(req, res) => {
 	// list all applications
+	const { user } = req.body;
 	try {
 		const list = await appModel.find({ });
-		console.log(list);
-		res.send(list);
+		let finalList = [];
+		for(let i = 0; i < list.length; i++){
+			if(list[i].creator == user){
+				finalList.push(list[i]);
+			}
+			else{
+				for(let j = 0; j < list[i].roles.length; j++){
+					if(list[i].roles[j].name == user && list[i].roles[j].role == 'Developer'){
+						finalList.push(list[i]);
+					}
+				}
+			}
+		}
+
+		console.log(finalList);
+		res.send(finalList);
 	}
 	catch (err) {
 		console.error('Error: ', err);
-		res.status(400).json({ message: `Error in getting app` });
+		res.status(400).json({ message: `Error in getting list of apps based on logged in user` });
 	}
 });
 
