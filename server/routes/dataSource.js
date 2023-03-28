@@ -102,12 +102,11 @@ router.post('/add', async (req, res) => {
 });
 
 router.post('/getColumn', async (req, res) => {
-	const { url, sheetIndex } = req.body;
+	const { url, name } = req.body;
 	// const name = "Sheet1";
 
 	const authClientObject = await auth.getClient();
 	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
-	
 
 	try {
 		// get spreadsheet Id of dataSource
@@ -119,38 +118,26 @@ router.post('/getColumn', async (req, res) => {
 			spreadsheetId,
 			auth,
 		});
-		let check = false;
 
-		for(let i = 0; i < response.data.sheets.length; i++){
-			// parse through sheets, find spreadsheet that is the same index and get the name of that sheet
-			if(response.data.sheets[i].properties.index == sheetIndex){
-				let name = response.data.sheets[i].properties.title;
+		const readData = await googleSheetsInstance.spreadsheets.values.get({
+			auth, //auth object
+			spreadsheetId, // spreadsheet id
+			range: `${name}`, //range of cells to read from.
+		})
 
-				const readData = await googleSheetsInstance.spreadsheets.values.get({
-					auth, //auth object
-					spreadsheetId, // spreadsheet id
-					range: `${name}`, //range of cells to read from.
-				})
-		
-				// get each column and put into array
-				let finalList = [];
-				for(let i = 0; i < readData.data.values[0].length; i++){
-					let tempList = [];
-					for(let j = 0; j < readData.data.values.length; j++){
-						tempList.push(readData.data.values[j][i]);
-					}
-					finalList.push(tempList);
-				}
-		
-				// console.log(readData.data.values);
-				console.log(finalList);
-				res.send(finalList);
-				check = true;
+		// get each column and put into array
+		let finalList = [];
+		for(let i = 0; i < readData.data.values[0].length; i++){
+			let tempList = [];
+			for(let j = 0; j < readData.data.values.length; j++){
+				tempList.push(readData.data.values[j][i]);
 			}
+			finalList.push(tempList);
 		}
-		if(check == false){
-			res.status(400).json({ message: `Sheet not found, for sheet index ${sheetIndex}` });
-		}
+
+		// console.log(readData.data.values);
+		console.log(finalList);
+		res.send(finalList);
 	}
 	catch (error){
 		console.error('Error: ', error);
