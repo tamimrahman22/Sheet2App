@@ -156,9 +156,15 @@ router.post('/publish', async(req, res) => {
 	// publish an application
 	const { appId } = req.body;
 	try {
+		let newPublished = true;
+		const currentApp = await appModel.findById( { _id: appId } );
+		console.log(currentApp.published);
+		if (currentApp.published == true){
+			newPublished = false;
+		}
 		const updatedApp = await appModel.findOneAndUpdate(
 			{ _id: appId },
-			{ published: true },
+			{ published: newPublished },
 			{ new: true },
 		);
 		res.send(updatedApp);
@@ -166,23 +172,6 @@ router.post('/publish', async(req, res) => {
 	catch (err) {
 		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in publishing app` });
-	}
-});
-
-router.post('/unpublish', async(req, res) => {
-	// unpublish an application, not available to end user
-	const { appId } = req.body;
-	try {
-		const updatedApp = await appModel.findOneAndUpdate(
-			{ _id: appId },
-			{ published: false },
-			{ new: true },
-		);
-		res.send(updatedApp);
-	}
-	catch (err) {
-		console.error('Error: ', err);
-		res.status(400).json({ message: `Error in unpublishing app` });
 	}
 });
 
