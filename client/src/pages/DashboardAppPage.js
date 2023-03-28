@@ -34,8 +34,7 @@ export default function DashboardAppPage() {
                   <Box component="span" sx={{ p: 2 }} key={app._id}>
                     <Card>
                       <Link sx={{ display: 'contents' }} onClick={() => {
-                        console.log("TESTING");
-                        store.setCurrentApp(app._id);
+                        store.setCurrentAppById(app._id);
                         navigate("/editor");
                       }}>
                         <CardContent>

@@ -5,9 +5,11 @@ const api = axios.create({
 });
 
 // app
-export const getAppList = () => api.get("app/list");
+export const getAppList = (payload) => api.post("app/list", payload);
 export const createApp = (payload) => api.post("app/create", payload);
 export const getAppById = (id) => api.get(`/app/get/${id}`);
+export const renameApp = (payload) => api.post("/app/rename", payload);
+export const publishApp = (payload) => api.post("/app/publish", payload);
 
 // data source
 
@@ -17,6 +19,8 @@ const apis = {
     getAppList,
     createApp,
     getAppById,
+    renameApp,
+    publishApp,
 };
 
 export default apis;

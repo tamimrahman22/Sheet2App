@@ -156,12 +156,10 @@ router.post('/publish', async(req, res) => {
 	// publish an application
 	const { appId } = req.body;
 	try {
-		let newPublished = true;
+		
 		const currentApp = await appModel.findById( { _id: appId } );
 		console.log(currentApp.published);
-		if (currentApp.published == true){
-			newPublished = false;
-		}
+		let newPublished = !currentApp.published;
 		const updatedApp = await appModel.findOneAndUpdate(
 			{ _id: appId },
 			{ published: newPublished },
@@ -175,5 +173,21 @@ router.post('/publish', async(req, res) => {
 	}
 });
 
+router.post("/rename", async(req, res) => {
+	// update the name of an application
+	const {appId, newName} = req.body;
+	try {
+		const updatedApp = await appModel.findOneAndUpdate(
+			{ _id: appId },
+			{ name: newName },
+			{ new: true },
+		);
+		res.send(updatedApp);
+	}
+	catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in renaming app` });
+	}
+})
 
 module.exports = router;

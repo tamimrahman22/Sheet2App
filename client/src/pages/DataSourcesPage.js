@@ -8,9 +8,10 @@ import GlobalContext from '../components/context/GlobalContext';
 import { useContext } from 'react';
 
 export default function WelcomeScreen() {
-    const { auth } = useContext(AuthContext);
+    const auth = useContext(AuthContext);
     const store = useContext(GlobalContext);
-    console.log(store.currentAppID);
+    console.log(auth.user);
+    console.log(store.currentApp);
 
     return (
         <div id="welcome-screen">

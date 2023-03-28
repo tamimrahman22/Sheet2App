@@ -1,4 +1,5 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
+import AuthContext from "../context/AuthContext";
 import { useNavigate } from 'react-router-dom';
 import api from '../../api'
 
@@ -6,26 +7,31 @@ const GlobalContext = createContext();
 console.log('Creating store context...')
 
 export function GlobalContextProvider({children}){
-
+    const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
     // GLOBAL STATE OF THE APPLICATION 
     const [appList, setAppList] = useState([]); 
-    const [currentAppID, setCurrentAppID] = useState(null);
+    const [currentApp, setCurrentApp] = useState(null);
 
     // Functions to be used to manipulate the global state of our application 
 
     // This function will load the lists of the current user.   
     const loadAppList = function(){
         async function getLists() {    
-            const response = await api.getAppList();
+            let payload = {
+                user: auth.user.email,
+            }
+            const response = await api.getAppList(payload);
             console.log('[STORE] Response: ', response);
             console.log('[STORE] Data: ',  response.data);
             // Set the app list with the new lists that were found! 
             setAppList(response.data);
+            setCurrentApp(null);
             // // Push the dashboard to show the new app being made! 
             // navigate('/dashboard', { replace: true })
           }
+          console.log()
         getLists();
     }
 
@@ -50,27 +56,57 @@ export function GlobalContextProvider({children}){
         createApplication(appName, userEmail, roleSheet)
     }
 
-    // THE API CALL IS LOWKEY UNNECESSARY
-    const setCurrentApp = function(id) {
+    const setCurrentAppById = function(id) {
         async function setAppId(id) { 
             const response = await api.getAppById(id);
             console.log('[STORE] Getting application...', response);
             if (response.status === 200) {
-                setCurrentAppID(id);
+                setCurrentApp(response.data[0]);
             }
         }
         setAppId(id);
+    }
+
+    const renameApp = function(name) {
+        async function renameApplication(name) {
+            let payload = {
+                appId: currentApp._id,
+                newName: name,
+            }
+            const response = await api.renameApp(payload);
+            console.log('[STORE] Renaming application...', response);
+            if (response.status === 200) {
+                setCurrentApp(response.data);
+            }
+        }
+        renameApplication(name);
+    }
+
+    const publishApp = function() {
+        async function publishApplication() {
+            let payload = {
+                appId: currentApp._id
+            }
+            const response = await api.publishApp(payload);
+            console.log('[STORE] (Un)publishing application...', response);
+            if (response.status === 200) {
+                setCurrentApp(response.data);
+            }
+        }
+        publishApplication()
     }
 
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
     const funcs = {
         appList, 
         setAppList, 
-        currentAppID, 
-        setCurrentAppID, 
+        currentApp, 
+        setCurrentApp, 
         loadAppList, 
         createApp,
-        setCurrentApp,
+        setCurrentAppById,
+        renameApp,
+        publishApp,
     }
 
     return(
