@@ -114,11 +114,10 @@ router.post('/list', async(req, res) => {
 	}
 });
 
-router.post('/get', async(req, res) => {
+router.get('/get/:id', async(req, res) => {
 	// get application
-	const { appId } = req.body;
 	try {
-		const currentApp = await appModel.find({ _id: appId });
+		const currentApp = await appModel.find(req.query);
 		console.log(currentApp);
 		res.send(currentApp);
 	}

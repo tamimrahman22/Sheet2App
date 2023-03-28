@@ -2,7 +2,6 @@ import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import EditorLayout from "./layouts/editor";
-import SimpleLayout from './layouts/simple';
 //
 // import BlogPage from './pages/BlogPage';
 // import UserPage from './pages/UserPage';
@@ -12,6 +11,7 @@ import Page404 from './pages/Page404';
 import DashboardAppPage from './pages/DashboardAppPage';
 import DataSourcesPage from './pages/DataSourcesPage';
 import ViewsPage from './pages/ViewsPage';
+import SettingsPage from './pages/SettingsPage';
 import { AuthContextProvider } from './components/context/AuthContext';
 import { GlobalContextProvider } from './components/context/GlobalContext';
 
@@ -53,21 +53,20 @@ export default function Router() {
       children: [
         { element: <Navigate to="/editor/data" />, index: true },
         { path: 'data', element: <DataSourcesPage />},
-        { path: 'views', element: <ViewsPage />}
+        { path: 'views', element: <ViewsPage />},
+        { path: 'settings', element: <SettingsPage />}
       ],
     },
     {
-      element: <SimpleLayout />,
+      element: 
+      <AuthContextProvider>
+        <LoginPage />
+      </AuthContextProvider>,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
-      path: '/',
-      element: 
-      <AuthContextProvider>
-        <LoginPage />
-      </AuthContextProvider>,
     },
     {
       path: '*',

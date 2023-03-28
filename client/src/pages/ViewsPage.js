@@ -6,7 +6,7 @@ import { Typography } from '@mui/material';
 // import AuthContext from '../auth'
 // import GlobalStoreContext from '../store'
 
-export default function WelcomeScreen() {
+export default function ViewsPage() {
     // const { auth } = useContext(AuthContext);
     // const { store } = useContext(GlobalStoreContext);
 

@@ -1,19 +1,25 @@
 // component
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 // ----------------------------------------------------------------------
 
 const navConfig = [
   {
-    title: 'data sources',
+    title: 'Data Sources',
     path: '/editor/data',
     icon: <TableRowsIcon/>,
   },
   {
-    title: 'views',
+    title: 'Views',
     path: '/editor/views',
     icon: <ViewCarouselIcon/>
+  },
+  {
+    title: 'App Settings',
+    path: '/editor/settings',
+    icon: <SettingsIcon/>
   }
 ];
 

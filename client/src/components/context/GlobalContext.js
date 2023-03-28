@@ -1,6 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../api'
 
 const GlobalContext = createContext();
 console.log('Creating store context...')
@@ -17,13 +17,8 @@ export function GlobalContextProvider({children}){
 
     // This function will load the lists of the current user.   
     const loadAppList = function(){
-        async function getLists() {
-            axios.defaults.withCredentials = true;
-            const api = axios.create({
-              baseURL: 'http://localhost:4000/app',
-            });
-      
-            const response = await api.get("/list");
+        async function getLists() {    
+            const response = await api.getAppList();
             console.log('[STORE] Response: ', response);
             console.log('[STORE] Data: ',  response.data);
             // Set the app list with the new lists that were found! 
@@ -37,10 +32,6 @@ export function GlobalContextProvider({children}){
     // This function is for creating an application to S2A for the user. 
     const createApp = function(appName, userEmail, roleSheet){
         async function createApplication (appName, userEmail, roleSheet){
-            axios.defaults.withCredentials = true;
-            const api = axios.create({
-              baseURL: 'http://localhost:4000/app',
-            });
             let payload = {
                 // Get the name of the app
                 name: appName,
@@ -51,7 +42,7 @@ export function GlobalContextProvider({children}){
             };
             console.log('[STORE] Creating application... sending: ',payload)
             // Send the request with the payload and wait for a response back. 
-            const response = await api.post('/create', payload);
+            const response = await api.createApp(payload);
             console.log('[STORE] Created application...', response)
             // After application has been created, reload the app list. 
             navigate('/dashboard', { replace: true })
@@ -59,8 +50,31 @@ export function GlobalContextProvider({children}){
         createApplication(appName, userEmail, roleSheet)
     }
 
+    // THE API CALL IS LOWKEY UNNECESSARY
+    const setCurrentApp = function(id) {
+        async function setAppId(id) { 
+            const response = await api.getAppById(id);
+            console.log('[STORE] Getting application...', response);
+            if (response.status === 200) {
+                setCurrentAppID(id);
+            }
+        }
+        setAppId(id);
+    }
+
+    // IF THIS GETS BIG WE MIGHT NEED A REDUCER
+    const funcs = {
+        appList, 
+        setAppList, 
+        currentAppID, 
+        setCurrentAppID, 
+        loadAppList, 
+        createApp,
+        setCurrentApp,
+    }
+
     return(
-        <GlobalContext.Provider value={{appList, setAppList, currentAppID, setCurrentAppID, loadAppList, createApp}}>
+        <GlobalContext.Provider value={funcs}>
             {children}
         </GlobalContext.Provider>
     )

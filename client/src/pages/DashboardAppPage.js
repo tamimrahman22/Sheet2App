@@ -1,31 +1,16 @@
 import { Helmet } from 'react-helmet-async';
-import { useContext, useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import axios from 'axios';
+import { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 // @mui
-// import { useTheme } from '@mui/material/styles';
 import { Container, Typography, List, Stack, Box, Link, Card, CardContent} from '@mui/material';
 import GlobalContext from '../components/context/GlobalContext';
-// components
-// import Iconify from '../components/iconify';
-// sections
-// import {
-//   AppTasks,
-//   AppNewsUpdate,
-//   AppOrderTimeline,
-//   AppCurrentVisits,
-//   AppWebsiteVisits,
-//   AppTrafficBySite,
-//   AppWidgetSummary,
-//   AppCurrentSubject,
-//   AppConversionRates,
-// } from '../sections/@dashboard/app';
 
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
   // const theme = useTheme();
   const store = useContext(GlobalContext);
+  const navigate = useNavigate();
 
   console.log('[DASHBOARD APP PAGE] Store is: ', store);
 
@@ -48,7 +33,11 @@ export default function DashboardAppPage() {
                 store.appList.map((app) => (
                   <Box component="span" sx={{ p: 2 }} key={app._id}>
                     <Card>
-                      <Link to="/editor" component={RouterLink} sx={{ display: 'contents' }}>
+                      <Link sx={{ display: 'contents' }} onClick={() => {
+                        console.log("TESTING");
+                        store.setCurrentApp(app._id);
+                        navigate("/editor");
+                      }}>
                         <CardContent>
                           <Stack direction="row" alignItems="center" spacing={2} >
                             {/* <Box component="img" alt={title} src={image} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} /> */}

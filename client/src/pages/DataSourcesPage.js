@@ -9,7 +9,8 @@ import { useContext } from 'react';
 
 export default function WelcomeScreen() {
     const { auth } = useContext(AuthContext);
-    const { store } = useContext(GlobalContext);
+    const store = useContext(GlobalContext);
+    console.log(store.currentAppID);
 
     return (
         <div id="welcome-screen">
