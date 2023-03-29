@@ -61,7 +61,7 @@ export function GlobalContextProvider({children}){
             const response = await api.getAppById(id);
             console.log('[STORE] Getting application...', response);
             if (response.status === 200) {
-                setCurrentApp(response.data[0]);
+                setCurrentApp(response.data);
             }
         }
         setAppId(id);

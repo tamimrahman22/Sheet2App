@@ -116,8 +116,9 @@ router.post('/list', async(req, res) => {
 
 router.get('/get/:id', async(req, res) => {
 	// get application
+	console.log();
 	try {
-		const currentApp = await appModel.find(req.query);
+		const currentApp = await appModel.findById(req.params.id);
 		console.log(currentApp);
 		res.send(currentApp);
 	}
