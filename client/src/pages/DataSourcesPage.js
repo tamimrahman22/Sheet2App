@@ -18,7 +18,7 @@ export default function WelcomeScreen() {
     const [open, setOpen] = useState(false)
     const [spreadsheetURL, setSpreadSheetURL] = useState();
     const [index, setIndex] = useState();
-    const [keys, setKeys] = useState();    
+    const [keys, setKeys] = useState([]);    
 
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp)
@@ -33,6 +33,12 @@ export default function WelcomeScreen() {
 
 
     function handleAddDataSource(event){
+        console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp._id)
+        console.log('[DATA SOURCE] Spreadsheet: ', spreadsheetURL)
+        console.log('[DATA SOURCE] Sheet Index: ', index)
+        console.log('[DATA SOURCE] Keys: ', keys)
+        // Pass this infomration to our store to create the data source! 
+        store.createDataSource(store.currentApp._id, spreadsheetURL, index, keys)
         // Close the modal! 
         setOpen(false)
     }
