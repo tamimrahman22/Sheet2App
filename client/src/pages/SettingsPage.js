@@ -31,13 +31,13 @@ export default function ViewsPage() {
                         <Stack direction="row" alignItems="center" spacing={2} >
                       
                             <Box sx={{ minWidth: 240, flexGrow: 1 }}>
-                              <Typography color="inherit" variant="h4" underline="hover" noWrap>
+                              <Typography color="inherit" variant="h5" underline="hover" noWrap>
                                 App Name: 
                               </Typography>
                               { !edit ? <Typography color="inherit" variant="body1" underline="hover" noWrap> {store.currentApp.name}</Typography> : null }
-                              { edit ? <TextField fullWidth id="app-name" variant="standard" defaultValue={store.currentApp.name}/> : null }
-                      
-                              <Typography variant="h4">
+                              { edit ? <TextField fullWidth id="app-name" variant="filled" defaultValue={store.currentApp.name}/> : null }
+                              <br></br>
+                              <Typography variant="h5">
                                 Role Membership Sheet URL: 
                               </Typography>
                               <Link href={store.currentApp.roleMembershipSheet} target="_blank">{store.currentApp.roleMembershipSheet}</Link>
