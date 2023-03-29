@@ -2,7 +2,7 @@
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Container, Typography } from '@mui/material';
+import { Button, Container, Typography } from '@mui/material';
 // import Copyright from './Copyright'
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
@@ -24,6 +24,7 @@ export default function WelcomeScreen() {
             <Typography variant="h4" >
             Data Sources
             </Typography>
+            <Button variant="contained">Add Data Source</Button>
             
         </Container>
         </>
