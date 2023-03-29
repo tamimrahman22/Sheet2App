@@ -145,4 +145,23 @@ router.post('/getColumn', async (req, res) => {
 	}
 });
 
+router.get('/get/:id', async(req, res) => {
+	// get application
+	console.log();
+	try {
+		const currentApp = await appModel.findById(req.params.id);
+		console.log(currentApp.dataSources);
+		let finalList = [];
+		for(let i = 0; i < currentApp.dataSources.length; i++){
+			finalList.push(await dataSourceModel.findById({ _id: currentApp.dataSources[i] }));
+		}
+		console.log(finalList);
+		res.send(finalList);
+	}
+	catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in getting app` });
+	}
+});
+
 module.exports = router;
