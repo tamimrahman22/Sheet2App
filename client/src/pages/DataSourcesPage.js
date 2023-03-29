@@ -16,6 +16,9 @@ export default function WelcomeScreen() {
 
     //states for the components
     const [open, setOpen] = useState(false)
+    const [spreadsheetURL, setSpreadSheetURL] = useState();
+    const [index, setIndex] = useState();
+    const [keys, setKeys] = useState();    
 
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp)
@@ -41,7 +44,7 @@ export default function WelcomeScreen() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 300,
-        height: 300,
+        height: 330,
         bgcolor: 'background.paper',
         border: '2px solid #000',
         boxShadow: 24,
@@ -78,13 +81,13 @@ export default function WelcomeScreen() {
                     </Typography>
                 </Box>
                 <Box paddingTop={2}>
-                    <TextField id="standard-basic" label="Spreadsheet URL" variant="standard"/>
+                    <TextField id="standard-basic" label="Spreadsheet URL" variant="standard" onChange={(e) => setSpreadSheetURL(e.target.value)}/>
                 </Box>
                 <Box paddingTop={2}>
-                    <TextField id="standard-basic" label="Sheet Index" variant="standard"/>
+                    <TextField id="standard-basic" label="Sheet Index" variant="standard" onChange={(e) => setIndex(e.target.value)}/>
                 </Box>
                 <Box paddingTop={2}>
-                    <TextField id="standard-basic" label="Keys" variant="standard"/>
+                    <TextField id="standard-basic" label="Keys" variant="standard" onChange={(e) => setKeys(e.target.value)}/>
                 </Box>
                 <Box paddingTop={2}>
                     <Button variant="contained" onClick={handleAddDataSource}>Add</Button>
