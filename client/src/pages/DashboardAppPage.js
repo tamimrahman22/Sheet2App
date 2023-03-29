@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Container, Typography, List, Stack, Box, Link, Card, CardContent} from '@mui/material';
+import { Container, Typography, List, Stack, Box, Link, Card, CardContent, CardActionArea} from '@mui/material';
 import GlobalContext from '../components/context/GlobalContext';
 
 // ----------------------------------------------------------------------
@@ -33,7 +33,7 @@ export default function DashboardAppPage() {
                 store.appList.map((app) => (
                   <Box component="span" sx={{ p: 2 }} key={app._id}>
                     <Card>
-                      <Link sx={{ display: 'contents' }} onClick={() => {
+                      <CardActionArea sx={{ display: 'contents' }} onClick={() => {
                         store.setCurrentAppById(app._id);
                         navigate("/editor");
                       }}>
@@ -57,7 +57,7 @@ export default function DashboardAppPage() {
                             
                           </Stack>
                         </CardContent>
-                      </Link>
+                      </CardActionArea>
                     </Card>
                   </Box>
                 ))
