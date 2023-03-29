@@ -147,10 +147,10 @@ router.post('/getColumn', async (req, res) => {
 
 router.get('/get/:id', async(req, res) => {
 	// get application
-	console.log();
+	// console.log();
 	try {
 		const currentApp = await appModel.findById(req.params.id);
-		console.log(currentApp.dataSources);
+		// console.log(currentApp.dataSources);
 		let finalList = [];
 		for(let i = 0; i < currentApp.dataSources.length; i++){
 			finalList.push(await dataSourceModel.findById({ _id: currentApp.dataSources[i] }));

@@ -68,4 +68,22 @@ router.get('/list', async(req, res) => {
 	}
 });
 
+router.get('/get/:id', async(req, res) => {
+	// get application
+	try {
+		const currentApp = await appModel.findById(req.params.id);
+		let finalList = [];
+		for(let i = 0; i < currentApp.views.length; i++){
+			finalList.push(await viewsModel.findById({ _id: currentApp.views[i] }));
+		}
+		console.log(finalList);
+		res.send(finalList);
+	}
+	catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in getting app` });
+	}
+});
+
+
 module.exports = router;
