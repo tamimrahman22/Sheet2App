@@ -2,26 +2,37 @@
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Button, Container, Typography, Drawer, Modal, TextField} from '@mui/material';
+import { Button, Container, Typography, Drawer, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell} from '@mui/material';
 // import Copyright from './Copyright'
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
 import { useContext, useState } from 'react';
 
-export default function WelcomeScreen() {
+export default function DataSource() {
     const auth = useContext(AuthContext);
     const store = useContext(GlobalContext);
-    console.log(auth.user);
-    console.log(store.currentApp);
+    console.log('[DATA SOURCE] USER IS: ', auth.user);
+    console.log('[DATA SOURCE] STORE IS: ', store);
+    console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
+    console.log('[DATA SOURCE] CURRENT App Data Source: ', store.currentAppDataSource)
 
-    //states for the components
+    store.currentAppDataSource.map(ds =>{
+        const row = (
+        <TableRow key={ds._id}>
+            <TableCell>{ds.name}</TableCell>
+            <TableCell>{ds.url}</TableCell>
+            <TableCell>{ds.sheetIndex + 1}</TableCell>
+            <TableCell>HELLO!</TableCell>
+        </TableRow>)
+    })
+    //states for the component
     const [open, setOpen] = useState(false)
     const [spreadsheetURL, setSpreadSheetURL] = useState();
     const [index, setIndex] = useState();
     const [keys, setKeys] = useState([]);    
 
     function openModal(event) {
-        console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp)
+        console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
         // Open the modal! 
         setOpen(true);
     }
@@ -30,7 +41,6 @@ export default function WelcomeScreen() {
         // Close the modal! 
         setOpen(false)
     }
-
 
     function handleAddDataSource(event){
         console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp._id)
@@ -61,6 +71,14 @@ export default function WelcomeScreen() {
         justifyContent: "center"
       };
 
+
+    // Sheets that they added for the data source
+    // Name of the columns within the data source! 
+    // URL of the sheet for the data sources
+    // Sheet Name 
+    
+    // have the option to delete the data source {OPTIONAL! }
+
     return (
         <>
         <Helmet>
@@ -72,8 +90,38 @@ export default function WelcomeScreen() {
             Data Sources
             </Typography>
             <Button variant="contained" onClick= {openModal}>Add Data Source</Button>
-            
         </Container>
+
+        <Box>
+            <TableContainer
+                    component={Paper}
+                >   
+                    <Table aria-label="simple table">
+                        <TableHead>
+                            <TableCell>Sheet Name</TableCell>
+                            <TableCell>URL of Spreadsheet</TableCell>
+                            <TableCell>Sheet Index</TableCell>
+                            <TableCell>Column Name(s)</TableCell>
+                        </TableHead>
+                        <TableBody>
+                        {   
+                            store.currentAppDataSource.length > 0 ? 
+                            store.currentAppDataSource.map(ds => {
+                                return (
+                                    <TableRow key={ds._id}>
+                                        <TableCell>{ds.name}</TableCell>
+                                        <TableCell>{ds.url}</TableCell>
+                                        <TableCell>{ds.sheetIndex + 1}</TableCell>
+                                        <TableCell>{ds.columns.map(col => col.name).join(", ")}</TableCell>
+                                    </TableRow>
+                                );
+                            }) : <Typography>NO DATA SOURCES ADDED TO APP!</Typography>
+                        }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+        </Box>
+
         <Modal
             open={open}
             onClose={handleClose}

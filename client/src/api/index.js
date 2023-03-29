@@ -14,7 +14,7 @@ export const publishApp = (payload) => api.post("/app/publish", payload);
 
 // data source
 export const createDataSource = (payload) => api.post("/datasource/add", payload); 
-
+export const getDataSourcesById = (id) => api.get(`/datasource/get/${id}`);
 // views
 
 const apis = {
@@ -23,7 +23,8 @@ const apis = {
     getAppById,
     renameApp,
     publishApp,
-    createDataSource
+    createDataSource,
+    getDataSourcesById
 };
 
 export default apis;

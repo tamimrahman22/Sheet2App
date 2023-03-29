@@ -89,7 +89,7 @@ router.post('/add', async (req, res) => {
 				);
 
 				console.log(currentApp);
-				
+
 				// Send the updated applicationg back to the user!
 				res.send(await appModel.findById({ _id: appId }))
 			}
@@ -162,7 +162,7 @@ router.get('/get/:id', async(req, res) => {
 	}
 	catch (err) {
 		console.error('Error: ', err);
-		res.status(400).json({ message: `Error in getting app` });
+		res.status(400).json({message: `Error in getting app`});
 	}
 });
 

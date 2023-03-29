@@ -13,6 +13,7 @@ export function GlobalContextProvider({children}){
     // GLOBAL STATE OF THE APPLICATION 
     const [appList, setAppList] = useState([]); 
     const [currentApp, setCurrentApp] = useState(null);
+    const [currentAppDataSource, setCurrentAppDataSouce] = useState([]); 
 
     // Functions to be used to manipulate the global state of our application 
 
@@ -53,7 +54,23 @@ export function GlobalContextProvider({children}){
             navigate('/dashboard', { replace: true })
         }
         createApplication(appName, userEmail, roleSheet)
-    }   
+    } 
+    
+    // This function will be used in order to set the current app for S2A and also getting the required information regarding existing data sources for the user. 
+    const setApp = function(app){
+        async function getDataSourceForApp(app){
+            console.log('[STORE] GETTING DATA SOURCES FOR THE APPLICATION!')
+            const ds = app.dataSources 
+            console.log('[STORE] DATA SOURCES FOR THE APPLICATION IS: ', ds)
+            const response = await api.getDataSourcesById(app._id);
+            console.log(response.data)
+            setCurrentAppDataSouce(response.data)
+            navigate("/editor");
+        }
+        // Check if the application already has data sources. If not, navigate to the editor page. 
+        setCurrentApp(app)
+        getDataSourceForApp(app)
+    }
     
     // Add the spreadsheet as a data source to review 
     const createDataSource = function (appID, sheetURL, sheetIndex, keys){
@@ -132,7 +149,10 @@ export function GlobalContextProvider({children}){
         createApp,
         renameApp,
         publishApp,
-        createDataSource
+        createDataSource,
+        setApp,
+        currentAppDataSource,
+        setCurrentAppDataSouce
     }
 
     return(

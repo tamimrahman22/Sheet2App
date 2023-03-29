@@ -36,9 +36,7 @@ export default function DashboardAppPage() {
                       <CardActionArea sx={{ display: 'contents' }} onClick={() => {
                         console.log ('[DASHBOARD APP] Current list is: ', app)
                         // SET THE CURRENT APPLICATION!
-                        store.setCurrentApp(app)
-                        // NAVIGATE TO THE EDITOR!
-                        navigate("/editor");
+                        store.setApp(app)
                       }}>
                         <CardContent>
                           <Stack direction="row" alignItems="center" spacing={2} >
