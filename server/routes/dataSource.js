@@ -89,7 +89,9 @@ router.post('/add', async (req, res) => {
 				);
 
 				console.log(currentApp);
-				res.send(updatedDataSource)
+				
+				// Send the updated applicationg back to the user!
+				res.send(await appModel.findById({ _id: appId }))
 			}
 		}
 		console.log(response.data.sheets);

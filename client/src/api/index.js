@@ -13,6 +13,7 @@ export const renameApp = (payload) => api.post("/app/rename", payload);
 export const publishApp = (payload) => api.post("/app/publish", payload);
 
 // data source
+export const createDataSource = (payload) => api.post("/datasource/add", payload); 
 
 // views
 
@@ -22,6 +23,7 @@ const apis = {
     getAppById,
     renameApp,
     publishApp,
+    createDataSource
 };
 
 export default apis;

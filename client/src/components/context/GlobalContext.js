@@ -56,24 +56,39 @@ export function GlobalContextProvider({children}){
     }   
     
     // Add the spreadsheet as a data source to review 
-    const createDataSource = function (){
+    const createDataSource = function (appID, sheetURL, sheetIndex, keys){
         async function createDataSource(){
-        }
-        createDataSource(); 
-        // Update our App Lis
-        loadAppList();
-    }
-
-    // Function to to set the current application that user will be working on!
-    const setCurrentAppById = function(id) {
-        async function setAppId(id) { 
-            const response = await api.getAppById(id);
-            console.log('[STORE] Getting application...', response);
-            if (response.status === 200) {
-                setCurrentApp(response.data[0]);
+            let payload = {
+                appId:appID, 
+                url:sheetURL, 
+                sheetIndex:sheetIndex-1, 
+                keys:keys 
+            };
+            console.log('[STORE] Sending request to create data source... : ',payload)
+            const response = await api.createDataSource(payload)
+            console.log('[STORE] Created data source...', response)
+            // Set the current app list to be the one that was update with the data source!
+            setCurrentApp(response.data)
+            async function getLists() {    
+                let payload = {
+                    user: auth.user.email,
+                }
+                const response = await api.getAppList(payload);
+                console.log('[STORE] Response: ', response);
+                console.log('[STORE] Data: ',  response.data);
+                // Set the app list with the new lists that were found! 
+                setAppList(response.data);
             }
+            // Update our AppList with the latest information!
+            getLists();
         }
-        setAppId(id);
+        createDataSource(appID, sheetURL, sheetIndex, keys); 
+        // Verify we got the input we need!
+        console.log('[STORE] Creating data source....')
+        console.log('[STORE] Application ID: ', appID)
+        console.log('[STORE] Spreadsheet: ', sheetURL)
+        console.log('[STORE] Sheet Index: ', sheetIndex-1)
+        console.log('[STORE] Keys: ', keys)
     }
 
     // Function to rename the application! 
@@ -115,7 +130,6 @@ export function GlobalContextProvider({children}){
         setCurrentApp, 
         loadAppList, 
         createApp,
-        setCurrentAppById,
         renameApp,
         publishApp,
         createDataSource

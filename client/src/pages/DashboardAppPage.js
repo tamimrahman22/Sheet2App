@@ -34,7 +34,10 @@ export default function DashboardAppPage() {
                   <Box component="span" sx={{ p: 2 }} key={app._id}>
                     <Card>
                       <CardActionArea sx={{ display: 'contents' }} onClick={() => {
-                        store.setCurrentAppById(app._id);
+                        console.log ('[DASHBOARD APP] Current list is: ', app)
+                        // SET THE CURRENT APPLICATION!
+                        store.setCurrentApp(app)
+                        // NAVIGATE TO THE EDITOR!
                         navigate("/editor");
                       }}>
                         <CardContent>
