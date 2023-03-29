@@ -30,8 +30,7 @@ export function GlobalContextProvider({children}){
             setCurrentApp(null);
             // // Push the dashboard to show the new app being made! 
             // navigate('/dashboard', { replace: true })
-          }
-          console.log()
+        }
         getLists();
     }
 
@@ -54,19 +53,30 @@ export function GlobalContextProvider({children}){
             navigate('/dashboard', { replace: true })
         }
         createApplication(appName, userEmail, roleSheet)
+    }   
+    
+    // Add the spreadsheet as a data source to review 
+    const createDataSource = function (){
+        async function createDataSource(){
+        }
+        createDataSource(); 
+        // Update our App Lis
+        loadAppList();
     }
 
+    // Function to to set the current application that user will be working on!
     const setCurrentAppById = function(id) {
         async function setAppId(id) { 
             const response = await api.getAppById(id);
             console.log('[STORE] Getting application...', response);
             if (response.status === 200) {
-                setCurrentApp(response.data);
+                setCurrentApp(response.data[0]);
             }
         }
         setAppId(id);
     }
 
+    // Function to rename the application! 
     const renameApp = function(name) {
         async function renameApplication(name) {
             let payload = {
@@ -82,6 +92,7 @@ export function GlobalContextProvider({children}){
         renameApplication(name);
     }
 
+    // Function to publish the application! 
     const publishApp = function() {
         async function publishApplication() {
             let payload = {
@@ -107,6 +118,7 @@ export function GlobalContextProvider({children}){
         setCurrentAppById,
         renameApp,
         publishApp,
+        createDataSource
     }
 
     return(
