@@ -25,38 +25,35 @@ export default function ViewsPage() {
 
     return (
         <div id="settings">
-            <Helmet>
-              <title> S2A Settings </title>
-            </Helmet>
-            <Box component="span" sx={{ p: 2 }} key={100}>
-                <Card>
-                    <CardContent>
-                        <Stack direction="row" alignItems="center" spacing={2} >
-                      
-                            <Box sx={{ minWidth: 240, flexGrow: 1 }}>
-                              <Typography color="inherit" variant="h5" underline="hover" noWrap>
-                                App Name: 
-                              </Typography>
-                              { !edit ? <Typography color="inherit" variant="body1" underline="hover" noWrap> {store.currentApp.name}</Typography> : null }
-                              { edit ? <TextField fullWidth id="app-name" defaultValue={store.currentApp.name}/> : null }
-                              <br></br>
-                              <Typography variant="h5">
-                                Role Membership Sheet URL: 
-                              </Typography>
-                              <Link href={store.currentApp.roleMembershipSheet} target="_blank">{store.currentApp.roleMembershipSheet}</Link>
-                            </Box>
+          <Box component="span" sx={{ p: 2 }} key={100}>
+            <Card>
+          <CardContent>
+              <Stack direction="row" alignItems="center" spacing={2} >
+            
+                  <Box sx={{ minWidth: 240, flexGrow: 1 }}>
+                    <Typography color="inherit" variant="h5" underline="hover" noWrap>
+                      App Name: 
+                    </Typography>
+                    { !edit ? <Typography color="inherit" variant="body1" underline="hover" noWrap> {store.currentApp.name}</Typography> : null }
+                    { edit ? <TextField fullWidth id="app-name" variant="filled" defaultValue={store.currentApp.name}/> : null }
+                    <br></br>
+                    <Typography variant="h5">
+                      Role Membership Sheet URL: 
+                    </Typography>
+                    <Link href={store.currentApp.roleMembershipSheet} target="_blank">{store.currentApp.roleMembershipSheet}</Link>
+                  </Box>
 
-                            { !edit ? <Button variant="outlined" onClick={handleEdit}>Edit</Button> : null}
-                            { edit ? <Button variant="outlined" onClick={handleSave}>Save</Button> : null}
+                  { !edit ? <Button variant="outlined" onClick={handleEdit}>Edit</Button> : null}
+                  { edit ? <Button variant="outlined" onClick={handleSave}>Save</Button> : null}
 
-                            <Box sx={{ mx: 2.5 }} justifyContent="center" display="flex" alignItems="center"> 
-                              <Button variant="contained" onClick={handlePublish}>{ !store.currentApp.published ? "Publish" : "Unpublish" }</Button>
-                            </Box>
-                            
-                          </Stack>
-                        </CardContent>
-                </Card>
-            </Box>
+                  <Box sx={{ mx: 2.5 }} justifyContent="center" display="flex" alignItems="center"> 
+                    <Button variant="contained" onClick={handlePublish}>{ !store.currentApp.published ? "Publish" : "Unpublish" }</Button>
+                  </Box>
+                  
+                </Stack>
+              </CardContent>
+            </Card>
+          </Box>
         </div>
     );
 }
