@@ -26,6 +26,7 @@ function TableView(props) {
             length.current = response.data[0].length + 1;
         }
         fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function Row(props) {

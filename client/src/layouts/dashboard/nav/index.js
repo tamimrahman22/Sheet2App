@@ -12,7 +12,6 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
 import navConfig from './config';
-import axios from 'axios';
 
 import AuthContext from '../../../components/context/AuthContext';
 import GlobalContext from '../../../components/context/GlobalContext';

@@ -5,7 +5,6 @@ import { Typography, Grid, CssBaseline, Box } from '@mui/material';
 // import useResponsive from '../useResponsive';
 // components
 import Logo from '../components/logo';
-import Navbar from '../components/navbar/Navbar';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jwt_decode from "jwt-decode";
