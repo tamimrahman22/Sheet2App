@@ -43,20 +43,20 @@ export default function Nav({ openNav, onCloseNav }) {
 
   const handleClose = () => setOpen(false);
 
+  // Style for the modal!
   const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 300,
+    width: 450,
     height: 300,
     bgcolor: 'background.paper',
-    boxShadow: 24,
     p: 4,
     borderRadius: '10px',
-    alignItems: "center",
-    textAlign: "center",
-    justifyContent: "center"
+    // alignItems: "center",
+    // textAlign: "center",
+    // justifyContent: "center"
   };
 
   const account = {
@@ -152,13 +152,19 @@ export default function Nav({ openNav, onCloseNav }) {
             </Typography>
           </Box>
           <Box paddingTop={1}>
-            <TextField id="standard-basic" label="App Name" variant="standard" onChange={(e) => setAppName(e.target.value)}/>
+            <TextField fullWidth id="standard-basic" label="App Name" variant="standard" onChange={(e) => setAppName(e.target.value)}/>
           </Box>
           <Box paddingTop={2}>
-            <TextField id="standard-basic" label="Roles Sheet" variant="standard" onChange={(e) => setRoleSheet(e.target.value)}/>
+            <TextField fullWidth id="standard-basic" label="Roles Sheet" variant="standard" onChange={(e) => setRoleSheet(e.target.value)}/>
           </Box>
-          <Box paddingTop={5}>
-            <Button variant="contained" onClick={handleCreateApp}>Create</Button>
+          <Box m={1}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center" 
+              paddingTop={4}
+          >
+              <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
+              <Button variant="contained" onClick={handleCreateApp}>Create</Button>
           </Box>
         </Box>
       </Modal>
