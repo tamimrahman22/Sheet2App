@@ -2,7 +2,7 @@
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Button, Typography, Grid, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell} from '@mui/material';
+import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack} from '@mui/material';
 // import Copyright from './Copyright'
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
@@ -49,7 +49,7 @@ export default function DataSource() {
         console.log('[DATA SOURCE] Sheet Index: ', index)
         console.log('[DATA SOURCE] Keys: ', keys)
         // Pass this infomration to our store to create the data source! 
-        store.createDataSource(store.currentApp._id, spreadsheetURL, index, keys)
+        store.addDataSource(store.currentApp._id, spreadsheetURL, index, keys)
         // Close the modal! 
         setOpen(false)
     }
@@ -83,7 +83,7 @@ export default function DataSource() {
         <Helmet>
             <title> S2A Data Sources </title>
         </Helmet>
-
+{/* 
         <Grid container paddingLeft={2} paddingRight={2}>
             <Grid item xs={10} >
                 <Typography variant="h4" >
@@ -91,9 +91,25 @@ export default function DataSource() {
                 </Typography>
             </Grid>
             <Grid item xs={2}>
-                <Button variant="contained" onClick={openModal}>Add Data Source</Button>
+                <Stack direction="row" justifyContent="end">
+                    <Button variant="contained" onClick={openModal}>Add Data Source</Button>
+                </Stack>
             </Grid>
-        </Grid>
+        </Grid> */}
+
+
+        <Stack
+        direction="row"
+        justifyContent="space-between"
+        spacing={12}
+        sx={{ px:1 }}
+        >
+            <Typography variant="h4" >
+                Data Sources
+            </Typography>
+            <Button variant="contained" onClick={openModal}>Add Data Source</Button>
+        </Stack>
+
         
 
         <Box paddingTop={1}>
@@ -112,7 +128,7 @@ export default function DataSource() {
                                 <TableBody>
                                     <TableRow padding={2} key={ds._id}>
                                         <TableCell>{ds.name}</TableCell>
-                                        <TableCell>{ds.url}</TableCell>
+                                        <TableCell><Link href={ds.url} target="_blank">{ds.url}</Link></TableCell>
                                         <TableCell>{ds.sheetIndex + 1}</TableCell>
                                         <TableCell>{ds.columns.map(col => col.name).join(", ")}</TableCell>
                                     </TableRow>

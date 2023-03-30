@@ -37,6 +37,7 @@ export default function DashboardAppPage() {
                         console.log ('[DASHBOARD APP] Current list is: ', app)
                         // SET THE CURRENT APPLICATION!
                         store.setApp(app)
+                        navigate("/editor");
                       }}>
                         <CardContent>
                           <Stack direction="row" alignItems="center" spacing={2} >

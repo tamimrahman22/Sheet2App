@@ -69,7 +69,7 @@ export function GlobalContextProvider({children}){
             const viewResponse = await api.getViews(app._id);
             console.log('[STORE] Getting application views...', viewResponse);
             setAppViews(viewResponse.data);
-            navigate("/editor");
+            // navigate("/editor");
         }
         // Check if the application already has data sources. If not, navigate to the editor page. 
         setCurrentApp(app)
@@ -77,8 +77,8 @@ export function GlobalContextProvider({children}){
     }
     
     // Add the spreadsheet as a data source to review 
-    const createDataSource = function (appID, sheetURL, sheetIndex, keys){
-        async function createDataSource(){
+    const addDataSource = function (appID, sheetURL, sheetIndex, keys){
+        async function addDataSource(){
             let payload = {
                 appId:appID, 
                 url:sheetURL, 
@@ -86,30 +86,49 @@ export function GlobalContextProvider({children}){
                 keys:keys 
             };
             console.log('[STORE] Sending request to create data source... : ',payload)
-            const response = await api.createDataSource(payload)
+            const response = await api.addDataSource(payload)
             console.log('[STORE] Created data source...', response)
             // Set the current app list to be the one that was update with the data source!
-            setCurrentApp(response.data)
-            async function getLists() {    
-                let payload = {
-                    user: auth.user.email,
-                }
-                const response = await api.getAppList(payload);
-                console.log('[STORE] Response: ', response);
-                console.log('[STORE] Data: ',  response.data);
-                // Set the app list with the new lists that were found! 
-                setAppList(response.data);
-            }
-            // Update our AppList with the latest information!
-            getLists();
+            setApp(response.data);
+            navigate("/editor/data");
+            
+            // IS THIS BOTTOM PORTION REALLY NECESSARY?
+            // async function getLists() {    
+            //     let payload = {
+            //         user: auth.user.email,
+            //     }
+            //     const response = await api.getAppList(payload);
+            //     console.log('[STORE] Response: ', response);
+            //     console.log('[STORE] Data: ',  response.data);
+            //     // Set the app list with the new lists that were found! 
+            //     setAppList(response.data);
+            // }
+            // // Update our AppList with the latest information!
+            // getLists();
         }
-        createDataSource(appID, sheetURL, sheetIndex, keys); 
+        addDataSource(appID, sheetURL, sheetIndex, keys); 
         // Verify we got the input we need!
         console.log('[STORE] Creating data source....')
         console.log('[STORE] Application ID: ', appID)
         console.log('[STORE] Spreadsheet: ', sheetURL)
         console.log('[STORE] Sheet Index: ', sheetIndex-1)
         console.log('[STORE] Keys: ', keys)
+    }
+
+    const addView = function(tableId, viewType) {
+        async function createView(tableId, viewType) {
+            let payload = {
+                appId: currentApp._id,
+                tableId: tableId,
+                viewType: viewType
+            }
+            console.log('[STORE] Sending request to create view... : ',payload)
+            const response = await api.addView(payload);
+            console.log('[STORE] Created view...', response);
+            setApp(response.data);
+            navigate("/editor/views")
+        }
+        createView(tableId, viewType);
     }
 
     // Function to rename the application! 
@@ -157,7 +176,8 @@ export function GlobalContextProvider({children}){
         createApp,
         renameApp,
         publishApp,
-        createDataSource,
+        addDataSource,
+        addView,
         setApp,
     }
 

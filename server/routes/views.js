@@ -44,6 +44,7 @@ router.post('/add', async (req, res) => {
         const updatedApp = await appModel.findOneAndUpdate(
             { _id: appId },
             {views: currentViews},
+            {new: true}
         );
 
         res.send(updatedApp);

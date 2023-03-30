@@ -13,14 +13,15 @@ export const renameApp = (payload) => api.post("/app/rename", payload);
 export const publishApp = (payload) => api.post("/app/publish", payload);
 
 // data source
-export const createDataSource = (payload) => api.post("/datasource/add", payload); 
+export const addDataSource = (payload) => api.post("/datasource/add", payload); 
 export const getDataSourcesByAppId = (id) => api.get(`/datasource/getbyAppId/${id}`);
 export const getDataSourceById = (id) => api.get(`/datasource/get/${id}`)
 export const getColumns = (payload) => api.post("/datasource/getColumns", payload);
 export const getRows = (payload) => api.post("/datasource/getRows", payload);
 
 // views
-export const getViews = (id) => api.get(`views/get/${id}`);
+export const getViews = (id) => api.get(`/views/get/${id}`);
+export const addView = (payload) => api.post("/views/add", payload);
 
 const apis = {
     getAppList,
@@ -29,13 +30,14 @@ const apis = {
     renameApp,
     publishApp,
 
-    createDataSource,
+    addDataSource,
     getDataSourcesByAppId,
     getDataSourceById,
     getColumns,
     getRows,
 
     getViews,
+    addView,
 };
 
 export default apis;
