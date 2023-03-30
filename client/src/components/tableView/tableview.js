@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse} from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse} from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import api from "../../api";
@@ -8,11 +8,13 @@ import api from "../../api";
 function TableView(props) {
     const { view } = props;
     // console.log(view);
-    const length = useRef(0)
+    const length = view.columns.length + 1
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
+            setLoading(true);
             let response = await api.getDataSourceById(view.table);
             console.log(response.data.url);
             let payload = {
@@ -23,7 +25,7 @@ function TableView(props) {
             console.log(response.data);
             response.data.shift();
             setData(response.data);
-            length.current = response.data[0].length + 1;
+            setLoading(false);
         }
         fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,11 +49,11 @@ function TableView(props) {
                 </TableRow>
 
                 <TableRow>
-                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length.current}>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length}>
                         <Collapse in={open} timeout="auto" unmountOnExit>
                             <Box sx={{ margin: 1 }}>
                                 <Typography variant="h6" gutterBottom component="div">
-                                    LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT LONG AMOUNT OF TEXT 
+                                    SOON TO DISPLAY RELEVANT BUTTONS, ETC
                                 </Typography>
                             </Box>
                         </Collapse>
@@ -87,12 +89,15 @@ function TableView(props) {
                                     <TableCell/>
                                 </TableHead>
                                 <TableBody>
-                                {
+                                { loading ? 
+                                <TableCell colSpan={length}>
+                                    <LinearProgress /> 
+                                </TableCell> :
                                     data.map(row => {
                                         return (
                                             <Row row={row} />
                                         )
-                                    })
+                                    }) 
                                 }
                                 </TableBody>
                             </Table>
