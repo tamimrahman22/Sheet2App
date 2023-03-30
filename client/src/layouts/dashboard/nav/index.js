@@ -51,10 +51,9 @@ export default function Nav({ openNav, onCloseNav }) {
     width: 300,
     height: 300,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
-    borderRadius: '20px',
+    borderRadius: '10px',
     alignItems: "center",
     textAlign: "center",
     justifyContent: "center"
