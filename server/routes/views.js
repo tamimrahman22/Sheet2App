@@ -6,7 +6,7 @@ const viewsModel = require('../models/View');
 
 const { google } = require("googleapis");
 
-router.post('/create', async (req, res) => {
+router.post('/add', async (req, res) => {
     // get name, table, columns, and roles from appId, 
     const { appId, tableId, viewType } = req.body;
     try{
@@ -30,7 +30,7 @@ router.post('/create', async (req, res) => {
 
         // create a view
         const newViews = await viewsModel.create({
-            name: name,
+            name: "New View",
             table: tableId,
             columns: columns,
             viewType: viewType,

@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { Typography, Box, Card, CardContent, Stack, Link, Button, TextField } from '@mui/material';
-// import Copyright from './Copyright'
+import { Helmet } from 'react-helmet-async';
 // import AuthContext from '../auth'
 import GlobalStoreContext from "../components/context/GlobalContext";
 
@@ -25,6 +25,9 @@ export default function ViewsPage() {
 
     return (
         <div id="settings">
+            <Helmet>
+              <title> S2A Settings </title>
+            </Helmet>
             <Box component="span" sx={{ p: 2 }} key={100}>
                 <Card>
                     <CardContent>
@@ -35,7 +38,7 @@ export default function ViewsPage() {
                                 App Name: 
                               </Typography>
                               { !edit ? <Typography color="inherit" variant="body1" underline="hover" noWrap> {store.currentApp.name}</Typography> : null }
-                              { edit ? <TextField fullWidth id="app-name" variant="filled" defaultValue={store.currentApp.name}/> : null }
+                              { edit ? <TextField fullWidth id="app-name" defaultValue={store.currentApp.name}/> : null }
                               <br></br>
                               <Typography variant="h5">
                                 Role Membership Sheet URL: 

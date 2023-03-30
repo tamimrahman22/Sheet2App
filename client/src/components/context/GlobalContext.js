@@ -13,7 +13,8 @@ export function GlobalContextProvider({children}){
     // GLOBAL STATE OF THE APPLICATION 
     const [appList, setAppList] = useState([]); 
     const [currentApp, setCurrentApp] = useState(null);
-    const [currentAppDataSource, setCurrentAppDataSouce] = useState([]); 
+    const [appDataSource, setAppDataSource] = useState([]); 
+    const [appViews, setAppViews] = useState([]);
 
     // Functions to be used to manipulate the global state of our application 
 
@@ -58,18 +59,21 @@ export function GlobalContextProvider({children}){
     
     // This function will be used in order to set the current app for S2A and also getting the required information regarding existing data sources for the user. 
     const setApp = function(app){
-        async function getDataSourceForApp(app){
+        async function setAppDetails(app){
             console.log('[STORE] GETTING DATA SOURCES FOR THE APPLICATION!')
             const ds = app.dataSources 
             console.log('[STORE] DATA SOURCES FOR THE APPLICATION IS: ', ds)
-            const response = await api.getDataSourcesById(app._id);
+            const response = await api.getDataSourcesByAppId(app._id);
             console.log(response.data)
-            setCurrentAppDataSouce(response.data)
+            setAppDataSource(response.data)
+            const viewResponse = await api.getViews(app._id);
+            console.log('[STORE] Getting application views...', viewResponse);
+            setAppViews(viewResponse.data);
             navigate("/editor");
         }
         // Check if the application already has data sources. If not, navigate to the editor page. 
         setCurrentApp(app)
-        getDataSourceForApp(app)
+        setAppDetails(app)
     }
     
     // Add the spreadsheet as a data source to review 
@@ -144,15 +148,17 @@ export function GlobalContextProvider({children}){
         appList, 
         setAppList, 
         currentApp, 
-        setCurrentApp, 
+        setCurrentApp,
+        appDataSource,
+        setAppDataSource,
+        appViews,
+        setAppViews,
         loadAppList, 
         createApp,
         renameApp,
         publishApp,
         createDataSource,
         setApp,
-        currentAppDataSource,
-        setCurrentAppDataSouce
     }
 
     return(

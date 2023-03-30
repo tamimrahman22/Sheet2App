@@ -103,7 +103,7 @@ router.post('/add', async (req, res) => {
 	}
 });
 
-router.post('/getColumn', async (req, res) => {
+router.post('/getColumns', async (req, res) => {
 	const { url, name } = req.body;
 	// const name = "Sheet1";
 
@@ -147,7 +147,39 @@ router.post('/getColumn', async (req, res) => {
 	}
 });
 
-router.get('/get/:id', async(req, res) => {
+router.post('/getRows', async (req, res) => {
+	const { url, name } = req.body;
+	// const name = "Sheet1";
+
+	const authClientObject = await auth.getClient();
+	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+
+	try {
+		// get spreadsheet Id of dataSource
+		const regex = /\/d\/(.*?)\/edit/;
+		const match = url.match(regex);
+		const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+
+		const response = await googleSheetsInstance.spreadsheets.get({
+			spreadsheetId,
+			auth,
+		});
+
+		const readData = await googleSheetsInstance.spreadsheets.values.get({
+			auth, //auth object
+			spreadsheetId, // spreadsheet id
+			range: `${name}`, //range of cells to read from.
+		})
+
+		res.send(readData.data.values);
+	}
+	catch (error){
+		console.error('Error: ', error);
+		res.status(400).json({ message: `Error in getting column for data source ${url}` });
+	}
+});
+
+router.get('/getByAppId/:id', async(req, res) => {
 	// get application
 	// console.log();
 	try {
@@ -162,7 +194,21 @@ router.get('/get/:id', async(req, res) => {
 	}
 	catch (err) {
 		console.error('Error: ', err);
-		res.status(400).json({message: `Error in getting app`});
+		res.status(400).json({message: `Error in getting app data sources`});
+	}
+});
+
+router.get('/get/:id', async(req, res) => {
+	// get application
+	// console.log();
+	try {
+		const datasource = await dataSourceModel.findById(req.params.id);
+		console.log(datasource);
+		res.send(datasource);
+	}
+	catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({message: `Error in getting data source`});
 	}
 });
 

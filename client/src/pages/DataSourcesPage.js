@@ -14,9 +14,9 @@ export default function DataSource() {
     console.log('[DATA SOURCE] USER IS: ', auth.user);
     console.log('[DATA SOURCE] STORE IS: ', store);
     console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
-    console.log('[DATA SOURCE] CURRENT App Data Source: ', store.currentAppDataSource)
+    console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSource)
 
-    store.currentAppDataSource.map(ds =>{
+    store.appDataSource.map(ds =>{
         const row = (
         <TableRow key={ds._id}>
             <TableCell>{ds.name}</TableCell>
@@ -105,8 +105,8 @@ export default function DataSource() {
                         <TableCell>Column Name(s)</TableCell>
                     </TableHead>
                     {   
-                        store.currentAppDataSource.length > 0 ? 
-                        store.currentAppDataSource.map(ds => {
+                        store.appDataSource.length > 0 ? 
+                        store.appDataSource.map(ds => {
                             return (
                                 <TableBody>
                                     <TableRow padding={2} key={ds._id}>
@@ -117,7 +117,7 @@ export default function DataSource() {
                                     </TableRow>
                                 </TableBody>
                             );
-                        }) : <Typography padding={2} fontWeight='bold' color='red' fontStyle='italic'>Uh-oh! No data sources were added to the app!</Typography>
+                        }) : <Typography padding={2} fontWeight='bold' color='red' fontStyle='ita7c'>Uh-oh! No data sources were added to the app!</Typography>
                     }
                 </Table>
             </TableContainer>
