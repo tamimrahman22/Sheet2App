@@ -27,8 +27,8 @@ export default function ViewsPage() {
         <div id="settings">
           <Box component="span" sx={{ p: 2 }} key={100}>
             <Card>
-          <CardContent>
-              <Stack direction="row" alignItems="center" spacing={2} >
+              <CardContent>
+                <Stack direction="row" alignItems="center" spacing={2} >
             
                   <Box sx={{ minWidth: 240, flexGrow: 1 }}>
                     <Typography color="inherit" variant="h5" underline="hover" noWrap>
