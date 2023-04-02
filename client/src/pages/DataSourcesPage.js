@@ -2,7 +2,7 @@
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack, IconButton} from '@mui/material';
+import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack, IconButton, FormControl, InputLabel, Select, MenuItem} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -33,6 +33,8 @@ export default function DataSource() {
     const [originalDataSourceName, setOriginalDataSourceName] = useState('')
     // State that store the data source that is being modified 
     const [dataSource, setDataSource] = useState({})
+    // State that stored the key column for the data source!
+    const [keyColumn, setKeyColumn] = useState('');
 
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
@@ -43,6 +45,24 @@ export default function DataSource() {
     function closeModal(event) {
         // Close the modal! 
         setOpen(false)
+    }
+
+    const handleKeySelect = (e, ds) => {
+        // Grab the select value from the user 
+        const selectedValue = e.target.value;
+        // The data source that we are modifying the key column for 
+        const dataSource = ds
+        
+        // Update the state of the key column
+        setKeyColumn(selectedValue)
+        // Update the state of the current data source
+        setDataSource(ds)
+
+        console.log('[DATA SOURCE] Data source is: ', ds)
+        console.log('[DATA SOURCE| The specified key column is: ', selectedValue)
+        
+        //Update the key column of the data source 
+        store.setKeys(selectedValue, dataSource)
     }
 
     function handleChangeDataSourceName(){
@@ -84,14 +104,6 @@ export default function DataSource() {
         // justifyContent: "center"
       };
 
-
-    // Sheets that they added for the data source
-    // Name of the columns within the data source! 
-    // URL of the sheet for the data sources
-    // Sheet Name 
-    
-    // have the option to delete the data source {OPTIONAL! }
-
     return (
         <>
         <Helmet>
@@ -119,7 +131,7 @@ export default function DataSource() {
                             gap: 3
                         }}
                     >
-                        {editMode ? 
+                        {editMode && ds._id === dataSource._id  ? 
                         (
                             <TextField
                                 label = 'Enter a name for the data source'
@@ -142,7 +154,7 @@ export default function DataSource() {
                         )
                         }
                             {
-                                editMode ? 
+                                editMode && ds._id === dataSource._id ? 
                                 (
                                     <>
                                         <IconButton
@@ -185,6 +197,7 @@ export default function DataSource() {
                                 <TableCell>URL of Spreadsheet</TableCell>
                                 <TableCell>Sheet Index</TableCell>
                                 <TableCell>Column Name(s)</TableCell>
+                                <TableCell>Keys</TableCell>
                             </TableHead>
                             {
                                 store.appDataSource.length > 0 ? 
@@ -195,6 +208,20 @@ export default function DataSource() {
                                         <TableCell><Link href={ds.url} target="_blank">{ds.url}</Link></TableCell>
                                         <TableCell>{ds.sheetIndex + 1}</TableCell>
                                         <TableCell>{ds.columns.map(col => col.name).join(", ")}</TableCell>
+                                        <TableCell>
+                                            <FormControl sx={{ minWidth: 250 }}>
+                                                <InputLabel id="key-column-label">Key Column</InputLabel>
+                                                    <Select
+                                                        labelId="key-column-label"
+                                                        value = {ds.keys}
+                                                        onChange={(e) => handleKeySelect(e, ds)}
+                                                    >
+                                                        {ds.columns.map((col) => (
+                                                        <MenuItem value={col.name}>{col.name}</MenuItem>
+                                                        ))}
+                                                    </Select>
+                                            </FormControl>
+                                        </TableCell>
                                     </TableRow>
                                 </TableBody> 
                                             : 

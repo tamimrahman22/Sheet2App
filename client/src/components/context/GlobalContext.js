@@ -138,6 +138,27 @@ export function GlobalContextProvider({children}){
         changeName(newName, dataSource)
     }
 
+     // Function to specify the key column of a data source! 
+     const setKeys = function (keyColumnName, dataSource){
+        async function setKeyColumn (){
+            let payload = {
+                //ID of the current application
+                appID: currentApp._id,
+                //Name of the datasource
+                keyName: keyColumnName,
+                // ID of the data source
+                dataSourceID: dataSource._id
+            }
+            // Send a request to the backend 
+            console.log('[STORE] Sending payload to set the key column...', payload)
+            const response = await api.setKeys(payload)
+            console.log('[STORE] Reloading data sources list for current application' )
+            const res = await api.getDataSourcesByAppId(currentApp._id);
+            setAppDataSource(res.data)
+        }
+        setKeyColumn(keyColumnName, dataSource)
+    }
+
     const addView = function(tableId, viewType) {
         async function createView(tableId, viewType) {
             let payload = {
@@ -202,7 +223,8 @@ export function GlobalContextProvider({children}){
         addDataSource,
         addView,
         setApp,
-        renameDataSource
+        renameDataSource,
+        setKeys
     }
 
     return(
