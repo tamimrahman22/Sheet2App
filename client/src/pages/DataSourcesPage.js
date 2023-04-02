@@ -3,6 +3,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
 import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack, IconButton} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 // import Copyright from './Copyright'
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
@@ -86,28 +87,30 @@ export default function DataSource() {
 
         {
             store.appDataSource.map(ds => (
-                <Box key={ds._id} paddingTop={1}>
-                    <Box>
-                        <h2>{ds.dataSourceName}</h2>
+                <Box key={ds._id} paddingTop={3}>
+                    <Box
+                        display="flex" 
+                        alignItems="center"
+                        sx = {{
+                            gap: 3
+                        }}
+                    >
+                        <Typography variant="h4">{ds.dataSourceName}</Typography>
+                        <IconButton>
+                            <EditIcon />
+                        </IconButton>
                     </Box>
-                </Box>
-            ))
-        }
-
-        <Box paddingTop={1}>
-            <TableContainer component={Paper}>   
-                <Table aria-label="simple table">
-                    <TableHead>
-                        <TableCell>Spreadsheet Name</TableCell>
-                        <TableCell>Sheet Name</TableCell>
-                        <TableCell>URL of Spreadsheet</TableCell>
-                        <TableCell>Sheet Index</TableCell>
-                        <TableCell>Column Name(s)</TableCell>
-                    </TableHead>
-                    {   
-                        store.appDataSource.length > 0 ? 
-                        store.appDataSource.map(ds => {
-                            return (
+                    <TableContainer component={Paper}>   
+                        <Table aria-label="simple table">
+                            <TableHead>
+                                <TableCell>Spreadsheet Name</TableCell>
+                                <TableCell>Sheet Name</TableCell>
+                                <TableCell>URL of Spreadsheet</TableCell>
+                                <TableCell>Sheet Index</TableCell>
+                                <TableCell>Column Name(s)</TableCell>
+                            </TableHead>
+                            {
+                                store.appDataSource.length > 0 ? 
                                 <TableBody>
                                     <TableRow padding={2} key={ds._id}>
                                         <TableCell>{ds.spreadSheetName}</TableCell>
@@ -116,13 +119,15 @@ export default function DataSource() {
                                         <TableCell>{ds.sheetIndex + 1}</TableCell>
                                         <TableCell>{ds.columns.map(col => col.name).join(", ")}</TableCell>
                                     </TableRow>
-                                </TableBody>
-                            );
-                        }) : <Typography padding={2} fontWeight='bold' color='red' fontStyle='ita7c'>Uh-oh! No data sources were added to the app!</Typography>
-                    }
-                </Table>
-            </TableContainer>
-        </Box>
+                                </TableBody> 
+                                            : 
+                                <Typography padding={2} fontWeight='bold' color='red' fontStyle='ita7c'>Uh-oh! No data sources were added to the app!</Typography>
+                            }
+                        </Table>
+                    </TableContainer>
+                </Box>
+            ))
+        }
 
         <Modal
             open={open}
