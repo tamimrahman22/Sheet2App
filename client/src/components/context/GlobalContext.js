@@ -92,19 +92,18 @@ export function GlobalContextProvider({children}){
             setApp(response.data);
             navigate("/editor/data");
             
-            // IS THIS BOTTOM PORTION REALLY NECESSARY?
-            // async function getLists() {    
-            //     let payload = {
-            //         user: auth.user.email,
-            //     }
-            //     const response = await api.getAppList(payload);
-            //     console.log('[STORE] Response: ', response);
-            //     console.log('[STORE] Data: ',  response.data);
-            //     // Set the app list with the new lists that were found! 
-            //     setAppList(response.data);
-            // }
-            // // Update our AppList with the latest information!
-            // getLists();
+            async function getLists() {    
+                let payload = {
+                    user: auth.user.email,
+                }
+                const response = await api.getAppList(payload);
+                console.log('[STORE] Response: ', response);
+                console.log('[STORE] Data: ',  response.data);
+                // Set the app list with the new lists that were found! 
+                setAppList(response.data);
+            }
+            // Update our AppList with the latest information!
+            getLists();
         }
         addDataSource(appID, sheetURL, sheetIndex, keys); 
         // Verify we got the input we need!

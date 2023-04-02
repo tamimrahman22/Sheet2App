@@ -27,33 +27,45 @@ router.post('/add', async (req, res) => {
 			spreadsheetId,
 			auth,
 		});
+
+		//Get the name of the spreadsheet --> we're also going to be using this to serve as the name of the data source 
+		const spreadSheetName = response.data.properties.title;
+
 		for(let i = 0; i < response.data.sheets.length; i++){
 			// parse through sheets, find spreadsheet that is the same index and get the name of that sheet
 			if(response.data.sheets[i].properties.index == sheetIndex){
 				let columns = [];
-				// name of sheet in spreadsheet
-				let name = response.data.sheets[i].properties.title;
+				// Name of the sheet within a spreadsheet 
+				let sheetName = response.data.sheets[i].properties.title;
 				
 				// get column names in sheet
 				const readColumns = await googleSheetsInstance.spreadsheets.values.get({
 					auth, //auth object
 					spreadsheetId, // spreadsheet id
-					range: `${name}!1:1`, //range of cells to read from.
+					range: `${sheetName}!1:1`, //range of cells to read from.
 				})
 
 				// get type for each column
 				const readData = await googleSheetsInstance.spreadsheets.values.get({
 					auth, //auth object
 					spreadsheetId, // spreadsheet id
-					range: `${name}!2:2`, //range of cells to read from.
+					range: `${sheetName}!2:2`, //range of cells to read from.
 					valueRenderOption: 'UNFORMATTED_VALUE',
     				dateTimeRenderOption: 'SERIAL_NUMBER'
 				})
 				// create dataSource, need to add columns next
 				const newDataSource = await dataSourceModel.create({
-					name: name,
+					// Name of the sheet
+					sheetName: sheetName, 
+					// Name of the spredsheet
+					spreadSheetName: spreadSheetName,
+					// Name of the data source --> default to the name of the data source
+					dataSourceName: spreadSheetName, 
+					// URL to the Spreadsheet
 					url: url,
+					// Index of the sheet 
 					sheetIndex: sheetIndex,
+					// Key column which will be specified by the user 
 					keys: keys,
 					// columns: columns
 				});

@@ -1,9 +1,19 @@
 const mongoose = require('mongoose');
 const dataSourceSchema = new mongoose.Schema({
 	// name of Sheet
-    name: {
+    sheetName: {
 		type: String,
 		required: true,
+	},
+	// name of the spreadsheet
+	spreadSheetName: {
+		type: String,
+		required: true 	
+	},
+	// name of the DataSouce
+	dataSourceName: {
+		type: String, 
+		required: true 
 	},
 	// location of spreadsheet
 	url: {
@@ -15,13 +25,12 @@ const dataSourceSchema = new mongoose.Schema({
 		type: Number,
 		required: true,
 	},
-	// unique keys
-	keys: [
-		{
-			type: mongoose.Schema.Types.Mixed,
-			required: true,
-		}
-	],
+	// name of the unique key column of the data source!
+	keys: {
+		type: String,
+		required: false,
+		default: ''
+	}, 
 	// column values that are taken from the spreadsheet's sheet
     columns: [
         {

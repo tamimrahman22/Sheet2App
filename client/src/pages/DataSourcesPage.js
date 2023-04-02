@@ -2,7 +2,7 @@
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack} from '@mui/material';
+import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack, IconButton} from '@mui/material';
 // import Copyright from './Copyright'
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
@@ -16,21 +16,10 @@ export default function DataSource() {
     console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
     console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSource)
 
-    // store.appDataSource.map(ds => {
-    //     const row = (
-    //     <TableRow key={ds._id}>
-    //         <TableCell>{ds.name}</TableCell>
-    //         <TableCell>{ds.url}</TableCell>
-    //         <TableCell>{ds.sheetIndex + 1}</TableCell>
-    //         <TableCell>HELLO!</TableCell>
-    //     </TableRow>)
-    // })
-    
     //states for the component
     const [open, setOpen] = useState(false)
     const [spreadsheetURL, setSpreadSheetURL] = useState();
     const [index, setIndex] = useState();
-    const [keys, setKeys] = useState([]);    
 
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
@@ -47,9 +36,8 @@ export default function DataSource() {
         console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp._id)
         console.log('[DATA SOURCE] Spreadsheet: ', spreadsheetURL)
         console.log('[DATA SOURCE] Sheet Index: ', index)
-        console.log('[DATA SOURCE] Keys: ', keys)
         // Pass this infomration to our store to create the data source! 
-        store.addDataSource(store.currentApp._id, spreadsheetURL, index, keys)
+        store.addDataSource(store.currentApp._id, spreadsheetURL, index, '')
         // Close the modal! 
         setOpen(false)
     }
@@ -83,20 +71,6 @@ export default function DataSource() {
         <Helmet>
             <title> S2A Data Sources </title>
         </Helmet>
-{/* 
-        <Grid container paddingLeft={2} paddingRight={2}>
-            <Grid item xs={10} >
-                <Typography variant="h4" >
-                    Data Sources
-                </Typography>
-            </Grid>
-            <Grid item xs={2}>
-                <Stack direction="row" justifyContent="end">
-                    <Button variant="contained" onClick={openModal}>Add Data Source</Button>
-                </Stack>
-            </Grid>
-        </Grid> */}
-
 
         <Stack
         direction="row"
@@ -110,12 +84,21 @@ export default function DataSource() {
             <Button variant="contained" onClick={openModal}>Add Data Source</Button>
         </Stack>
 
-        
+        {
+            store.appDataSource.map(ds => (
+                <Box key={ds._id} paddingTop={1}>
+                    <Box>
+                        <h2>{ds.dataSourceName}</h2>
+                    </Box>
+                </Box>
+            ))
+        }
 
         <Box paddingTop={1}>
             <TableContainer component={Paper}>   
                 <Table aria-label="simple table">
                     <TableHead>
+                        <TableCell>Spreadsheet Name</TableCell>
                         <TableCell>Sheet Name</TableCell>
                         <TableCell>URL of Spreadsheet</TableCell>
                         <TableCell>Sheet Index</TableCell>
@@ -127,7 +110,8 @@ export default function DataSource() {
                             return (
                                 <TableBody>
                                     <TableRow padding={2} key={ds._id}>
-                                        <TableCell>{ds.name}</TableCell>
+                                        <TableCell>{ds.spreadSheetName}</TableCell>
+                                        <TableCell>{ds.sheetName}</TableCell>
                                         <TableCell><Link href={ds.url} target="_blank">{ds.url}</Link></TableCell>
                                         <TableCell>{ds.sheetIndex + 1}</TableCell>
                                         <TableCell>{ds.columns.map(col => col.name).join(", ")}</TableCell>
@@ -157,9 +141,6 @@ export default function DataSource() {
                 </Box>
                 <Box paddingTop={2}>
                     <TextField fullWidth id="standard-basic" label="Sheet Index" variant="standard" onChange={(e) => setIndex(e.target.value)}/>
-                </Box>
-                <Box paddingTop={2}>
-                    <TextField fullWidth id="standard-basic" label="Keys" variant="standard" onChange={(e) => setKeys(e.target.value)}/>
                 </Box>
                 <Box m={1}
                     display="flex"
