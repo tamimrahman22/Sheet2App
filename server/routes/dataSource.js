@@ -224,4 +224,21 @@ router.get('/get/:id', async(req, res) => {
 	}
 });
 
+router.post("/rename", async(req, res) => {
+	// update the name of an application
+	const {appID, name, dataSourceID} = req.body;
+	try {
+		// Change the name of the data source! 
+		const updatedDataSource = await dataSourceModel.findOneAndUpdate(
+			{ _id: dataSourceID },
+			{ dataSourceName: name },
+		);
+		res.send(updatedDataSource);
+	}
+	catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in renaming the data source!`});
+	}
+})
+
 module.exports = router;

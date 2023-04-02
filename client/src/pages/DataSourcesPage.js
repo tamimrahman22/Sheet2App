@@ -14,17 +14,25 @@ import { useContext, useState } from 'react';
 export default function DataSource() {
     const auth = useContext(AuthContext);
     const store = useContext(GlobalContext);
-    console.log('[DATA SOURCE] USER IS: ', auth.user);
-    console.log('[DATA SOURCE] STORE IS: ', store);
-    console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
-    console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSource)
+    // console.log('[DATA SOURCE] USER IS: ', auth.user);
+    // console.log('[DATA SOURCE] STORE IS: ', store);
+    // console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
+    // console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSource)
 
-    //states for the component
+    // State that opens and shows the modal 
     const [open, setOpen] = useState(false)
+    // State that takes the user input for the spreadsheet url 
     const [spreadsheetURL, setSpreadSheetURL] = useState();
+    // State that takes the user input for index of the sheet they want to be added as a data source
     const [index, setIndex] = useState();
+    // State that allows the user to change the name of the data source
     const [editMode, setEditMode] = useState(false);
+    // State that stores the change named of the data source being modified
     const [dataSourceName, setDataSourceName] = useState('');
+    // State that stores the original name of the data source 
+    const [originalDataSourceName, setOriginalDataSourceName] = useState('')
+    // State that store the data source that is being modified 
+    const [dataSource, setDataSource] = useState({})
 
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
@@ -32,13 +40,21 @@ export default function DataSource() {
         setOpen(true);
     }
 
-    function handleClose(event) {
+    function closeModal(event) {
         // Close the modal! 
         setOpen(false)
     }
 
     function handleChangeDataSourceName(){
+        console.log('[DATA SOURCE] Handle name change of data source!')
+        console.log('[DATA SOURCE] Original data source name: ', originalDataSourceName);
         console.log('[DATA SOURCE] New data source name: ', dataSourceName);
+        // The user has made changes to the name
+        if (dataSourceName.trim() !== '' && dataSourceName !== originalDataSourceName) {
+            // Update the name of the data source
+            store.renameDataSource(dataSourceName, dataSource);
+        }
+        // Stop editing the name of the data source
         setEditMode(false)
     }
 
@@ -112,9 +128,6 @@ export default function DataSource() {
                                 onChange={(e) => {
                                     setDataSourceName(e.target.value)
                                 }}
-                                onBlur={(e) => {
-                                    setEditMode(false)
-                                }}
                                 sx={{ width: "35%" }}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -135,17 +148,14 @@ export default function DataSource() {
                                         <IconButton
                                             sx={{ bgcolor: 'green', color: 'white' }}
                                             disableRipple
-                                            color="inherit"
-                                            onClick={() => {
-                                                handleChangeDataSourceName()
-                                            }}
+                                            onClick={() => handleChangeDataSourceName()}
                                         >
                                             <DoneIcon></DoneIcon>
                                         </IconButton>
+
                                         <IconButton
                                             sx={{ bgcolor: 'red', color: 'white'}}
                                             disableRipple
-                                            color="inherit"
                                             onClick={() => setEditMode(false)}
                                         >
                                             <ClearIcon></ClearIcon>
@@ -156,7 +166,9 @@ export default function DataSource() {
                                 (
                                     <IconButton
                                         onClick={() => {
+                                            setOriginalDataSourceName(ds.dataSourceName)
                                             setDataSourceName(ds.dataSourceName)
+                                            setDataSource(ds)
                                             setEditMode(true)
                                         }}
                                     >
@@ -196,7 +208,7 @@ export default function DataSource() {
 
         <Modal
             open={open}
-            onClose={handleClose}
+            onClose={closeModal}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -218,7 +230,7 @@ export default function DataSource() {
                     alignItems="center" 
                     paddingTop={2}
                 >
-                    <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
+                    <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
                     <Button variant="contained" onClick={handleAddDataSource}>Add</Button>
                 </Box>
             </Box>

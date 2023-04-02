@@ -18,6 +18,7 @@ export const getDataSourcesByAppId = (id) => api.get(`/datasource/getbyAppId/${i
 export const getDataSourceById = (id) => api.get(`/datasource/get/${id}`)
 export const getColumns = (payload) => api.post("/datasource/getColumns", payload);
 export const getRows = (payload) => api.post("/datasource/getRows", payload);
+export const renameDataSource = (payload) => api.post("/datasource/rename", payload);
 
 // views
 export const getViews = (id) => api.get(`/views/get/${id}`);
@@ -35,6 +36,7 @@ const apis = {
     getDataSourceById,
     getColumns,
     getRows,
+    renameDataSource,
 
     getViews,
     addView,

@@ -114,6 +114,30 @@ export function GlobalContextProvider({children}){
         console.log('[STORE] Keys: ', keys)
     }
 
+    //Function for re-naming the data source of an application 
+    const renameDataSource = function(newName, dataSource){
+        async function changeName(dataSourceName){
+            //Define they payload we need to send to the backend
+            let payload = {
+                //ID of the current application
+                appID: currentApp._id,
+                //Name of the datasource
+                name: dataSourceName,
+                // ID of the data source
+                dataSourceID: dataSource._id
+            }
+            // Send a request to the backend 
+            console.log('[STORE] Sending payload to rename the data source...', payload)
+            const response = await api.renameDataSource(payload);
+            console.log('[STORE] Reloading data sources list for current application' )
+            const res = await api.getDataSourcesByAppId(currentApp._id);
+            setAppDataSource(res.data)
+        }
+        console.log('[STORE] Changing name of data source to: ', newName)
+        console.log('[STORE] Data Source is: ', dataSource)
+        changeName(newName, dataSource)
+    }
+
     const addView = function(tableId, viewType) {
         async function createView(tableId, viewType) {
             let payload = {
@@ -178,6 +202,7 @@ export function GlobalContextProvider({children}){
         addDataSource,
         addView,
         setApp,
+        renameDataSource
     }
 
     return(
