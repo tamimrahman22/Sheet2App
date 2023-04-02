@@ -4,6 +4,8 @@ import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
 import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack, IconButton} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import DoneIcon from '@mui/icons-material/Done';
+import ClearIcon from '@mui/icons-material/Clear';
 // import Copyright from './Copyright'
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
@@ -21,6 +23,8 @@ export default function DataSource() {
     const [open, setOpen] = useState(false)
     const [spreadsheetURL, setSpreadSheetURL] = useState();
     const [index, setIndex] = useState();
+    const [editMode, setEditMode] = useState(false);
+    const [dataSourceName, setDataSourceName] = useState('');
 
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
@@ -31,6 +35,11 @@ export default function DataSource() {
     function handleClose(event) {
         // Close the modal! 
         setOpen(false)
+    }
+
+    function handleChangeDataSourceName(){
+        console.log('[DATA SOURCE] New data source name: ', dataSourceName);
+        setEditMode(false)
     }
 
     function handleAddDataSource(event){
@@ -84,7 +93,6 @@ export default function DataSource() {
             </Typography>
             <Button variant="contained" onClick={openModal}>Add Data Source</Button>
         </Stack>
-
         {
             store.appDataSource.map(ds => (
                 <Box key={ds._id} paddingTop={3}>
@@ -95,10 +103,67 @@ export default function DataSource() {
                             gap: 3
                         }}
                     >
-                        <Typography variant="h4">{ds.dataSourceName}</Typography>
-                        <IconButton>
-                            <EditIcon />
-                        </IconButton>
+                        {editMode ? 
+                        (
+                            <TextField
+                                label = 'Enter a name for the data source'
+                                variant='standard'
+                                value = {dataSourceName}
+                                onChange={(e) => {
+                                    setDataSourceName(e.target.value)
+                                }}
+                                onBlur={(e) => {
+                                    setEditMode(false)
+                                }}
+                                sx={{ width: "35%" }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleChangeDataSourceName();
+                                    }
+                                }}
+                            />
+                        ) 
+                            : 
+                        (
+                            <Typography variant="h4">{ds.dataSourceName}</Typography>
+                        )
+                        }
+                            {
+                                editMode ? 
+                                (
+                                    <>
+                                        <IconButton
+                                            sx={{ bgcolor: 'green', color: 'white' }}
+                                            disableRipple
+                                            color="inherit"
+                                            onClick={() => {
+                                                handleChangeDataSourceName()
+                                            }}
+                                        >
+                                            <DoneIcon></DoneIcon>
+                                        </IconButton>
+                                        <IconButton
+                                            sx={{ bgcolor: 'red', color: 'white'}}
+                                            disableRipple
+                                            color="inherit"
+                                            onClick={() => setEditMode(false)}
+                                        >
+                                            <ClearIcon></ClearIcon>
+                                        </IconButton>
+                                    </>
+                                ) 
+                                    : 
+                                (
+                                    <IconButton
+                                        onClick={() => {
+                                            setDataSourceName(ds.dataSourceName)
+                                            setEditMode(true)
+                                        }}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                )
+                            }
                     </Box>
                     <TableContainer component={Paper}>   
                         <Table aria-label="simple table">
