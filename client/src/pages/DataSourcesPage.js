@@ -14,10 +14,10 @@ import { useContext, useState } from 'react';
 export default function DataSource() {
     const auth = useContext(AuthContext);
     const store = useContext(GlobalContext);
-    // console.log('[DATA SOURCE] USER IS: ', auth.user);
-    // console.log('[DATA SOURCE] STORE IS: ', store);
-    // console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
-    // console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSource)
+    console.log('[DATA SOURCE] USER IS: ', auth.user);
+    console.log('[DATA SOURCE] STORE IS: ', store);
+    console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
+    console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSource)
 
     // State that opens and shows the modal 
     const [open, setOpen] = useState(false)

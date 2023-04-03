@@ -22,6 +22,7 @@ export function GlobalContextProvider({children}){
     const loadAppList = function(){
         async function getLists() {    
             let payload = {
+                // Get all the list of applications by the name of the user 
                 user: auth.user.email,
             }
             const response = await api.getAppList(payload);
@@ -30,8 +31,6 @@ export function GlobalContextProvider({children}){
             // Set the app list with the new lists that were found! 
             setAppList(response.data);
             setCurrentApp(null);
-            // // Push the dashboard to show the new app being made! 
-            // navigate('/dashboard', { replace: true })
         }
         getLists();
     }
@@ -80,9 +79,13 @@ export function GlobalContextProvider({children}){
     const addDataSource = function (appID, sheetURL, sheetIndex, keys){
         async function addDataSource(){
             let payload = {
+                // Application ID of where we will be adding the data source to
                 appId:appID, 
+                // The URL to the Google SpreadSheet 
                 url:sheetURL, 
-                sheetIndex:sheetIndex-1, 
+                // Sheet index of where the data source is being generated from 
+                sheetIndex:sheetIndex-1,
+                // The key column 
                 keys:keys 
             };
             console.log('[STORE] Sending request to create data source... : ',payload)
@@ -92,6 +95,7 @@ export function GlobalContextProvider({children}){
             setApp(response.data);
             navigate("/editor/data");
             
+            // Update the list of application with the latest information
             async function getLists() {    
                 let payload = {
                     user: auth.user.email,
@@ -102,7 +106,6 @@ export function GlobalContextProvider({children}){
                 // Set the app list with the new lists that were found! 
                 setAppList(response.data);
             }
-            // Update our AppList with the latest information!
             getLists();
         }
         addDataSource(appID, sheetURL, sheetIndex, keys); 
@@ -163,8 +166,11 @@ export function GlobalContextProvider({children}){
     const addView = function(tableId, viewType) {
         async function createView(tableId, viewType) {
             let payload = {
+                // The id of the application we will be adding the view to
                 appId: currentApp._id,
+                // The id of the data source that was specified by the user
                 tableId: tableId,
+                // The view type that was specified by the user 
                 viewType: viewType
             }
             console.log('[STORE] Sending request to create view... : ',payload)
@@ -180,7 +186,9 @@ export function GlobalContextProvider({children}){
     const renameApp = function(name) {
         async function renameApplication(name) {
             let payload = {
+                // The id of the application's name we will be editing
                 appId: currentApp._id,
+                // The name that was given from the user
                 newName: name,
             }
             const response = await api.renameApp(payload);

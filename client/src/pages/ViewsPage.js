@@ -14,27 +14,36 @@ export default function ViewsPage() {
     console.log('[VIEWS] Current application is: ', store.currentApp);
     console.log('[VIEWS] Current application data source(s) are: ', store.appDataSource);
 
+    // State to either show or hide the modal
     const [open, setOpen] = useState(false);
+    // State to be updated about the view type the user wants to be added to the app 
     const [viewType, setViewType] = useState("Table");
+    // State to store the data source object 
     const [dataSource, setDataSource] = useState(null);
 
+    // Function to open the modal 
     function openModal(event) {
         console.log('[VIEWS] CURRENT App: ', store.currentApp)
         // Open the modal! 
         setOpen(true);
     }
 
+    // Function to close the modal 
     function closeModal(event) {
         // Close the modal! 
         setOpen(false);
+        // Reset the state values
         setViewType("Table");
         setDataSource(null);
     }
 
+    // Function to handle when the add button is hit on the modal in order to process the view being made for the app
     function handleAddView(event) {
         console.log('[VIEWS] View Type: ', viewType)
         console.log('[VIEWS] Data Source Name is: ', dataSource)
+        // Data source is the object itself, pass the id to the function in order to generate the view + the view type the person specified 
         store.addView(dataSource._id, viewType);
+        // Hide the modal 
         setOpen(false);
     }
 
