@@ -52,7 +52,7 @@ router.post('/create', async(req, res) => {
 					else{
 						roles.push({
 							name: readData.data.values[j][i],
-							role: "End User"
+							role: readData.data.values[0][i]
 						})
 					}
 				}
@@ -241,7 +241,7 @@ async function updateAppRoles(){
 						else{
 							roles.push({
 								name: readData.data.values[j][i],
-								role: "End User"
+								role: readData.data.values[0][i]
 							})
 						}
 					}
