@@ -88,6 +88,7 @@ router.post('/delete', async(req, res) => {
 
 router.post('/list', async(req, res) => {
 	// list all applications
+	await updateAppRoles();
 	const { user } = req.body;
 	try {
 		const list = await appModel.find({ });
@@ -131,6 +132,8 @@ router.get('/get/:id', async(req, res) => {
 router.post('/published-end-user', async(req, res) => {
 	// list all published applications where current user is end user
 	// need user
+	await updateAppRoles();
+	
 	const { user } = req.body;
 	try {
 		const list = await appModel.find({ published: true });
@@ -190,5 +193,59 @@ router.post("/rename", async(req, res) => {
 		res.status(400).json({ message: `Error in renaming app` });
 	}
 })
+
+async function updateAppRoles(){
+	const authClientObject = await auth.getClient();
+	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+	const list = await appModel.find({ });
+	try{
+		for(let i = 0; i < list.length; i++){
+			// get name of sheet
+			const url = list[i].roleMembershipSheet;
+			const regex = /\/d\/(.*?)\/edit/;
+			const match = url.match(regex);
+			const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+
+			const readData = await googleSheetsInstance.spreadsheets.values.get({
+				auth, //auth object
+				spreadsheetId, // spreadsheet id
+				range: `Sheet1`, //range of cells to read from.
+			})
+	
+			// get each column and put into array
+			let roles = [];
+			for(let i = 0; i < readData.data.values[0].length; i++){
+				// let tempList = [];
+				for(let j = 1; j < readData.data.values.length; j++){
+					if(typeof readData.data.values[j][i] !== 'undefined'){
+						if(i == 0){
+							roles.push({
+								name: readData.data.values[j][i],
+								role: "Developer"
+							})
+						}
+						else{
+							roles.push({
+								name: readData.data.values[j][i],
+								role: "End User"
+							})
+						}
+					}
+				}
+			}
+			console.log(list[i].name);
+			console.log(roles);
+			const updatedApp = await appModel.findOneAndUpdate(
+				{ _id: list[i].id },
+				{roles: roles},
+			);
+		}
+		// console.log(finalList);
+		console.log("App roles updated");
+	}
+	catch (err) {
+		console.error('Error in updating app roles: ', err);
+	}
+}
 
 module.exports = router;
