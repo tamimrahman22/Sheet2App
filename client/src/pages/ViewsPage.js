@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem} from '@mui/material';
+import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl} from '@mui/material';
 import TableView from '../components/tableView';
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
@@ -9,8 +9,10 @@ import GlobalContext from '../components/context/GlobalContext';
 export default function ViewsPage() {
     const auth = useContext(AuthContext);
     const store = useContext(GlobalContext);
-    console.log(auth.user);
-    console.log(store.currentApp);
+    console.log('[VIEWS] User is: ', auth.user);
+    console.log('[VIEWS] Store is: ', store);
+    console.log('[VIEWS] Current application is: ', store.currentApp);
+    console.log('[VIEWS] Current application data source(s) are: ', store.appDataSource);
 
     const [open, setOpen] = useState(false);
     const [viewType, setViewType] = useState("Table");
@@ -22,7 +24,7 @@ export default function ViewsPage() {
         setOpen(true);
     }
 
-    function handleClose(event) {
+    function closeModal(event) {
         // Close the modal! 
         setOpen(false);
         setViewType("Table");
@@ -30,9 +32,9 @@ export default function ViewsPage() {
     }
 
     function handleAddView(event) {
-        console.log(viewType);
-        console.log(dataSource);
-        store.addView(dataSource, viewType);
+        console.log('[VIEWS] View Type: ', viewType)
+        console.log('[VIEWS] Data Source Name is: ', dataSource)
+        store.addView(dataSource._id, viewType);
         setOpen(false);
     }
 
@@ -47,9 +49,6 @@ export default function ViewsPage() {
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
-        // alignItems: "center",
-        // textAlign: "center",
-        // justifyContent: "center"
     };
 
     return (
@@ -70,9 +69,6 @@ export default function ViewsPage() {
         </Stack>
 
         <Container maxWidth="xl">
-            {/* <Typography variant="h4" >
-                Views
-            </Typography> */}
             <List sx={{ width: '100%' }}>
             {
                 store.appViews.map((view) => (
@@ -86,7 +82,7 @@ export default function ViewsPage() {
 
         <Modal
             open={open}
-            onClose={handleClose}
+            onClose={closeModal}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -97,35 +93,39 @@ export default function ViewsPage() {
                     </Typography>
                 </Box>
                 <Box paddingTop={1}>
-                    <InputLabel id="viewType-select-label">View Type</InputLabel>
-                    <Select
-                        labelId="viewType-select-label"
-                        id="viewType-select"
-                        value={viewType}
-                        label="Age"
-                        onChange={(e) => setViewType(e.target.value)}
-                    >
-                        <MenuItem value={"Table"}>Table</MenuItem>
-                        <MenuItem value={"Detail"}>Detail</MenuItem>
-                    </Select>
+                    <FormControl sx={{ minWidth: 350 }}>
+                        <InputLabel id="viewType-select-label">View Type</InputLabel>
+                        <Select
+                            labelId="viewType-select-label"
+                            id="viewType-select"
+                            value={viewType}
+                            label="Age"
+                            onChange={(e) => setViewType(e.target.value)}
+                        >
+                            <MenuItem value={"Table"}>Table</MenuItem>
+                            <MenuItem value={"Detail"}>Detail</MenuItem>
+                        </Select>
+                    </FormControl>
                 </Box>
                 <Box paddingTop={2}>
-                    <InputLabel id="dataSource-select-label">View Type</InputLabel>
-                    <Select
-                        labelId="dataSource-select-label"
-                        id="dataSource-select"
-                        value={dataSource}
-                        label="Age"
-                        onChange={(e) => setDataSource(e.target.value)}
-                    >
-                        {
-                            store.currentApp.dataSources.map(ds => {
-                                return (
-                                    <MenuItem value={ds}>{ds}</MenuItem>
-                                )
-                            })
-                        }
-                    </Select>
+                    <FormControl sx={{ minWidth: 350}}>
+                        <InputLabel id="dataSource-select-label">Data Source</InputLabel>
+                        <Select
+                            labelId="dataSource-select-label"
+                            id="dataSource-select"
+                            value={dataSource}
+                            label="Age"
+                            onChange={(e) => setDataSource(e.target.value)}
+                        >
+                            {
+                                store.appDataSource.map(ds => {
+                                    return (
+                                        <MenuItem value={ds}>{ds.dataSourceName}</MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </FormControl>
                 </Box>
                 <Box m={1}
                     display="flex"
@@ -133,7 +133,7 @@ export default function ViewsPage() {
                     alignItems="center" 
                     paddingTop={2}
                 >
-                    <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
+                    <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
                     <Button variant="contained" onClick={handleAddView}>Add</Button>
                 </Box>
             </Box>

@@ -159,6 +159,7 @@ export function GlobalContextProvider({children}){
         setKeyColumn(keyColumnName, dataSource)
     }
 
+    // Function to add a specified view type to the application
     const addView = function(tableId, viewType) {
         async function createView(tableId, viewType) {
             let payload = {
