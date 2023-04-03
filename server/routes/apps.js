@@ -34,16 +34,30 @@ router.post('/create', async(req, res) => {
 		const readData = await googleSheetsInstance.spreadsheets.values.get({
 			auth, //auth object
 			spreadsheetId, // spreadsheet id
-			range: "Sheet1!A:B", //range of cells to read from.
+			range: `Sheet1`, //range of cells to read from.
 		})
 
-		// push those values into an array with the email of the user and their role
-		for(let i = 1; i < readData.data.values.length; i++){
-			roles.push({
-				name: readData.data.values[i][0],
-				role: readData.data.values[i][1]
-			})
-		};
+		// get each column and put into array
+		let roles = [];
+		for(let i = 0; i < readData.data.values[0].length; i++){
+			// let tempList = [];
+			for(let j = 1; j < readData.data.values.length; j++){
+				if(typeof readData.data.values[j][i] !== 'undefined'){
+					if(i == 0){
+						roles.push({
+							name: readData.data.values[j][i],
+							role: "Developer"
+						})
+					}
+					else{
+						roles.push({
+							name: readData.data.values[j][i],
+							role: "End User"
+						})
+					}
+				}
+			}
+		}
 
 		console.log(roles);
 	}
@@ -133,7 +147,7 @@ router.post('/published-end-user', async(req, res) => {
 	// list all published applications where current user is end user
 	// need user
 	await updateAppRoles();
-	
+
 	const { user } = req.body;
 	try {
 		const list = await appModel.find({ published: true });
