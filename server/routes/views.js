@@ -5,6 +5,11 @@ const dataSourceModel = require('../models/DataSource');
 const viewsModel = require('../models/View');
 
 const { google } = require("googleapis");
+const auth = new google.auth.GoogleAuth({
+	// keyFile: "./keys.json",
+	keyFile: "keys.json",
+	scopes: "https://www.googleapis.com/auth/spreadsheets"
+});
 
 router.post('/add', async (req, res) => {
     // get name, table, columns, and roles from appId, 
@@ -84,6 +89,38 @@ router.get('/get/:id', async(req, res) => {
 		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in getting app` });
 	}
+});
+
+router.post('/addRecord', async (req, res) => {
+    // get dataSource
+    const { record, tableId } = req.body;
+    const authClientObject = await auth.getClient();
+	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+    const table = await dataSourceModel.findById( { _id: tableId });
+
+    const regex = /\/d\/(.*?)\/edit/;
+    const match = table.url.match(regex);
+    const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+    const range = table.sheetName;
+    const values = [];
+    values.push(record);
+    const resource = { values };
+
+    // add record to datasource
+    try {
+        const writeData = googleSheetsInstance.spreadsheets.values.append({
+            spreadsheetId,
+            range,
+            valueInputOption: "USER_ENTERED",
+            resource,
+        });
+      console.log("successfully wrote to sheet");
+      res.status(200).json({ tableId: tableId });
+    }
+    catch (err){
+        console.error('Error: ', err);
+		res.status(400).json({ message: `Error in getting app` });
+    }
 });
 
 
