@@ -6,7 +6,6 @@ import { Button, Typography, Link, Modal, TextField, TableContainer, Table, Tabl
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
-// import Copyright from './Copyright'
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
 import { useContext, useState } from 'react';
@@ -192,12 +191,14 @@ export default function DataSource() {
                     <TableContainer component={Paper}>   
                         <Table aria-label="simple table">
                             <TableHead>
-                                <TableCell>Spreadsheet Name</TableCell>
-                                <TableCell>Sheet Name</TableCell>
-                                <TableCell>URL of Spreadsheet</TableCell>
-                                <TableCell>Sheet Index</TableCell>
-                                <TableCell>Column Name(s)</TableCell>
-                                <TableCell>Keys</TableCell>
+                                <TableRow>
+                                    <TableCell>Spreadsheet Name</TableCell>
+                                    <TableCell>Sheet Name</TableCell>
+                                    <TableCell>URL of Spreadsheet</TableCell>
+                                    <TableCell>Sheet Index</TableCell>
+                                    <TableCell>Column Name(s)</TableCell>
+                                    <TableCell>Keys</TableCell>
+                                </TableRow>
                             </TableHead>
                             {
                                 store.appDataSource.length > 0 ? 
@@ -217,7 +218,7 @@ export default function DataSource() {
                                                         onChange={(e) => handleKeySelect(e, ds)}
                                                     >
                                                         {ds.columns.map((col) => (
-                                                        <MenuItem value={col.name}>{col.name}</MenuItem>
+                                                        <MenuItem key={col.name} value={col.name}>{col.name}</MenuItem>
                                                         ))}
                                                     </Select>
                                             </FormControl>

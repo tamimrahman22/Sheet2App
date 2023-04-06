@@ -1,16 +1,24 @@
-import { useEffect, useState, } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button } from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import EditIcon from '@mui/icons-material/Edit';
+import DoneIcon from '@mui/icons-material/Done';
+import ClearIcon from '@mui/icons-material/Clear';
 import api from "../../api";
+import GlobalContext from '../../components/context/GlobalContext';
 
 function TableView(props) {
     const { view } = props;
+    const store = useContext(GlobalContext);
     // console.log(view);
     const length = view.columns.length + 1
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    const [editMode, setEditMode] = useState(false);
+    const [viewToEdit, setViewtoEdit] = useState(null);
+    const [viewName, setViewName] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -19,7 +27,7 @@ function TableView(props) {
             console.log(response.data.url);
             let payload = {
                 url: response.data.url,
-                name: "Sheet1"
+                name: "Sheet1"  // DEFAULTING TO SHEET1
             }
             response = await api.getRows(payload);
             console.log(response.data);
@@ -30,6 +38,17 @@ function TableView(props) {
         fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    function handleChangeViewName() {
+        console.log('[VIEWS] Handle name change of view!')
+        console.log('[VIEWS] Original view name: ', view.name);
+        console.log('[VIEWS] New view name: ', viewName);
+        if (viewName.trim() !== '' && viewName !== view.name) {
+            // Update the name of the data source
+            store.renameView(viewName, view._id);
+        }
+        setEditMode(false);
+    }
 
     function Row(props) {
         const { row, col } = props;
@@ -92,9 +111,59 @@ function TableView(props) {
                             spacing={12}
                             sx={{ px:1, mb: 2 }}
                         >
-                            <Typography color="inherit" variant="h6" underline="hover" noWrap sx={{ pt: 1 }}>
-                                {view.name}
-                            </Typography>
+                            <Box display="flex" alignItems="center" sx = {{ gap: 3}}>
+                                { editMode && view._id === viewToEdit._id ? 
+                                    <TextField
+                                    label = 'Enter a name for the view'
+                                    variant='standard'
+                                    value = {viewName}
+                                    onChange={(e) => {
+                                        setViewName(e.target.value)
+                                    }}
+                                    sx={{ width: "35%" }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleChangeViewName();
+                                        }
+                                    }}
+                                    />
+                                    :
+                                    <Typography color="inherit" variant="h6" underline="hover" noWrap sx={{ pt: 1 }}>
+                                        {view.name}
+                                    </Typography>
+                                }
+                                {
+                                    editMode && view._id === viewToEdit._id ? 
+                                    <>
+                                        <IconButton
+                                            sx={{ bgcolor: 'green', color: 'white' }}
+                                            disableRipple
+                                            onClick={() => handleChangeViewName()}
+                                        >
+                                            <DoneIcon></DoneIcon>
+                                        </IconButton>
+
+                                        <IconButton
+                                                sx={{ bgcolor: 'red', color: 'white'}}
+                                                disableRipple
+                                                onClick={() => setEditMode(false)}
+                                        >
+                                            <ClearIcon></ClearIcon>
+                                        </IconButton>
+                                    </>
+                                    :
+                                    <IconButton
+                                        onClick={() => {
+                                            setViewName(view.name);
+                                            setViewtoEdit(view);
+                                            setEditMode(true);
+                                        }}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                }
+                            </Box>
+                            
                             <Button variant="contained">Add Record</Button>
                          </Stack>
                         
@@ -116,9 +185,9 @@ function TableView(props) {
                                 <TableCell colSpan={length}>
                                     <LinearProgress /> 
                                 </TableCell> :
-                                    data.map(row => {
+                                    data.map((row, index) => {
                                         return (
-                                            <Row row={row} col={view.columns}/>
+                                            <Row key={"row " + index} row={row} col={view.columns}/>
                                         )
                                     }) 
                                 }
@@ -126,7 +195,7 @@ function TableView(props) {
                             </Table>
                         </TableContainer>
                     </Box>
-{/*                       
+                    {/*                       
                     <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
                         View Type: {view.viewType}
                     </Typography> */}

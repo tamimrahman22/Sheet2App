@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Container, Typography, List, Stack, Box, Link, Card, CardContent, CardActionArea} from '@mui/material';
+import { Container, Typography, List, Stack, Box, Card, CardContent, CardActionArea} from '@mui/material';
 import GlobalContext from '../components/context/GlobalContext';
 
 // ----------------------------------------------------------------------

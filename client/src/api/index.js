@@ -11,6 +11,7 @@ export const createApp = (payload) => api.post("/app/create", payload);
 export const getAppById = (id) => api.get(`/app/get/${id}`);
 export const renameApp = (payload) => api.post("/app/rename", payload);
 export const publishApp = (payload) => api.post("/app/publish", payload);
+export const deleteApp = (payload) => api.post("/app/delete", payload);
 
 // data source
 export const addDataSource = (payload) => api.post("/datasource/add", payload); 
@@ -24,6 +25,7 @@ export const setKeys = (payload) => api.post("/datasource/setKeys", payload)
 // views
 export const getViews = (id) => api.get(`/views/get/${id}`);
 export const addView = (payload) => api.post("/views/add", payload);
+export const renameView = (payload) => api.post("/views/rename", payload);
 
 const apis = {
     getAppList,
@@ -31,6 +33,7 @@ const apis = {
     getAppById,
     renameApp,
     publishApp,
+    deleteApp,
 
     addDataSource,
     getDataSourcesByAppId,
@@ -42,6 +45,7 @@ const apis = {
 
     getViews,
     addView,
+    renameView,
 };
 
 export default apis;

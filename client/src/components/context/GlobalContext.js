@@ -31,6 +31,8 @@ export function GlobalContextProvider({children}){
             // Set the app list with the new lists that were found! 
             setAppList(response.data);
             setCurrentApp(null);
+            setAppDataSource([]);
+            setAppViews([]);
         }
         getLists();
     }
@@ -182,6 +184,23 @@ export function GlobalContextProvider({children}){
         createView(tableId, viewType);
     }
 
+    const renameView = function(name, viewId) {
+        async function changeViewName(name, viewId) {
+            let payload = {
+                name: name,
+                viewId: viewId
+            }
+            console.log('[STORE] Sending request to rename view... : ',payload);
+            await api.renameView(payload);
+            console.log('[STORE] Reloading views for current application' );
+            const res = await api.getViews(currentApp._id);
+            setAppViews(res.data);
+        }
+        console.log('[STORE] Changing name of view to: ', name);
+        console.log('[STORE] View is: ', viewId);
+        changeViewName(name, viewId);
+    }
+
     // Function to rename the application! 
     const renameApp = function(name) {
         async function renameApplication(name) {
@@ -215,6 +234,20 @@ export function GlobalContextProvider({children}){
         publishApplication()
     }
 
+    const deleteApp = function() {
+        async function deleteApplication() {
+            let payload = {
+                appId: currentApp._id
+            }
+            const response = await api.deleteApp(payload);
+            console.log('[STORE] (Deleting application...', response);
+            if (response.status === 200) {
+                navigate("/dashboard");
+            }
+        }
+        deleteApplication();
+    }
+
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
     const funcs = {
         appList, 
@@ -233,7 +266,9 @@ export function GlobalContextProvider({children}){
         addView,
         setApp,
         renameDataSource,
-        setKeys
+        setKeys,
+        renameView,
+        deleteApp,
     }
 
     return(

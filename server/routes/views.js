@@ -91,6 +91,22 @@ router.get('/get/:id', async(req, res) => {
 	}
 });
 
+router.post("/rename", async(req, res) => {
+    // update name of a view
+    const {name, viewId} = req.body;
+    try {
+        const updatedView = await viewsModel.findOneAndUpdate(
+            { _id: viewId },
+            { name: name }
+        );
+        res.send(updatedView);
+    }
+    catch (err) {
+        console.error('Error: ', err);
+        res.status(400).json({ message: `Error in renaming the view!`});
+    }
+})
+
 router.post('/addRecord', async (req, res) => {
     // get dataSource
     const { record, tableId } = req.body;
