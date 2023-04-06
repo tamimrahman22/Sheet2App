@@ -6,6 +6,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
 import api from "../../api";
 import GlobalContext from '../../components/context/GlobalContext';
 
@@ -50,13 +51,28 @@ function TableView(props) {
         setEditMode(false);
     }
 
-    function Row(props) {
+    function handleAddRecord() {
+        console.log('[VIEWS] Handle adding new record to view');
+        const inputs = [];
+        for (let i = 0; i < length - 1; i++) {
+            // console.log(document.getElementById("add-record-" + i).value);
+            inputs.push(document.getElementById("add-record-" + i).value);
+        }
+        console.log(inputs);
+        let temp = data;
+        temp.push(inputs);
+        setData(temp);
+        console.log(data);
+        store.addRecord(inputs, view.table);
+    }
+
+    function DetailedRow(props) {
         const { row, col } = props;
         const [open, setOpen] = useState(false);
 
         return (
             <>
-                <TableRow onClick={() => {console.log("clicked"); setOpen(!open)}}>
+                <TableRow onClick={() => {setOpen(!open)}}>
                     {
                         row.map(cell => {
                             return (
@@ -82,7 +98,7 @@ function TableView(props) {
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={11}>
-                                                        <TextField fullWidth id="app-name" variant="outlined" defaultValue={row[index]}/>
+                                                        <TextField fullWidth id="textfield" variant="outlined" defaultValue={row[index]}/>
                                                     </Grid>
                                                 </>
                                             )
@@ -90,6 +106,50 @@ function TableView(props) {
                                     }
                                     <Grid item xs={12} justifyContent="center" display="flex" alignItems="center">
                                         <Button variant="contained">Update Record</Button>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow>
+            </>
+        )
+    }
+
+    function AddRecordRow(props) {
+        const { col } = props;
+        const [open, setOpen] = useState(false);
+        
+        return (
+            <>
+                <TableRow onClick={() => {setOpen(!open)}}>
+                    <TableCell colSpan={length -1} align="center">Add Record</TableCell>
+                    <TableCell align="right"> {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} </TableCell>
+                </TableRow>
+
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length}>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box sx={{ margin: 1 }}>
+                                <Grid container spacing={1}>
+                                    {
+                                        col.map((c, count) => {
+                                            return (
+                                                <>
+                                                    <Grid item xs={1} justifyContent="center" display="flex" alignItems="center">
+                                                        <Typography variant="h6">
+                                                            {c.name}:
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={11}>
+                                                        <TextField fullWidth id={"add-record-" + count} variant="outlined"/>
+                                                    </Grid>
+                                                </>
+                                            )
+                                        })
+                                    }
+                                    <Grid item xs={12} justifyContent="center" display="flex" alignItems="center">
+                                        <Button variant="contained" onClick={handleAddRecord}>Add Record</Button>
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -164,7 +224,10 @@ function TableView(props) {
                                 }
                             </Box>
                             
-                            <Button variant="contained">Add Record</Button>
+                            {/* <Button variant="contained" onClick={handleAddRecord}>Add Record</Button> */}
+                            <IconButton>
+                                <DeleteIcon />
+                            </IconButton>
                          </Stack>
                         
                         
@@ -187,10 +250,11 @@ function TableView(props) {
                                 </TableCell> :
                                     data.map((row, index) => {
                                         return (
-                                            <Row key={"row " + index} row={row} col={view.columns}/>
+                                            <DetailedRow key={"row-" + index} row={row} col={view.columns}/>
                                         )
                                     }) 
                                 }
+                                <AddRecordRow col={view.columns} />
                                 </TableBody>
                             </Table>
                         </TableContainer>

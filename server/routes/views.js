@@ -122,6 +122,10 @@ router.post('/addRecord', async (req, res) => {
     values.push(record);
     const resource = { values };
 
+    console.log(spreadsheetId);
+    console.log(range);
+    console.log.apply(resource);
+
     // add record to datasource
     try {
         const writeData = googleSheetsInstance.spreadsheets.values.append({

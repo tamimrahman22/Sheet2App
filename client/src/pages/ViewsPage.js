@@ -82,7 +82,7 @@ export default function ViewsPage() {
             {
                 store.appViews.map((view) => (
                     <Box component="span" sx={{ p: 2 }} key={view._id}>
-                        <TableView view={view} />
+                        <TableView key={view._id} view={view} />
                     </Box>
                 ))
             }

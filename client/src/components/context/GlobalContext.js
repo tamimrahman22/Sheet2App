@@ -256,6 +256,21 @@ export function GlobalContextProvider({children}){
         changeViewName(name, viewId);
     }
 
+    const addRecord = function(record, tableId) {
+        async function addRecordToView(record, tableId) {
+            let payload = {
+                record: record,
+                tableId: tableId
+            }
+            const response = await api.addRecord(payload);
+            if (response.status === 200) {
+                const res = await api.getViews(currentApp._id);
+                setAppViews(res.data);
+            }
+        }
+        addRecordToView(record, tableId);
+    }
+
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
     const funcs = {
         // STATES
@@ -268,6 +283,7 @@ export function GlobalContextProvider({children}){
         appViews,
         setAppViews,
 
+        // APPS
         loadAppList, 
         createApp,
         setApp,
@@ -275,12 +291,16 @@ export function GlobalContextProvider({children}){
         publishApp,
         deleteApp,
         
+
+        // DATA SOURCES
         addDataSource,
         renameDataSource,
         setKeys,
         
+        // VIEWS
         addView,
         renameView,
+        addRecord,
     }
 
     return(

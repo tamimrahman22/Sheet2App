@@ -26,6 +26,7 @@ export const setKeys = (payload) => api.post("/datasource/setKeys", payload)
 export const getViews = (id) => api.get(`/views/get/${id}`);
 export const addView = (payload) => api.post("/views/add", payload);
 export const renameView = (payload) => api.post("/views/rename", payload);
+export const addRecord = (payload) => api.post("/views/addRecord", payload);
 
 const apis = {
     getAppList,
@@ -46,6 +47,7 @@ const apis = {
     getViews,
     addView,
     renameView,
+    addRecord,
 };
 
 export default apis;
