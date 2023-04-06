@@ -12,14 +12,14 @@ export default function ViewsPage() {
     console.log('[VIEWS] User is: ', auth.user);
     console.log('[VIEWS] Store is: ', store);
     console.log('[VIEWS] Current application is: ', store.currentApp);
-    console.log('[VIEWS] Current application data source(s) are: ', store.appDataSource);
+    console.log('[VIEWS] Current application data source(s) are: ', store.appDataSources);
 
     // State to either show or hide the modal
     const [open, setOpen] = useState(false);
     // State to be updated about the view type the user wants to be added to the app 
     const [viewType, setViewType] = useState("Table");
     // State to store the data source object 
-    const [dataSource, setDataSource] = useState(null);
+    const [dataSource, setDataSource] = useState("");
 
     // Function to open the modal 
     function openModal(event) {
@@ -127,9 +127,9 @@ export default function ViewsPage() {
                             onChange={(e) => setDataSource(e.target.value)}
                         >
                             {
-                                store.appDataSource.map(ds => {
+                                store.appDataSources.map(ds => {
                                     return (
-                                        <MenuItem key={ds} value={ds}>{ds.dataSourceName}</MenuItem>
+                                        <MenuItem key={ds._id} value={ds}>{ds.dataSourceName}</MenuItem>
                                     )
                                 })
                             }

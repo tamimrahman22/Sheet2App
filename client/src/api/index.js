@@ -20,12 +20,14 @@ export const getDataSourceById = (id) => api.get(`/datasource/get/${id}`)
 export const getColumns = (payload) => api.post("/datasource/getColumns", payload);
 export const getRows = (payload) => api.post("/datasource/getRows", payload);
 export const renameDataSource = (payload) => api.post("/datasource/rename", payload);
-export const setKeys = (payload) => api.post("/datasource/setKeys", payload)
+export const setKeys = (payload) => api.post("/datasource/setKeys", payload);
+export const deleteDataSource = (payload) => api.post("/datasource/delete", payload);
 
 // views
 export const getViews = (id) => api.get(`/views/get/${id}`);
 export const addView = (payload) => api.post("/views/add", payload);
 export const renameView = (payload) => api.post("/views/rename", payload);
+export const deleteView = (payload) => api.post("/views/delete", payload);
 export const addRecord = (payload) => api.post("/views/addRecord", payload);
 
 const apis = {
@@ -43,10 +45,12 @@ const apis = {
     getRows,
     renameDataSource,
     setKeys,
+    deleteDataSource,
 
     getViews,
     addView,
     renameView,
+    deleteView,
     addRecord,
 };
 

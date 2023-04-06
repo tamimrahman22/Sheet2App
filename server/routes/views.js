@@ -107,6 +107,40 @@ router.post("/rename", async(req, res) => {
     }
 })
 
+router.post('/delete', async(req, res) => {
+    const { appId, viewId } = req.body;
+    try {
+        // DELETE FROM THE VIEWS COLLECTION
+        const view = await viewsModel.deleteOne({ _id: viewId });
+        console.log(view);
+        if (view.deletedCount != 1) {
+            throw new Error("Deletion unsuccessful or incorrect amount")
+        }
+ 
+        // DELETE FROM THE LIST OF VIEWS IN APP
+        const app = await appModel.findOne({ _id: appId });
+        console.log(app.views);
+        console.log(app.views.indexOf(viewId));
+        let index = app.views.indexOf(viewId);
+        if (index === -1) {
+            throw new Error("View not found in app");
+        }
+        app.views.splice(index, 1);
+        console.log(app.views);
+
+        const update = await appModel.findOneAndUpdate(
+            { _id: appId },
+            { views: app.views },
+            { new: true },
+        );
+        res.send(update);
+    }
+    catch (err) {
+        console.error('Error: ', err);
+        res.status(400).json({ message: `Error in view deletion for view ${viewId}` });
+    }
+})
+
 router.post('/addRecord', async (req, res) => {
     // get dataSource
     const { record, tableId } = req.body;

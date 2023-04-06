@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const appModel = require('../models/Apps');
 const dataSourceModel = require('../models/DataSource');
+const viewsModel = require('../models/View');
 const { google } = require("googleapis");
 
 const auth = new google.auth.GoogleAuth({
@@ -255,6 +256,67 @@ router.post("/setKeys", async(req, res) => {
 	catch (err) {
 		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in renaming the data source!`});
+	}
+})
+
+router.post("/delete", async(req, res) => {
+	const { appId, dataSourceID } = req.body;
+	try {
+
+		// DELETE FROM THE DATA SOURCES COLLECTION
+		const response = await dataSourceModel.deleteOne({ _id: dataSourceID });
+		console.log(response);
+        if (response.deletedCount != 1) {
+            throw new Error("Deletion unsuccessful or incorrect amount")
+        }
+
+		// DELETE VIEWS USING DATA SOURCE
+		const views = await viewsModel.find({ table: dataSourceID });
+		console.log(views);
+		views.forEach(element => {
+			console.log(element._id);
+		});
+		const resp = await viewsModel.deleteMany({ table: dataSourceID });
+		console.log(resp);
+		if (res.acknowledged === false) {
+			throw new Error("Deletion unsuccessful or incorrect amount")
+		}
+
+		// DELETE FROM LIST OF DATA SOURCES IN APP
+		const app = await appModel.findOne({ _id: appId });
+		console.log(app.dataSources);
+		console.log(app.dataSources.indexOf(dataSourceID));
+		let index = app.dataSources.indexOf(dataSourceID);
+		if (index === -1) {
+            throw new Error("Data source not found in app");
+        }
+		app.dataSources.splice(index, 1);
+		console.log(app.dataSources);
+
+		// DELETE REMOVED VIEWS FROM LIST OF VIEWS IN APP
+		console.log(app.views);
+		views.forEach(v => {
+			let index = app.views.indexOf(v._id);
+			console.log(index)
+			app.views.splice(index, 1);
+		})
+		console.log(app.views);
+
+		let update = await appModel.findOneAndUpdate(
+			{ _id: appId },
+			{ dataSources: app.dataSources },
+			{ new: true},
+		);
+		update = await appModel.findOneAndUpdate(
+			{ _id: appId },
+			{ views: app.views },
+			{ new: true},
+		);
+		res.send(update);
+	}
+	catch (err) {
+		console.log('Error: ', err);
+		res.status(400).json({ message: `Error in data source deletion for ${dataSourceID}` });
 	}
 })
 

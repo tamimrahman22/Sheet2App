@@ -13,7 +13,7 @@ export function GlobalContextProvider({children}){
     // GLOBAL STATE OF THE APPLICATION 
     const [appList, setAppList] = useState([]); 
     const [currentApp, setCurrentApp] = useState(null);
-    const [appDataSource, setAppDataSource] = useState([]); 
+    const [appDataSources, setAppDataSources] = useState([]); 
     const [appViews, setAppViews] = useState([]);
 
     // Functions to be used to manipulate the global state of our application 
@@ -34,7 +34,7 @@ export function GlobalContextProvider({children}){
             if (response.status === 200) {
                 setAppList(response.data);
                 setCurrentApp(null);
-                setAppDataSource([]);
+                setAppDataSources([]);
                 setAppViews([]);
             }
         }
@@ -70,7 +70,7 @@ export function GlobalContextProvider({children}){
             console.log('[STORE] DATA SOURCES FOR THE APPLICATION IS: ', ds)
             const response = await api.getDataSourcesByAppId(app._id);
             console.log(response.data)
-            setAppDataSource(response.data)
+            setAppDataSources(response.data)
             const viewResponse = await api.getViews(app._id);
             console.log('[STORE] Getting application views...', viewResponse);
             setAppViews(viewResponse.data);
@@ -189,7 +189,7 @@ export function GlobalContextProvider({children}){
             await api.renameDataSource(payload);
             console.log('[STORE] Reloading data sources list for current application' )
             const res = await api.getDataSourcesByAppId(currentApp._id);
-            setAppDataSource(res.data)
+            setAppDataSources(res.data)
         }
         console.log('[STORE] Changing name of data source to: ', newName)
         console.log('[STORE] Data Source is: ', dataSource)
@@ -212,9 +212,30 @@ export function GlobalContextProvider({children}){
             await api.setKeys(payload)
             console.log('[STORE] Reloading data sources list for current application' )
             const res = await api.getDataSourcesByAppId(currentApp._id);
-            setAppDataSource(res.data)
+            setAppDataSources(res.data)
         }
         setKeyColumn(keyColumnName, dataSource)
+    }
+
+    const deleteDataSource = function(dataSourceID) {
+        async function deleteDataSourceById(dataSourceID) {
+            let payload = {
+                appId: currentApp._id,
+                dataSourceID: dataSourceID
+            }
+            console.log('[STORE] Sending request to delete data source... : ',payload);
+            const response = await api.deleteDataSource(payload);
+            if (response.status === 200) {
+                console.log('[STORE] Reloading data sources list for current application' )
+                const resp = await api.getDataSourcesByAppId(currentApp._id);
+                setAppDataSources(resp.data)
+
+                console.log('[STORE] Reloading views for current application' );
+                const res = await api.getViews(currentApp._id);
+                setAppViews(res.data);
+            }
+        }
+        deleteDataSourceById(dataSourceID);
     }
 
     /* ---------- FUNCTIONS BELOW RELATE TO THE VIEW ---------- */
@@ -256,6 +277,23 @@ export function GlobalContextProvider({children}){
         changeViewName(name, viewId);
     }
 
+    const deleteView = function(viewId) {
+        async function deleteViewbyId(viewId) {
+            let payload = {
+                appId: currentApp._id,
+                viewId: viewId
+            }
+            console.log('[STORE] Sending request to delete view... : ',payload);
+            const response = await api.deleteView(payload);
+            if (response.status === 200) {
+                console.log('[STORE] Reloading views for current application' );
+                const res = await api.getViews(currentApp._id);
+                setAppViews(res.data);
+            }
+        }
+        deleteViewbyId(viewId);
+    }
+
     const addRecord = function(record, tableId) {
         async function addRecordToView(record, tableId) {
             let payload = {
@@ -278,8 +316,8 @@ export function GlobalContextProvider({children}){
         setAppList, 
         currentApp, 
         setCurrentApp,
-        appDataSource,
-        setAppDataSource,
+        appDataSources,
+        setAppDataSources,
         appViews,
         setAppViews,
 
@@ -296,10 +334,12 @@ export function GlobalContextProvider({children}){
         addDataSource,
         renameDataSource,
         setKeys,
+        deleteDataSource,
         
         // VIEWS
         addView,
         renameView,
+        deleteView,
         addRecord,
     }
 

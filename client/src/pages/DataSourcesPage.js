@@ -6,6 +6,7 @@ import { Button, Typography, Link, Modal, TextField, TableContainer, Table, Tabl
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
 import { useContext, useState } from 'react';
@@ -16,10 +17,11 @@ export default function DataSource() {
     console.log('[DATA SOURCE] USER IS: ', auth.user);
     console.log('[DATA SOURCE] STORE IS: ', store);
     console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
-    console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSource)
+    console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSources)
 
     // State that opens and shows the modal 
     const [open, setOpen] = useState(false)
+    const [showDelete, setShowDelete] = useState(false);
     // State that takes the user input for the spreadsheet url 
     const [spreadsheetURL, setSpreadSheetURL] = useState();
     // State that takes the user input for index of the sheet they want to be added as a data source
@@ -43,7 +45,8 @@ export default function DataSource() {
 
     function closeModal(event) {
         // Close the modal! 
-        setOpen(false)
+        setOpen(false);
+        setShowDelete(false);
     }
 
     const handleKeySelect = (e, ds) => {
@@ -87,6 +90,12 @@ export default function DataSource() {
         setOpen(false)
     }
 
+    function handleDeleteDataSource() {
+        console.log(dataSource);
+        setShowDelete(false);
+        store.deleteDataSource(dataSource._id);
+    }
+
     // Style for the modal!
     const style = {
         position: 'absolute',
@@ -121,73 +130,85 @@ export default function DataSource() {
             <Button variant="contained" onClick={openModal}>Add Data Source</Button>
         </Stack>
         {
-            store.appDataSource.map(ds => (
+            store.appDataSources.map(ds => (
                 <Box key={ds._id} paddingTop={3}>
-                    <Box
-                        display="flex" 
-                        alignItems="center"
-                        sx = {{
-                            gap: 3
-                        }}
+                    <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        spacing={12}
+                        sx={{ px:1, mb: 2 }}
                     >
-                        {editMode && ds._id === dataSource._id  ? 
-                        (
-                            <TextField
-                                label = 'Enter a name for the data source'
-                                variant='standard'
-                                value = {dataSourceName}
-                                onChange={(e) => {
-                                    setDataSourceName(e.target.value)
-                                }}
-                                sx={{ width: "35%" }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleChangeDataSourceName();
-                                    }
-                                }}
-                            />
-                        ) 
-                            : 
-                        (
-                            <Typography variant="h4">{ds.dataSourceName}</Typography>
-                        )
-                        }
-                            {
-                                editMode && ds._id === dataSource._id ? 
-                                (
-                                    <>
-                                        <IconButton
-                                            sx={{ bgcolor: 'green', color: 'white' }}
-                                            disableRipple
-                                            onClick={() => handleChangeDataSourceName()}
-                                        >
-                                            <DoneIcon></DoneIcon>
-                                        </IconButton>
-
-                                        <IconButton
-                                            sx={{ bgcolor: 'red', color: 'white'}}
-                                            disableRipple
-                                            onClick={() => setEditMode(false)}
-                                        >
-                                            <ClearIcon></ClearIcon>
-                                        </IconButton>
-                                    </>
-                                ) 
-                                    : 
-                                (
-                                    <IconButton
-                                        onClick={() => {
-                                            setOriginalDataSourceName(ds.dataSourceName)
-                                            setDataSourceName(ds.dataSourceName)
-                                            setDataSource(ds)
-                                            setEditMode(true)
-                                        }}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                )
+                        <Box
+                            display="flex" 
+                            alignItems="center"
+                            sx = {{
+                                gap: 3
+                            }}
+                        >
+                            {editMode && ds._id === dataSource._id  ? 
+                            (
+                                <TextField
+                                    label = 'Enter a name for the data source'
+                                    variant='standard'
+                                    value = {dataSourceName}
+                                    onChange={(e) => {
+                                        setDataSourceName(e.target.value)
+                                    }}
+                                    sx={{ width: "35%" }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleChangeDataSourceName();
+                                        }
+                                    }}
+                                />
+                            ) 
+                                : 
+                            (
+                                <Typography variant="h4">{ds.dataSourceName}</Typography>
+                            )
                             }
-                    </Box>
+                                {
+                                    editMode && ds._id === dataSource._id ? 
+                                    (
+                                        <>
+                                            <IconButton
+                                                sx={{ bgcolor: 'green', color: 'white' }}
+                                                disableRipple
+                                                onClick={() => handleChangeDataSourceName()}
+                                            >
+                                                <DoneIcon></DoneIcon>
+                                            </IconButton>
+
+                                            <IconButton
+                                                sx={{ bgcolor: 'red', color: 'white'}}
+                                                disableRipple
+                                                onClick={() => setEditMode(false)}
+                                            >
+                                                <ClearIcon></ClearIcon>
+                                            </IconButton>
+                                        </>
+                                    ) 
+                                        : 
+                                    (
+                                        <IconButton
+                                            onClick={() => {
+                                                setOriginalDataSourceName(ds.dataSourceName)
+                                                setDataSourceName(ds.dataSourceName)
+                                                setDataSource(ds)
+                                                setEditMode(true)
+                                            }}
+                                        >
+                                            <EditIcon />
+                                        </IconButton>
+                                    )
+                                }
+                        </Box>
+                        <IconButton onClick={() => {
+                            setDataSource(ds);
+                            setShowDelete(true)}}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Stack>
                     <TableContainer component={Paper}>   
                         <Table aria-label="simple table">
                             <TableHead>
@@ -201,7 +222,7 @@ export default function DataSource() {
                                 </TableRow>
                             </TableHead>
                             {
-                                store.appDataSource.length > 0 ? 
+                                store.appDataSources.length > 0 ? 
                                 <TableBody>
                                     <TableRow padding={2} key={ds._id}>
                                         <TableCell>{ds.spreadSheetName}</TableCell>
@@ -263,6 +284,32 @@ export default function DataSource() {
                 </Box>
             </Box>
         </Modal>
+        <Modal
+                open={showDelete}
+                onClose={closeModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx = {style} justifyContent="center" alignItems="center">
+                    <Box>
+                        <Typography id="modal-modal-title" variant="h5" component="h2">
+                            Are you sure you want to delete the data source: <br/> {dataSource.dataSourceName}?
+                        </Typography>
+                        <Typography id="modal-modal-subtitle" variant="subtitle1" component="h2">
+                            This will delete any views using it.
+                        </Typography>
+                    </Box>
+                    <Box m={1}
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center" 
+                        paddingTop={2}
+                    >
+                        <Button variant="outlined" onClick={closeModal}>Cancel</Button>
+                        <Button variant="contained" color="error" onClick={handleDeleteDataSource}>Delete</Button>
+                    </Box>
+                </Box>
+            </Modal>
         </>
     );
 }
