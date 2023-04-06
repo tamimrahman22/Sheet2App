@@ -61,7 +61,7 @@ export default function DataSource() {
         console.log('[DATA SOURCE| The specified key column is: ', selectedValue)
         
         //Update the key column of the data source 
-        store.setKeys(selectedValue, dataSource)
+        store.setKeys(keyColumn, dataSource)
     }
 
     function handleChangeDataSourceName(){

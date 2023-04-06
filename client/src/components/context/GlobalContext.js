@@ -18,6 +18,8 @@ export function GlobalContextProvider({children}){
 
     // Functions to be used to manipulate the global state of our application 
 
+    /* ---------- FUNCTION BELOW RELATE TO APPLICATIONS ---------- */
+
     // This function will load the lists of the current user.   
     const loadAppList = function(){
         async function getLists() {    
@@ -29,10 +31,12 @@ export function GlobalContextProvider({children}){
             console.log('[STORE] Response: ', response);
             console.log('[STORE] Data: ',  response.data);
             // Set the app list with the new lists that were found! 
-            setAppList(response.data);
-            setCurrentApp(null);
-            setAppDataSource([]);
-            setAppViews([]);
+            if (response.status === 200) {
+                setAppList(response.data);
+                setCurrentApp(null);
+                setAppDataSource([]);
+                setAppViews([]);
+            }
         }
         getLists();
     }
@@ -76,6 +80,55 @@ export function GlobalContextProvider({children}){
         setCurrentApp(app)
         setAppDetails(app)
     }
+
+    // Function to rename the application! 
+    const renameApp = function(name) {
+        async function renameApplication(name) {
+            let payload = {
+                // The id of the application's name we will be editing
+                appId: currentApp._id,
+                // The name that was given from the user
+                newName: name,
+            }
+            const response = await api.renameApp(payload);
+            console.log('[STORE] Renaming application...', response);
+            if (response.status === 200) {
+                setCurrentApp(response.data);
+            }
+        }
+        renameApplication(name);
+    }
+
+    // Function to publish the application! 
+    const publishApp = function() {
+        async function publishApplication() {
+            let payload = {
+                appId: currentApp._id
+            }
+            const response = await api.publishApp(payload);
+            console.log('[STORE] (Un)publishing application...', response);
+            if (response.status === 200) {
+                setCurrentApp(response.data);
+            }
+        }
+        publishApplication()
+    }
+
+    const deleteApp = function() {
+        async function deleteApplication() {
+            let payload = {
+                appId: currentApp._id
+            }
+            const response = await api.deleteApp(payload);
+            console.log('[STORE] (Deleting application...', response);
+            if (response.status === 200) {
+                navigate("/dashboard");
+            }
+        }
+        deleteApplication();
+    }
+
+    /* ---------- FUNCTIONS BELOW RELATE TO THE DATA SOURCES ---------- */
     
     // Add the spreadsheet as a data source to review 
     const addDataSource = function (appID, sheetURL, sheetIndex, keys){
@@ -133,7 +186,7 @@ export function GlobalContextProvider({children}){
             }
             // Send a request to the backend 
             console.log('[STORE] Sending payload to rename the data source...', payload)
-            const response = await api.renameDataSource(payload);
+            await api.renameDataSource(payload);
             console.log('[STORE] Reloading data sources list for current application' )
             const res = await api.getDataSourcesByAppId(currentApp._id);
             setAppDataSource(res.data)
@@ -156,13 +209,15 @@ export function GlobalContextProvider({children}){
             }
             // Send a request to the backend 
             console.log('[STORE] Sending payload to set the key column...', payload)
-            const response = await api.setKeys(payload)
+            await api.setKeys(payload)
             console.log('[STORE] Reloading data sources list for current application' )
             const res = await api.getDataSourcesByAppId(currentApp._id);
             setAppDataSource(res.data)
         }
         setKeyColumn(keyColumnName, dataSource)
     }
+
+    /* ---------- FUNCTIONS BELOW RELATE TO THE VIEW ---------- */
 
     // Function to add a specified view type to the application
     const addView = function(tableId, viewType) {
@@ -201,55 +256,9 @@ export function GlobalContextProvider({children}){
         changeViewName(name, viewId);
     }
 
-    // Function to rename the application! 
-    const renameApp = function(name) {
-        async function renameApplication(name) {
-            let payload = {
-                // The id of the application's name we will be editing
-                appId: currentApp._id,
-                // The name that was given from the user
-                newName: name,
-            }
-            const response = await api.renameApp(payload);
-            console.log('[STORE] Renaming application...', response);
-            if (response.status === 200) {
-                setCurrentApp(response.data);
-            }
-        }
-        renameApplication(name);
-    }
-
-    // Function to publish the application! 
-    const publishApp = function() {
-        async function publishApplication() {
-            let payload = {
-                appId: currentApp._id
-            }
-            const response = await api.publishApp(payload);
-            console.log('[STORE] (Un)publishing application...', response);
-            if (response.status === 200) {
-                setCurrentApp(response.data);
-            }
-        }
-        publishApplication()
-    }
-
-    const deleteApp = function() {
-        async function deleteApplication() {
-            let payload = {
-                appId: currentApp._id
-            }
-            const response = await api.deleteApp(payload);
-            console.log('[STORE] (Deleting application...', response);
-            if (response.status === 200) {
-                navigate("/dashboard");
-            }
-        }
-        deleteApplication();
-    }
-
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
     const funcs = {
+        // STATES
         appList, 
         setAppList, 
         currentApp, 
@@ -258,17 +267,20 @@ export function GlobalContextProvider({children}){
         setAppDataSource,
         appViews,
         setAppViews,
+
         loadAppList, 
         createApp,
+        setApp,
         renameApp,
         publishApp,
+        deleteApp,
+        
         addDataSource,
-        addView,
-        setApp,
         renameDataSource,
         setKeys,
+        
+        addView,
         renameView,
-        deleteApp,
     }
 
     return(
