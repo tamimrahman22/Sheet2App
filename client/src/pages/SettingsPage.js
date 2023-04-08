@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { Typography, Box, Card, CardContent, Stack, Link, Button, TextField, IconButton, Modal } from '@mui/material';
+import { Typography, Box, Card, CardContent, Stack, Link, Button, TextField, IconButton, Modal, FormControl, Select, MenuItem, Chip } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 // import AuthContext from '../auth'
 import GlobalStoreContext from "../components/context/GlobalContext";
@@ -54,12 +54,68 @@ export default function ViewsPage() {
       // justifyContent: "center"
     };
 
+    function RoleSelection(props) {
+      const { role } = props;
+      const [actions, setActions] = useState(role.allowedActions);
+
+      function handleSelect(event) {
+        const {
+          target: { value },
+        } = event;
+        setActions(
+          value
+        );
+        console.log(value);
+        store.setAppRoles(role, value);
+      }
+
+      return (
+        <>
+          <Typography color="inherit" variant="h6" underline="hover" noWrap sx={{ pt: 1 }}>
+            {role.name}
+          </Typography>
+          <FormControl sx={{ m: 1, width: 500 }}>
+            <Select
+              labelId="demo-multiple-chip-label"
+              id="demo-multiple-chip"
+              multiple
+              value={actions}
+              onChange={handleSelect}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((value) => (
+                  <Chip key={value} label={value} />
+                  ))}
+                </Box>
+              )}
+              >
+              <MenuItem key={"Add Record"} value={"Add Record"}>
+                Add Record
+              </MenuItem>
+              <MenuItem key={"Edit Record"} value={"Edit Record"}>
+                Edit Record
+              </MenuItem>
+              <MenuItem key={"Delete Record"} value={"Delete Record"}>
+                Delete Record
+              </MenuItem>
+              <MenuItem key={"View Record"} value={"View Record"}>
+                View Record
+              </MenuItem>
+            </Select>
+          </FormControl>
+        </>
+      )
+    }
+
     return (
       <>
         <div id="settings">
           <Helmet>
           <title> S2A App Settings </title>
           </Helmet>
+          <Typography variant="h4" >
+                App Settings
+          </Typography>
           <Box component="span" sx={{ p: 2 }} key={100}>
             <Card>
               <CardContent>
@@ -130,6 +186,24 @@ export default function ViewsPage() {
                   </Box>
                   
                 </Stack>
+              </CardContent>
+            </Card>
+          </Box>
+          <Box component="span" sx={{ p: 2 }} key={200}>
+            <Card>
+              <CardContent>
+                <Typography color="inherit" variant="h5" underline="hover" noWrap>
+                  Role Permissions:
+                </Typography>
+                {
+                  store.currentApp.roles.map(role => {
+                    if (role.name !== "Developer") {
+                      return (
+                        <RoleSelection key={role.name} role={role} />
+                      )
+                    }
+                  })
+                }
               </CardContent>
             </Card>
           </Box>

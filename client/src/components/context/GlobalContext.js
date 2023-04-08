@@ -128,6 +128,19 @@ export function GlobalContextProvider({children}){
         deleteApplication();
     }
 
+    const setAppRoles = function(role, actions) {
+        async function setApplicationRoles(role, actions) {
+            let payload = {
+                appId: currentApp._id,
+                role: role,
+                actions: actions,
+            }
+            const response = await api.setRoles(payload);
+            console.log('[STORE] (Updating application roles...', response);
+        }
+        setApplicationRoles(role, actions);
+    }
+
     /* ---------- FUNCTIONS BELOW RELATE TO THE DATA SOURCES ---------- */
     
     // Add the spreadsheet as a data source to review 
@@ -328,7 +341,7 @@ export function GlobalContextProvider({children}){
         renameApp,
         publishApp,
         deleteApp,
-        
+        setAppRoles,
 
         // DATA SOURCES
         addDataSource,
