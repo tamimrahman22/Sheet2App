@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, Fragment} from 'react';
+import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
 import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -15,6 +15,7 @@ function TableView(props) {
     const store = useContext(GlobalContext);
     // console.log(view);
     const length = view.columns.length + 1
+    console.log(length);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [editMode, setEditMode] = useState(false);
@@ -41,22 +42,41 @@ function TableView(props) {
 
     useEffect(() => {
         async function fetchData() {
+            let url = ""
             setLoading(true);
             let response = await api.getDataSourceById(view.table);
-            console.log(response.data.url);
-            let payload = {
-                url: response.data.url,
-                name: "Sheet1"  // DEFAULTING TO SHEET1
+            url = response.data.url;
+            console.log(url);
+
+            if (!sessionStorage.getItem(url)) {
+                let payload = {
+                    url: response.data.url,
+                    name: "Sheet1"  // DEFAULTING TO SHEET1
+                }
+                response = await api.getRows(payload);
+                console.log(response.data);
+                response.data.shift();
+                setData(response.data);
+                
+                window.sessionStorage.setItem(url, JSON.stringify(response.data));
+                console.log("SHEET DATA ADDED TO SESSION STORAGE");
             }
-            response = await api.getRows(payload);
-            console.log(response.data);
-            response.data.shift();
-            setData(response.data);
+            else {
+                setData(JSON.parse(sessionStorage.getItem(url)));
+                console.log("SHEET DATA RETRIEVED FROM SESSION STORAGE");
+            }
             setLoading(false);
         }
         fetchData();
+        return () => { // ON UNMOUNT
+            window.sessionStorage.clear();
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // function compareArrays(a, b) {
+    //     return a.length === b.length && a.every((element, index) => element === b[index]);
+    // }
 
     function handleChangeViewName() {
         console.log('[VIEWS] Handle name change of view!')
