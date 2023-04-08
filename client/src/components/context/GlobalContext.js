@@ -137,6 +137,7 @@ export function GlobalContextProvider({children}){
             }
             const response = await api.setRoles(payload);
             console.log('[STORE] (Updating application roles...', response);
+            currentApp.roles = response.data.roles;
         }
         setApplicationRoles(role, actions);
     }

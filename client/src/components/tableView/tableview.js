@@ -227,7 +227,7 @@ function TableView(props) {
                         <InputLabel id="view-column-label">Select Column</InputLabel>
                             <Select
                                 labelId="view-column-label"
-                                value = {view.columns.keys}
+                                value = {view.columns}
                                 // onChange={(e) => handleKeySelect(e, ds)}
                             >
                                 {view.columns.map((col) => (
