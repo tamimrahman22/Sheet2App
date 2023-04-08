@@ -57,9 +57,12 @@ const viewSchema = new mongoose.Schema({
 				type: String,
 				required: true
 			},
-			role: {
-				type: String,
+			users: {
+				type: [String],
 				required: true
+			},
+			allowedActions: {
+				type: [String],
 			}
 		}
 	],
