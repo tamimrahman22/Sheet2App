@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, Fragment} from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal } from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -21,6 +21,7 @@ function TableView(props) {
     const [viewToEdit, setViewtoEdit] = useState(null);
     const [viewName, setViewName] = useState(null);
     const [open, setOpen] = useState(false);
+    const [viewColOpen, setViewColOpen] = useState(false);
 
     const style = {
         position: 'absolute',
@@ -194,6 +195,31 @@ function TableView(props) {
         )
     }
 
+    function ViewColumn(props) {
+        const { col } = props
+
+        return (
+            <>
+                <TableRow>
+                    <TableCell colSpan={length -1} align="center">View Column</TableCell>
+                    <TableCell>
+                    <FormControl sx={{ minWidth: 250 }}>
+                        <InputLabel id="view-column-label">Select Column</InputLabel>
+                            <Select
+                                labelId="view-column-label"
+                                value = {view.columns.keys}
+                                // onChange={(e) => handleKeySelect(e, ds)}
+                            >
+                                {view.columns.map((col) => (
+                                <MenuItem key={col.name} value={col.name}>{col.name}</MenuItem>))}
+                            </Select>
+                    </FormControl>
+                    </TableCell>
+                </TableRow>
+            </>
+        )
+    }
+
     return (
         <>
             <Card>
@@ -293,6 +319,7 @@ function TableView(props) {
                                         }) 
                                     }
                                     <AddRecordRow key={'add-record-' + view._id} col={view.columns} />
+                                    <ViewColumn key={'view-column-' + view._id} col={view.columns} />
                                     </TableBody>
                                 </Table>
                             </TableContainer>
