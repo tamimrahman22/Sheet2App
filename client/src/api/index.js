@@ -12,6 +12,7 @@ export const getAppById = (id) => api.get(`/app/get/${id}`);
 export const renameApp = (payload) => api.post("/app/rename", payload);
 export const publishApp = (payload) => api.post("/app/publish", payload);
 export const deleteApp = (payload) => api.post("/app/delete", payload);
+export const setRoles = (payload) => api.post("/app/setRoles", payload);
 
 // data source
 export const addDataSource = (payload) => api.post("/datasource/add", payload); 
@@ -37,6 +38,7 @@ const apis = {
     renameApp,
     publishApp,
     deleteApp,
+    setRoles,
 
     addDataSource,
     getDataSourcesByAppId,

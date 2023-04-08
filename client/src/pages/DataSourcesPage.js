@@ -247,7 +247,7 @@ export default function DataSource() {
                                     </TableRow>
                                 </TableBody> 
                                             : 
-                                <Typography padding={2} fontWeight='bold' color='red' fontStyle='ita7c'>Uh-oh! No data sources were added to the app!</Typography>
+                                <Typography padding={2} fontWeight='bold' color='red' fontStyle='italic'>Uh-oh! No data sources were added to the app!</Typography>
                             }
                         </Table>
                     </TableContainer>
@@ -303,7 +303,7 @@ export default function DataSource() {
                         display="flex"
                         justifyContent="space-between"
                         alignItems="center" 
-                        paddingTop={2}
+                        paddingTop={3}
                     >
                         <Button variant="outlined" onClick={closeModal}>Cancel</Button>
                         <Button variant="contained" color="error" onClick={handleDeleteDataSource}>Delete</Button>

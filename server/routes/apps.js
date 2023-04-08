@@ -38,27 +38,20 @@ router.post('/create', async(req, res) => {
 		})
 
 		// get each column and put into array
-		let roles = [];
+		console.log(readData.data.values);
 		for(let i = 0; i < readData.data.values[0].length; i++){
-			// let tempList = [];
-			for(let j = 1; j < readData.data.values.length; j++){
-				if(typeof readData.data.values[j][i] !== 'undefined'){
-					if(i == 0){
-						roles.push({
-							name: readData.data.values[j][i],
-							role: "Developer"
-						})
-					}
-					else{
-						roles.push({
-							name: readData.data.values[j][i],
-							role: readData.data.values[0][i]
-						})
-					}
-				}
+			let tempList = [];
+			for(let j = 0; j < readData.data.values.length; j++){
+				if (readData.data.values[j][i] != undefined)
+					tempList.push(readData.data.values[j][i]);
 			}
+			roleName = tempList.shift();
+			roles.push({
+				name: roleName,
+				users: tempList,
+				allowedActions: []
+			});
 		}
-
 		console.log(roles);
 	}
 	catch (error){
@@ -206,6 +199,30 @@ router.post("/rename", async(req, res) => {
 		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in renaming app` });
 	}
+});
+
+router.post("/setRoles", async(req, res) => {
+	const { appId, role, actions } = req.body;
+	try {
+		const app = await appModel.findById(appId);
+		let roles = app.roles;
+		for (let i = 0; i < roles.length; i++) {
+			if (roles[i].name === role.name) {
+				console.log(roles[i])
+				roles[i].allowedActions = actions;
+			}
+		}
+		const updatedApp = await appModel.findOneAndUpdate(
+			{ _id: appId },
+			{ roles: roles },
+			{ new: true }
+		);
+		res.send(updatedApp);
+	}
+	catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in editing ${role.name} allowed actions` });
+	}
 })
 
 async function updateAppRoles(){
@@ -229,23 +246,24 @@ async function updateAppRoles(){
 			// get each column and put into array
 			let roles = [];
 			for(let i = 0; i < readData.data.values[0].length; i++){
-				// let tempList = [];
-				for(let j = 1; j < readData.data.values.length; j++){
-					if(typeof readData.data.values[j][i] !== 'undefined'){
-						if(i == 0){
-							roles.push({
-								name: readData.data.values[j][i],
-								role: "Developer"
-							})
-						}
-						else{
-							roles.push({
-								name: readData.data.values[j][i],
-								role: readData.data.values[0][i]
-							})
-						}
+				let tempList = [];
+				for(let j = 0; j < readData.data.values.length; j++){
+					if (readData.data.values[j][i] != undefined)
+						tempList.push(readData.data.values[j][i]);
+				}
+				roleName = tempList.shift();
+				let actions = [];
+				for (let i = 0; i < list[i].roles.length; i++) {
+					if (list[i].roles[i].name === roleName) {
+						actions = list[i].roles[i].allowedActions;
+						break;
 					}
 				}
+				roles.push({
+					name: roleName,
+					users: tempList,
+					allowedActions: actions
+				});
 			}
 			console.log(list[i].name);
 			console.log(roles);
