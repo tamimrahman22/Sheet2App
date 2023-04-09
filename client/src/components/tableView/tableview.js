@@ -290,8 +290,7 @@ function TableView(props) {
         return (
             <>
                 <TableRow>
-                    <TableCell colSpan={length -1} align="center">View Column</TableCell>
-                    <TableCell>
+                    <TableCell colSpan={length -1} align="center">
                         <FormControl sx={{ m: 1, width: 300 }}>
                             <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
                                 <Select
@@ -330,7 +329,7 @@ function TableView(props) {
                         alignItems: 'center'
                     }}
                 >
-                    <Box sx={{ width: "75vw" }} component={Paper} padding={5}>
+                    <Box sx={{ width: "75%", height:"75%", overflow:"scroll" }} component={Paper} padding={5}>
                         <Typography variant="h4" component="h2">
                         Selected Columns
                         </Typography>
