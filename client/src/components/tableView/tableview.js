@@ -15,7 +15,6 @@ function TableView(props) {
     const store = useContext(GlobalContext);
     // console.log(view);
     const length = view.columns.length + 1
-    console.log(length);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [editMode, setEditMode] = useState(false);
@@ -73,11 +72,7 @@ function TableView(props) {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    // function compareArrays(a, b) {
-    //     return a.length === b.length && a.every((element, index) => element === b[index]);
-    // }
-
+    
     function handleChangeViewName() {
         console.log('[VIEWS] Handle name change of view!')
         console.log('[VIEWS] Original view name: ', view.name);
@@ -102,6 +97,7 @@ function TableView(props) {
         setData(temp);
         console.log(data);
         store.addRecord(inputs, view.table);
+        
     }
 
     function handleDeleteView() {
@@ -122,8 +118,18 @@ function TableView(props) {
       }
 
     function DetailedRow(props) {
-        const { row, col } = props;
+        const { row, col, tableId } = props;
         const [open, setOpen] = useState(false);
+
+        function handleDeleteRecord(event) {
+            event.stopPropagation();
+            console.log(row);
+            console.log(tableId);
+            store.deleteRecord(row, tableId);
+            let temp = data.filter(r => !row.includes(r[0]));
+            setData(temp);
+            // window.sessionStorage.clear();
+        }
 
         return (
             <>
@@ -135,7 +141,20 @@ function TableView(props) {
                             )
                         })
                     }
-                    <TableCell align="right"> {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} </TableCell>
+                    <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
+                        <IconButton onClick={handleDeleteRecord}>
+                            <DeleteIcon fontSize='small'/>
+                        </IconButton>
+                        {open ? 
+                        <IconButton onClick={() => {setOpen(!open)}} >
+                            <KeyboardArrowUpIcon />
+                        </IconButton>
+                        : 
+                        <IconButton onClick={() => {setOpen(!open)}} >
+                            <KeyboardArrowDownIcon />
+                        </IconButton>
+                        } 
+                    </TableCell>
                 </TableRow>
 
                 <TableRow>
@@ -442,7 +461,7 @@ function TableView(props) {
                                     </TableRow> :
                                         data.map((row, index) => {
                                             return (
-                                                <DetailedRow key={"detail-row-" + index} row={row} col={view.columns}/>
+                                                <DetailedRow key={"detail-row-" + index} row={row} col={view.columns} tableId={view.table} />
                                             )
                                         }) 
                                     }

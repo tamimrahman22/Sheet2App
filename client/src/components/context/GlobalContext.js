@@ -269,7 +269,7 @@ export function GlobalContextProvider({children}){
             const response = await api.addView(payload);
             console.log('[STORE] Created view...', response);
             setApp(response.data);
-            navigate("/editor/views")
+            navigate("/editor/views");
         }
         createView(tableId, viewType);
     }
@@ -314,13 +314,34 @@ export function GlobalContextProvider({children}){
                 record: record,
                 tableId: tableId
             }
+            console.log(`[STORE] Sending request to add record ${record} to ${tableId}`);
             const response = await api.addRecord(payload);
             if (response.status === 200) {
+                console.log('[STORE] Reloading views for current application' );
                 const res = await api.getViews(currentApp._id);
                 setAppViews(res.data);
+                navigate("/editor/views")
             }
         }
         addRecordToView(record, tableId);
+    }
+
+    const deleteRecord = function(record, tableId) {
+        async function deleteRecordFromSheet(record, tableId) {
+            let payload = {
+                record: record,
+                tableId: tableId
+            }
+            console.log(`[STORE] Sending request to delete record ${record} from ${tableId}`);
+            const response = await api.deleteRecord(payload);
+            if (response.status === 200) {
+                console.log('[STORE] Reloading views for current application' );
+                const res = await api.getViews(currentApp._id);
+                setAppViews(res.data);
+                navigate("/editor/views")
+            }
+        }
+        deleteRecordFromSheet(record, tableId);
     }
 
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
@@ -355,6 +376,7 @@ export function GlobalContextProvider({children}){
         renameView,
         deleteView,
         addRecord,
+        deleteRecord,
     }
 
     return(
