@@ -51,7 +51,7 @@ function TableView(props) {
             if (!sessionStorage.getItem(url)) {
                 let payload = {
                     url: response.data.url,
-                    name: "Sheet1"  // DEFAULTING TO SHEET1
+                    name: "Sheet1"  // DEFAULTING TO SHEET1``
                 }
                 response = await api.getRows(payload);
                 console.log(response.data);
@@ -224,12 +224,32 @@ function TableView(props) {
         //Import the global state of our application
         const store = useContext(GlobalContext);
 
+        // Get the data source that is used to build the view 
+        const viewDataSouce = store.appDataSources.find((ds) => (ds._id === view.table))
+        // Get the key column of the data source
+        const keyColumnName = viewDataSouce.keys
+        // Get the list of columns without the key column being in it!
+        const columnOptions = col.filter((col) => (col.name !== keyColumnName))
+    
+        
+  
+        // DEBUG CONSOLE STATEMENTS TO SEE WHAT VARIABLES ARE RETURNING!
+        console.log('[VIEW COLUMN] DATA SOURCE IS : ', viewDataSouce)
+        console.log('[VIEW COLUMN] COL IS: ', col);
+        console.log('[VIEW COLUMN] VIEW IS: ', view);
+        console.log('[VIEW COLUMN] OPTIONS ARE: ', columnOptions)
+
         // Store the column name of the columns the user wants to add to the view columns of the application 
-        const [columnName, setColumnName] = useState([]);
+        const [columnName, setColumnName] = useState([keyColumnName]);
+        // State to manage the opening and closing of the modal
+        const [open, setOpen] = useState(false)
 
         // Function to handle the change of the what was selected by the user
         const handleChange = (event) => {
-            setColumnName(event.target.value);
+            const value = event.target.value;
+            if (value !== columnName) {
+              setColumnName(value);
+            }
         };
 
         // Function to generate a detail table with the columns that the user specified 
@@ -237,20 +257,12 @@ function TableView(props) {
             event.preventDefault();
             console.log('[VIEW COLUMN] COLUMNS SELECTED WERE: ', columnName);
             // TODO: Add code to open a modal and generate the table the user specified by the column name!
+            setOpen(true)
         };
 
-        // Get the data source that is used to build the view 
-        const viewDataSouce = store.appDataSources.find((ds) => (ds._id === view.table))
-        // Get the key column of the data source
-        const keyColumn = viewDataSouce.keys
-        // Get the list of columns without the key column being in it!
-        const columnOptions = col.filter((col) => (col.name !== keyColumn))
-
-        // DEBUG CONSOLE STATEMENTS TO SEE WHAT VARIABLES ARE RETURNING!
-        console.log('[VIEW COLUMN] DATA SOURCE IS : ', viewDataSouce)
-        console.log('[VIEW COLUMN] COL IS: ', col);
-        console.log('[VIEW COLUMN] VIEW IS: ', view);
-        console.log('[VIEW COLUMN] OPTIONS ARE: ', columnOptions)
+        function closeModal(){
+            setOpen(false)
+        }
 
         return (
             <>
@@ -282,9 +294,36 @@ function TableView(props) {
                                     }
                                 </Select>
                         </FormControl>
-                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit}>Submit</Button>
+                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length == 0}>Submit</Button>
                     </TableCell>
                 </TableRow>
+                
+                <Modal
+                    open={open}
+                    onClose={closeModal}   
+                >
+                    <Box>
+                        <TableContainer component={Paper}>
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                    {
+                                        view.columns
+                                            .filter((col) => columnName.includes(col.name))
+                                            .map((c, index) => {
+                                            return (
+                                                <TableCell key={"column-" + index}>{c.name}</TableCell>
+                                            )
+                                            })
+                                    }
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+                </Modal>
             </>
         )
     }
