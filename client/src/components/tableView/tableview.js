@@ -386,7 +386,8 @@ function TableView(props) {
                                         onChange={(e) => {
                                             setViewName(e.target.value)
                                         }}
-                                        sx={{ width: "35%" }}
+                                        // sx={{ width: "35%" }}
+                                        fullWidth
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 handleChangeViewName();
@@ -402,16 +403,16 @@ function TableView(props) {
                                         editMode && view._id === viewToEdit._id ? 
                                         <>
                                             <IconButton
-                                                sx={{ bgcolor: 'green', color: 'white' }}
-                                                disableRipple
+                                                // sx={{ bgcolor: 'green', color: 'white' }}
+                                                color='success'
                                                 onClick={() => handleChangeViewName()}
                                             >
                                                 <DoneIcon></DoneIcon>
                                             </IconButton>
 
                                             <IconButton
-                                                    sx={{ bgcolor: 'red', color: 'white'}}
-                                                    disableRipple
+                                                    // sx={{ bgcolor: 'red', color: 'white'}}
+                                                    color='error'
                                                     onClick={() => setEditMode(false)}
                                             >
                                                 <ClearIcon></ClearIcon>

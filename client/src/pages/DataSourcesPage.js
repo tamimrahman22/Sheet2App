@@ -168,7 +168,8 @@ export default function DataSource() {
                                     onChange={(e) => {
                                         setDataSourceName(e.target.value)
                                     }}
-                                    sx={{ width: "35%" }}
+                                    fullWidth
+                                    // sx={{ width: "50%" }}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             handleChangeDataSourceName();
@@ -186,16 +187,16 @@ export default function DataSource() {
                                     (
                                         <>
                                             <IconButton
-                                                sx={{ bgcolor: 'green', color: 'white' }}
-                                                disableRipple
+                                                // sx={{ bgcolor: 'green', color: 'white' }}
+                                                color='success'
                                                 onClick={() => handleChangeDataSourceName()}
                                             >
                                                 <DoneIcon></DoneIcon>
                                             </IconButton>
 
                                             <IconButton
-                                                sx={{ bgcolor: 'red', color: 'white'}}
-                                                disableRipple
+                                                // sx={{ bgcolor: 'red', color: 'white'}}
+                                                color='error'
                                                 onClick={() => setEditMode(false)}
                                             >
                                                 <ClearIcon></ClearIcon>
