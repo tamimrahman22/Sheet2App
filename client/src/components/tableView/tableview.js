@@ -1,6 +1,6 @@
-import { useEffect, useState, useContext, Fragment} from 'react';
+import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput, Divider} from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -41,23 +41,38 @@ function TableView(props) {
 
     useEffect(() => {
         async function fetchData() {
+            let url = ""
             setLoading(true);
             let response = await api.getDataSourceById(view.table);
-            console.log(response.data.url);
-            let payload = {
-                url: response.data.url,
-                name: "Sheet1"  // DEFAULTING TO SHEET1
+            url = response.data.url;
+            console.log(url);
+
+            if (!sessionStorage.getItem(url)) {
+                let payload = {
+                    url: response.data.url,
+                    name: "Sheet1"  // DEFAULTING TO SHEET1``
+                }
+                response = await api.getRows(payload);
+                console.log(response.data);
+                response.data.shift();
+                setData(response.data);
+                
+                window.sessionStorage.setItem(url, JSON.stringify(response.data));
+                console.log("SHEET DATA ADDED TO SESSION STORAGE");
             }
-            response = await api.getRows(payload);
-            console.log(response.data);
-            response.data.shift();
-            setData(response.data);
+            else {
+                setData(JSON.parse(sessionStorage.getItem(url)));
+                console.log("SHEET DATA RETRIEVED FROM SESSION STORAGE");
+            }
             setLoading(false);
         }
         fetchData();
+        return () => { // ON UNMOUNT
+            window.sessionStorage.clear();
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
+    
     function handleChangeViewName() {
         console.log('[VIEWS] Handle name change of view!')
         console.log('[VIEWS] Original view name: ', view.name);
@@ -82,6 +97,7 @@ function TableView(props) {
         setData(temp);
         console.log(data);
         store.addRecord(inputs, view.table);
+        
     }
 
     function handleDeleteView() {
@@ -102,8 +118,18 @@ function TableView(props) {
       }
 
     function DetailedRow(props) {
-        const { row, col } = props;
+        const { row, col, tableId } = props;
         const [open, setOpen] = useState(false);
+
+        function handleDeleteRecord(event) {
+            event.stopPropagation();
+            console.log(row);
+            console.log(tableId);
+            store.deleteRecord(row, tableId);
+            let temp = data.filter(r => !row.includes(r[0]));
+            setData(temp);
+            // window.sessionStorage.clear();
+        }
 
         return (
             <>
@@ -115,7 +141,20 @@ function TableView(props) {
                             )
                         })
                     }
-                    <TableCell align="right"> {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} </TableCell>
+                    <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
+                        <IconButton onClick={handleDeleteRecord}>
+                            <DeleteIcon fontSize='small'/>
+                        </IconButton>
+                        {open ? 
+                        <IconButton onClick={() => {setOpen(!open)}} >
+                            <KeyboardArrowUpIcon />
+                        </IconButton>
+                        : 
+                        <IconButton onClick={() => {setOpen(!open)}} >
+                            <KeyboardArrowDownIcon />
+                        </IconButton>
+                        } 
+                    </TableCell>
                 </TableRow>
 
                 <TableRow>
@@ -196,26 +235,134 @@ function TableView(props) {
     }
 
     function ViewColumn(props) {
+        // Destructure the 'col' props from the 'props' object
         const { col } = props
+        // Destructure the 'view' props from the 'props' object
+        const { view } = props;
+
+        //Import the global state of our application
+        const store = useContext(GlobalContext);
+
+        // Get the data source that is used to build the view 
+        const viewDataSouce = store.appDataSources.find((ds) => (ds._id === view.table))
+        // Get the key column of the data source
+        const keyColumnName = viewDataSouce.keys
+        // Get the list of columns without the key column being in it!
+        const columnOptions = col.filter((col) => (col.name !== keyColumnName))
+
+        const keyIndex = col.findIndex((col) => col.name === keyColumnName);
+
+    
+        // DEBUG CONSOLE STATEMENTS TO SEE WHAT VARIABLES ARE RETURNING!
+        console.log('[VIEW COLUMN] DATA SOURCE IS : ', viewDataSouce)
+        console.log('[VIEW COLUMN] COL IS: ', col);
+        console.log('[VIEW COLUMN] VIEW IS: ', view);
+        console.log('[VIEW COLUMN] OPTIONS ARE: ', columnOptions)
+
+        // Store the column name of the columns the user wants to add to the view columns of the application 
+        const [columnName, setColumnName] = useState([{name: keyColumnName, index: keyIndex}]);
+        // State to manage the opening and closing of the modal
+        const [open, setOpen] = useState(false)
+
+       // Function to handle the change of the what was selected by the user
+        const handleChange = (event) => {
+            const selectedValues = event.target.value;
+            const selectedColumns = selectedValues.map((value) => {
+                const selectedColumn = col.find((col) => col.name === value);
+                return { name: selectedColumn.name, index: col.indexOf(selectedColumn) };
+            });
+            console.log(selectedColumns)
+            setColumnName(selectedColumns);
+        };
+          
+        // Function to generate a detail table with the columns that the user specified 
+        const handleSubmit = (event) => {
+            event.preventDefault();
+            console.log('[VIEW COLUMN] COLUMNS SELECTED WERE: ', columnName);
+            // TODO: Add code to open a modal and generate the table the user specified by the column name!
+            setOpen(true)
+        };
+
+        function closeModal(){
+            setOpen(false)
+        }
 
         return (
             <>
                 <TableRow>
                     <TableCell colSpan={length -1} align="center">View Column</TableCell>
                     <TableCell>
-                    <FormControl sx={{ minWidth: 250 }}>
-                        <InputLabel id="view-column-label">Select Column</InputLabel>
-                            <Select
-                                labelId="view-column-label"
-                                value = {view.columns.keys}
-                                // onChange={(e) => handleKeySelect(e, ds)}
-                            >
-                                {view.columns.map((col) => (
-                                <MenuItem key={col.name} value={col.name}>{col.name}</MenuItem>))}
-                            </Select>
-                    </FormControl>
+                        <FormControl sx={{ m: 1, width: 300 }}>
+                            <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
+                                <Select
+                                labelId="demo-multiple-chip-label"
+                                id="demo-multiple-chip"
+                                multiple
+                                value={columnName.map((col) => col.name)}
+                                onChange={handleChange}
+                                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                                renderValue={(selected) => (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                      {selected.length > 0 &&
+                                        selected.map((value) => (
+                                          <Chip key={value} label={value}/>
+                                        ))}
+                                    </Box>
+                                  )}
+                                >
+                                    {
+                                        columnOptions.map((col, index) => (
+                                            <MenuItem value={col.name} key={index}>{col.name}</MenuItem>
+                                        ))
+                                    }
+                                </Select>
+                        </FormControl>
+                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length == 1}>Submit</Button>
                     </TableCell>
                 </TableRow>
+                
+                <Modal
+                    open={open}
+                    onClose={closeModal}
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Box sx={{ width: "75vw" }} component={Paper}>
+                        <Typography variant="h4" component="h2">
+                        Modal Title
+                        </Typography>
+                        <TableContainer component={Paper}>
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                    {
+                                        columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))
+                                    }
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {data.map((row, rowIndex) => (
+                                        <TableRow key={`row-${rowIndex}`}>
+                                        {row.map((info, colIndex) => (
+                                            columnName.some((column) => column.index === colIndex) ?
+                                            <TableCell key={`cell-${rowIndex}-${colIndex}`}>{info}</TableCell> :
+                                            null
+                                        ))}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} component={Paper}>
+                            <Button variant="contained" onClick={closeModal}>
+                                Close
+                            </Button>
+                        </Box>
+                    </Box>
+                </Modal>
             </>
         )
     }
@@ -314,12 +461,12 @@ function TableView(props) {
                                     </TableRow> :
                                         data.map((row, index) => {
                                             return (
-                                                <DetailedRow key={"detail-row-" + index} row={row} col={view.columns}/>
+                                                <DetailedRow key={"detail-row-" + index} row={row} col={view.columns} tableId={view.table} />
                                             )
                                         }) 
                                     }
                                     <AddRecordRow key={'add-record-' + view._id} col={view.columns} />
-                                    <ViewColumn key={'view-column-' + view._id} col={view.columns} />
+                                    <ViewColumn key={'view-column-' + view._id} col={view.columns} view ={view}/>
                                     </TableBody>
                                 </Table>
                             </TableContainer>

@@ -197,11 +197,12 @@ export default function ViewsPage() {
                 </Typography>
                 {
                   store.currentApp.roles.map(role => {
-                    if (role.name !== "Developer") {
-                      return (
-                        <RoleSelection key={role.name} role={role} />
-                      )
+                    if (role.name === "Developer") {
+                      return <></>
                     }
+                    return (
+                      <RoleSelection key={role.name} role={role} />
+                    )
                   })
                 }
               </CardContent>

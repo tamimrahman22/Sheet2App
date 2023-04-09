@@ -173,9 +173,54 @@ router.post('/addRecord', async (req, res) => {
     }
     catch (err){
         console.error('Error: ', err);
-		res.status(400).json({ message: `Error in getting app` });
+		res.status(400).json({ message: `Error in adding record` });
     }
 });
+
+router.post("/deleteRecord", async (req, res) => {
+    const { record, tableId } = req.body;
+    const authClientObject = await auth.getClient();
+	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+    const table = await dataSourceModel.findById( { _id: tableId });
+
+    const regex = /\/d\/(.*?)\/edit/;
+    const match = table.url.match(regex);
+    const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+    const range = table.sheetName;
+
+    try {
+        // Get previous data and remove the selected record
+        const response = await googleSheetsInstance.spreadsheets.values.get({
+            spreadsheetId,
+            range: range,
+        });
+        const rows = response.data.values;
+        const values = rows.filter(row => !record.includes(row[0]));
+        console.log(values);
+        const resource = { values };
+
+        // Clear the spreadsheet data
+        await googleSheetsInstance.spreadsheets.values.clear({
+            spreadsheetId,
+            range: range,
+        })
+
+        // Insert all the data
+        const updateRequest = {
+            spreadsheetId,
+            range: range,
+            valueInputOption: "USER_ENTERED",
+            resource,
+        }
+        await googleSheetsInstance.spreadsheets.values.update(updateRequest)
+        console.log(`Deleted rows with values: ${record}`);
+        res.status(200).json({ tableId: tableId });
+    }
+    catch(err) {
+        console.error('Error: ', err);
+		res.status(400).json({ message: `Error in deleting ${record}` });
+    }
+})
 
 
 module.exports = router;
