@@ -12,15 +12,23 @@ import GlobalContext from '../components/context/GlobalContext';
 import { useContext, useState } from 'react';
 
 export default function DataSource() {
+    // Import the auth context of S2A 
     const auth = useContext(AuthContext);
+    // Import the gobal state of S2A 
     const store = useContext(GlobalContext);
+
+    // Create a mapping of the ID of the data sources with the name of the key column of each data source! 
+    const dsToKeyName = store.appDataSources.map(item => ({ _id: item._id, keys: item.keys }));
+
+    // CONSOLE DEBUG STATEMENTS TO SEEE WHAT FIELDS ARE RETURNING
     console.log('[DATA SOURCE] USER IS: ', auth.user);
     console.log('[DATA SOURCE] STORE IS: ', store);
     console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
     console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSources)
 
-    // State that opens and shows the modal 
+    // State that opens and shows the modal to create an application 
     const [open, setOpen] = useState(false)
+    // State that opens and shows the modal to delete a data source 
     const [showDelete, setShowDelete] = useState(false);
     // State that takes the user input for the spreadsheet url 
     const [spreadsheetURL, setSpreadSheetURL] = useState();
@@ -34,9 +42,7 @@ export default function DataSource() {
     const [originalDataSourceName, setOriginalDataSourceName] = useState('')
     // State that store the data source that is being modified 
     const [dataSource, setDataSource] = useState({})
-    // State that stored the key column for the data source!
-    const [keyColumn, setKeyColumn] = useState('');
-
+    
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
         // Open the modal! 
@@ -55,8 +61,6 @@ export default function DataSource() {
         // The data source that we are modifying the key column for 
         const dataSource = ds
         
-        // Update the state of the key column
-        setKeyColumn(selectedValue)
         // Update the state of the current data source
         setDataSource(ds)
 
@@ -64,7 +68,7 @@ export default function DataSource() {
         console.log('[DATA SOURCE| The specified key column is: ', selectedValue)
         
         //Update the key column of the data source 
-        store.setKeys(keyColumn, dataSource)
+        store.setKeys(selectedValue, dataSource)
     }
 
     function handleChangeDataSourceName(){
@@ -235,7 +239,7 @@ export default function DataSource() {
                                                 <InputLabel id="key-column-label">Key Column</InputLabel>
                                                     <Select
                                                         labelId="key-column-label"
-                                                        value = {ds.keys}
+                                                        value={(dsToKeyName.find(obj => obj._id === ds._id)).keys || ''}
                                                         label="Key Column"
                                                         onChange={(e) => handleKeySelect(e, ds)}
                                                     >
