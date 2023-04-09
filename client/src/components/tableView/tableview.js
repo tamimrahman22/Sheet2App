@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput} from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput, Divider} from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -230,9 +230,10 @@ function TableView(props) {
         const keyColumnName = viewDataSouce.keys
         // Get the list of columns without the key column being in it!
         const columnOptions = col.filter((col) => (col.name !== keyColumnName))
+
+        const keyIndex = col.findIndex((col) => col.name === keyColumnName);
+
     
-        
-  
         // DEBUG CONSOLE STATEMENTS TO SEE WHAT VARIABLES ARE RETURNING!
         console.log('[VIEW COLUMN] DATA SOURCE IS : ', viewDataSouce)
         console.log('[VIEW COLUMN] COL IS: ', col);
@@ -240,18 +241,21 @@ function TableView(props) {
         console.log('[VIEW COLUMN] OPTIONS ARE: ', columnOptions)
 
         // Store the column name of the columns the user wants to add to the view columns of the application 
-        const [columnName, setColumnName] = useState([keyColumnName]);
+        const [columnName, setColumnName] = useState([{name: keyColumnName, index: keyIndex}]);
         // State to manage the opening and closing of the modal
         const [open, setOpen] = useState(false)
 
-        // Function to handle the change of the what was selected by the user
+       // Function to handle the change of the what was selected by the user
         const handleChange = (event) => {
-            const value = event.target.value;
-            if (value !== columnName) {
-              setColumnName(value);
-            }
+            const selectedValues = event.target.value;
+            const selectedColumns = selectedValues.map((value) => {
+                const selectedColumn = col.find((col) => col.name === value);
+                return { name: selectedColumn.name, index: col.indexOf(selectedColumn) };
+            });
+            console.log(selectedColumns)
+            setColumnName(selectedColumns);
         };
-
+          
         // Function to generate a detail table with the columns that the user specified 
         const handleSubmit = (event) => {
             event.preventDefault();
@@ -275,7 +279,7 @@ function TableView(props) {
                                 labelId="demo-multiple-chip-label"
                                 id="demo-multiple-chip"
                                 multiple
-                                value={columnName || []}
+                                value={columnName.map((col) => col.name)}
                                 onChange={handleChange}
                                 input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
                                 renderValue={(selected) => (
@@ -285,7 +289,7 @@ function TableView(props) {
                                           <Chip key={value} label={value}/>
                                         ))}
                                     </Box>
-                                )}
+                                  )}
                                 >
                                     {
                                         columnOptions.map((col, index) => (
@@ -294,34 +298,50 @@ function TableView(props) {
                                     }
                                 </Select>
                         </FormControl>
-                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length == 0}>Submit</Button>
+                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length == 1}>Submit</Button>
                     </TableCell>
                 </TableRow>
                 
                 <Modal
                     open={open}
-                    onClose={closeModal}   
+                    onClose={closeModal}
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
                 >
-                    <Box>
+                    <Box sx={{ width: "75vw" }} component={Paper}>
+                        <Typography variant="h4" component="h2">
+                        Modal Title
+                        </Typography>
                         <TableContainer component={Paper}>
                             <Table aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
                                     {
-                                        view.columns
-                                            .filter((col) => columnName.includes(col.name))
-                                            .map((c, index) => {
-                                            return (
-                                                <TableCell key={"column-" + index}>{c.name}</TableCell>
-                                            )
-                                            })
+                                        columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))
                                     }
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
+                                    {data.map((row, rowIndex) => (
+                                        <TableRow key={`row-${rowIndex}`}>
+                                        {row.map((info, colIndex) => (
+                                            columnName.some((column) => column.index === colIndex) ?
+                                            <TableCell key={`cell-${rowIndex}-${colIndex}`}>{info}</TableCell> :
+                                            null
+                                        ))}
+                                        </TableRow>
+                                    ))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} component={Paper}>
+                            <Button variant="contained" onClick={closeModal}>
+                                Close
+                            </Button>
+                        </Box>
                     </Box>
                 </Modal>
             </>
