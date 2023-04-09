@@ -286,6 +286,7 @@ function TableView(props) {
         function closeModal(){
             setOpen(false)
         }
+        
         return (
             <>
                 <TableRow>
@@ -299,7 +300,7 @@ function TableView(props) {
                                 multiple
                                 value={columnName.map((col) => col.name)}
                                 onChange={handleChange}
-                                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                                input={<OutlinedInput id="select-multiple-chip" label="Select Columns" />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                       {selected.length > 0 &&
@@ -329,9 +330,9 @@ function TableView(props) {
                         alignItems: 'center'
                     }}
                 >
-                    <Box sx={{ width: "75vw" }} component={Paper}>
+                    <Box sx={{ width: "75vw" }} component={Paper} padding={5}>
                         <Typography variant="h4" component="h2">
-                        Modal Title
+                        Selected Columns
                         </Typography>
                         <TableContainer component={Paper}>
                             <Table aria-label="simple table">
@@ -354,7 +355,7 @@ function TableView(props) {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} component={Paper}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems:'center'}} component={Paper} paddingTop={2}>
                             <Button variant="contained" onClick={closeModal}>
                                 Close
                             </Button>

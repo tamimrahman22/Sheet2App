@@ -103,7 +103,7 @@ export default function DataSource() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 500,
-        height: 330,
+        height: 300,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
@@ -236,6 +236,7 @@ export default function DataSource() {
                                                     <Select
                                                         labelId="key-column-label"
                                                         value = {ds.keys}
+                                                        label="Key Column"
                                                         onChange={(e) => handleKeySelect(e, ds)}
                                                     >
                                                         {ds.columns.map((col) => (
@@ -277,7 +278,7 @@ export default function DataSource() {
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center" 
-                    paddingTop={2}
+                    paddingTop={3}
                 >
                     <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
                     <Button variant="contained" onClick={handleAddDataSource}>Add</Button>
