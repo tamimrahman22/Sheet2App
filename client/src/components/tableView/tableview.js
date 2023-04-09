@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput, Divider} from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput} from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -286,7 +286,6 @@ function TableView(props) {
         function closeModal(){
             setOpen(false)
         }
-
         return (
             <>
                 <TableRow>
@@ -317,7 +316,7 @@ function TableView(props) {
                                     }
                                 </Select>
                         </FormControl>
-                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length == 1}>Submit</Button>
+                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length === 1}>Submit</Button>
                     </TableCell>
                 </TableRow>
                 
@@ -338,21 +337,20 @@ function TableView(props) {
                             <Table aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                    {
-                                        columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))
-                                    }
+                                        {columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {data.map((row, rowIndex) => (
-                                        <TableRow key={`row-${rowIndex}`}>
-                                        {row.map((info, colIndex) => (
-                                            columnName.some((column) => column.index === colIndex) ?
-                                            <TableCell key={`cell-${rowIndex}-${colIndex}`}>{info}</TableCell> :
-                                            null
-                                        ))}
-                                        </TableRow>
-                                    ))}
+                                {data.map((row, rowIndex) => (
+                                    <TableRow key={`row-${rowIndex}`}>
+                                        {columnName.map((column) => {
+                                            const { name, index } = column;
+                                            return index >= 0 && index < row.length ?
+                                                <TableCell key={`cell-${rowIndex}-${index}`}>{row[index]}</TableCell> :
+                                                null
+                                        })}
+                                    </TableRow>
+                                ))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
