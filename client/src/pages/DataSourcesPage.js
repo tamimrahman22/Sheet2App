@@ -110,11 +110,21 @@ export default function DataSource() {
         height: 300,
         bgcolor: 'background.paper',
         p: 4,
-        borderRadius: '10px',
-        // alignItems: "center",
-        // textAlign: "center",
-        // justifyContent: "center"
-      };
+        borderRadius: '10px'
+    };
+
+    // Style for the delete modal!
+    const deleteStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 450,
+        height: 250,
+        bgcolor: 'background.paper',
+        p: 4,
+        borderRadius: '10px'
+    };
 
     return (
         <>
@@ -295,12 +305,12 @@ export default function DataSource() {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx = {style} justifyContent="center" alignItems="center">
+                <Box sx = {deleteStyle} width={450} justifyContent="center" alignItems="center">
                     <Box>
                         <Typography id="modal-modal-title" variant="h5" component="h2">
-                            Are you sure you want to delete the data source: <br/> {dataSource.dataSourceName}?
+                            Are you sure you want to delete the data source <i>{dataSource.dataSourceName}</i>?
                         </Typography>
-                        <Typography id="modal-modal-subtitle" variant="subtitle1" component="h2">
+                        <Typography id="modal-modal-subtitle" variant="subtitle1" component="h2" paddingTop={2}>
                             This will delete any views using it.
                         </Typography>
                     </Box>
