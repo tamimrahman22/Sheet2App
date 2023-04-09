@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput} from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -216,24 +216,73 @@ function TableView(props) {
     }
 
     function ViewColumn(props) {
+        // Destructure the 'col' props from the 'props' object
         const { col } = props
+        // Destructure the 'view' props from the 'props' object
+        const { view } = props;
+
+        //Import the global state of our application
+        const store = useContext(GlobalContext);
+
+        // Store the column name of the columns the user wants to add to the view columns of the application 
+        const [columnName, setColumnName] = useState([]);
+
+        // Function to handle the change of the what was selected by the user
+        const handleChange = (event) => {
+            setColumnName(event.target.value);
+        };
+
+        // Function to generate a detail table with the columns that the user specified 
+        const handleSubmit = (event) => {
+            event.preventDefault();
+            console.log('[VIEW COLUMN] COLUMNS SELECTED WERE: ', columnName);
+            // TODO: Add code to open a modal and generate the table the user specified by the column name!
+        };
+
+        // Get the data source that is used to build the view 
+        const viewDataSouce = store.appDataSources.find((ds) => (ds._id === view.table))
+        // Get the key column of the data source
+        const keyColumn = viewDataSouce.keys
+        // Get the list of columns without the key column being in it!
+        const columnOptions = col.filter((col) => (col.name !== keyColumn))
+
+        // DEBUG CONSOLE STATEMENTS TO SEE WHAT VARIABLES ARE RETURNING!
+        console.log('[VIEW COLUMN] DATA SOURCE IS : ', viewDataSouce)
+        console.log('[VIEW COLUMN] COL IS: ', col);
+        console.log('[VIEW COLUMN] VIEW IS: ', view);
+        console.log('[VIEW COLUMN] OPTIONS ARE: ', columnOptions)
 
         return (
             <>
                 <TableRow>
                     <TableCell colSpan={length -1} align="center">View Column</TableCell>
                     <TableCell>
-                    <FormControl sx={{ minWidth: 250 }}>
-                        <InputLabel id="view-column-label">Select Column</InputLabel>
-                            <Select
-                                labelId="view-column-label"
-                                value = {view.columns}
-                                // onChange={(e) => handleKeySelect(e, ds)}
-                            >
-                                {view.columns.map((col) => (
-                                <MenuItem key={col.name} value={col.name}>{col.name}</MenuItem>))}
-                            </Select>
-                    </FormControl>
+                        <FormControl sx={{ m: 1, width: 300 }}>
+                            <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
+                                <Select
+                                labelId="demo-multiple-chip-label"
+                                id="demo-multiple-chip"
+                                multiple
+                                value={columnName || []}
+                                onChange={handleChange}
+                                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                                renderValue={(selected) => (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                      {selected.length > 0 &&
+                                        selected.map((value) => (
+                                          <Chip key={value} label={value}/>
+                                        ))}
+                                    </Box>
+                                )}
+                                >
+                                    {
+                                        columnOptions.map((col, index) => (
+                                            <MenuItem value={col.name} key={index}>{col.name}</MenuItem>
+                                        ))
+                                    }
+                                </Select>
+                        </FormControl>
+                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit}>Submit</Button>
                     </TableCell>
                 </TableRow>
             </>
@@ -339,7 +388,7 @@ function TableView(props) {
                                         }) 
                                     }
                                     <AddRecordRow key={'add-record-' + view._id} col={view.columns} />
-                                    <ViewColumn key={'view-column-' + view._id} col={view.columns} />
+                                    <ViewColumn key={'view-column-' + view._id} col={view.columns} view ={view}/>
                                     </TableBody>
                                 </Table>
                             </TableContainer>
