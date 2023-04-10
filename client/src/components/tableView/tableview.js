@@ -108,12 +108,20 @@ function TableView(props) {
         // Close the modal! 
         console.log(view._id);
         setOpen(true)
-      }
+    }
 
     function closeModal(event) {
         // Close the modal! 
         setOpen(false)
-      }
+    }
+
+    function handleSelect(event) {
+        const {
+            target: { value },
+        } = event;
+        console.log(value);
+        store.setViewRoles(view._id, value);
+    }
 
     function DetailedRow(props) {
         const { row, col, tableId } = props;
@@ -428,10 +436,39 @@ function TableView(props) {
                                         </IconButton>
                                     }
                                 </Box>
-                                
-                                <IconButton onClick={openModal}>
-                                    <DeleteIcon />
-                                </IconButton>
+                                <Box display="flex" alignItems="center">
+                                    <FormControl sx={{ m: 1, width: 500 }}>
+                                        <Select
+                                        labelId="demo-multiple-chip-label"
+                                        id="demo-multiple-chip"
+                                        multiple
+                                        value={view.roles}
+                                        onChange={handleSelect}
+                                        renderValue={(selected) => (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {selected.map((value) => (
+                                            <Chip key={value} label={value} />
+                                            ))}
+                                            </Box>
+                                        )}
+                                        >
+                                            {
+                                                store.currentApp.roles.map(role => {
+                                                    if (role.name !== "Developer") {
+                                                        return (
+                                                            <MenuItem key={role.name} value={role.name}>
+                                                                {role.name}
+                                                            </MenuItem>
+                                                        )
+                                                    }
+                                                })
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                    <IconButton onClick={openModal} sx={{ verticalAlign: 'top' }}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Box>
                             </Stack>
                             
                             
@@ -463,7 +500,7 @@ function TableView(props) {
                                         }) 
                                     }
                                     <AddRecordRow key={'add-record-' + view._id} col={view.columns} />
-                                    <ViewColumn key={'view-column-' + view._id} col={view.columns} view ={view}/>
+                                    {/* <ViewColumn key={'view-column-' + view._id} col={view.columns} view ={view}/> */}
                                     </TableBody>
                                 </Table>
                             </TableContainer>

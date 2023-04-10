@@ -23,7 +23,6 @@ router.post('/add', async (req, res) => {
         const name = currentApp.name;
         const columns = table.columns;
         const allowedActions = [];
-        const roles = currentApp.roles;
 
         // add the proper allowed actions based on the viewType
         if(viewType == 'Table'){
@@ -40,7 +39,6 @@ router.post('/add', async (req, res) => {
             columns: columns,
             viewType: viewType,
             allowedActions: allowedActions,
-            roles: roles
         });
 
         // add views to the respective application
@@ -232,5 +230,20 @@ router.post("/deleteRecord", async (req, res) => {
     }
 })
 
+router.post("/setRoles", async(req, res) => {
+    const { viewId, roles } = req.body;
+    try {
+        const updatedView = await viewsModel.findOneAndUpdate(
+            { _id: viewId },
+            { roles: roles },
+            { new: true }
+        )
+        res.send(updatedView);
+    }
+    catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in setting up role for ${viewId}` });
+	}
+})
 
 module.exports = router;

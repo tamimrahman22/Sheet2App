@@ -135,7 +135,7 @@ export function GlobalContextProvider({children}){
                 role: role,
                 actions: actions,
             }
-            const response = await api.setRoles(payload);
+            const response = await api.setAppRoles(payload);
             console.log('[STORE] (Updating application roles...', response);
             currentApp.roles = response.data.roles;
         }
@@ -344,6 +344,21 @@ export function GlobalContextProvider({children}){
         deleteRecordFromSheet(record, tableId);
     }
 
+    const setViewRoles = function(viewId, roles) {
+        async function setRolesForView(viewId, roles) {
+            let payload = {
+                viewId: viewId,
+                roles: roles
+            }
+            console.log(`[STORE] Setting roles for view ${viewId}`);
+            await api.setViewRoles(payload);
+            console.log('[STORE] Reloading views for current application' );
+            const res = await api.getViews(currentApp._id);
+            setAppViews(res.data);
+        }
+        setRolesForView(viewId, roles);
+    }
+
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
     const funcs = {
         // STATES
@@ -377,6 +392,7 @@ export function GlobalContextProvider({children}){
         deleteView,
         addRecord,
         deleteRecord,
+        setViewRoles,
     }
 
     return(

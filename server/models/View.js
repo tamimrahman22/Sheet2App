@@ -51,21 +51,9 @@ const viewSchema = new mongoose.Schema({
 		required: true,
 	},
 	// roles associated with the application (developer vs. end user)
-	roles: [
-		{
-			name: {
-				type: String,
-				required: true
-			},
-			users: {
-				type: [String],
-				required: true
-			},
-			allowedActions: {
-				type: [String],
-			}
-		}
-	],
+	roles: {
+		type: [String],
+	},
 	// only include records with this fulture
 	filter: {
 		type: [Boolean],
