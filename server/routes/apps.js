@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const appModel = require('../models/Apps');
-// const dataSourceModel = require('../models/DataSource');
+const dataSourceModel = require('../models/DataSource');
+const viewsModel = require('../models/View');
 const { google } = require("googleapis");
 
 const auth = new google.auth.GoogleAuth({
@@ -82,9 +83,17 @@ router.post('/create', async(req, res) => {
 router.post('/delete', async(req, res) => {
 	const { appId } = req.body;
 	try{
+		const app = await appModel.findById({ _id: appId });
+		console.log(app.dataSources);
 		const result = await appModel.deleteOne({ _id: appId });
+		console.log(app.dataSources);
+		const result2 = await dataSourceModel.deleteMany({ _id: { $in: app.dataSources } });
+		const result3 = await viewsModel.deleteMany({ _id: { $in: app.views } });
+
 		console.log('Record deleted successfully');
 		console.log(result);
+		console.log(result2);
+		console.log(result3);
 		res.send(result);
 	}
 	catch (error) {
