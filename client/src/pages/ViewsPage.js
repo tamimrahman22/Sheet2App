@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
 import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl} from '@mui/material';
-import TableView from '../components/tableView';
+import TableView from '../components/TableView';
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
 
@@ -82,7 +82,7 @@ export default function ViewsPage() {
             {
                 store.appViews.map((view) => (
                     <Box component="span" sx={{ p: 2 }} key={view._id}>
-                        <TableView key={view._id} view={view} />
+                        <TableView key={Math.random() * 100000} view={view} />
                     </Box>
                 ))
             }
