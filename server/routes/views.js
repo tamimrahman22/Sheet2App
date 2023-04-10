@@ -169,6 +169,11 @@ router.post('/addRecord', async (req, res) => {
             resource,
         });
       console.log("successfully wrote to sheet");
+
+    await viewsModel.updateMany(
+        { table: tableId },
+        { updatedAt: Date.now() },
+    );
       res.status(200).json({ tableId: tableId });
     }
     catch (err){
@@ -214,6 +219,11 @@ router.post("/deleteRecord", async (req, res) => {
         }
         await googleSheetsInstance.spreadsheets.values.update(updateRequest)
         console.log(`Deleted rows with values: ${record}`);
+
+        await viewsModel.updateMany(
+            { table: tableId },
+            { updatedAt: Date.now() },
+        );
         res.status(200).json({ tableId: tableId });
     }
     catch(err) {

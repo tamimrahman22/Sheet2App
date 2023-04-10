@@ -70,8 +70,7 @@ function TableView(props) {
         return () => { // ON UNMOUNT
             window.sessionStorage.clear();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [view.table, view.updatedAt]);
     
     function handleChangeViewName() {
         console.log('[VIEWS] Handle name change of view!')

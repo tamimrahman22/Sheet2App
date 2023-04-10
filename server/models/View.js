@@ -82,7 +82,7 @@ const viewSchema = new mongoose.Schema({
 	editable: {
 		type: [String],
 	},
-});
+}, { timestamps: true });
 
 const View = mongoose.model("View", viewSchema);
 module.exports = View;
