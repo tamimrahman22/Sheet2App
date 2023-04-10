@@ -147,16 +147,18 @@ export default function ViewsPage() {
                       {edit ?
                         <>
                           <IconButton
-                              sx={{ bgcolor: 'green', color: 'white' }}
-                              disableRipple
+                              // sx={{ bgcolor: 'green', color: 'white' }}
+                              // disableRipple
+                              color='success'
                               onClick={() => handleSave()}
                           >
                               <DoneIcon></DoneIcon>
                           </IconButton>
 
                           <IconButton
-                              sx={{ bgcolor: 'red', color: 'white'}}
-                              disableRipple
+                              // sx={{ bgcolor: 'red', color: 'white'}}
+                              // disableRipple
+                              color = "error"
                               onClick={() => setEdit(false)}
                           >
                               <ClearIcon></ClearIcon>
