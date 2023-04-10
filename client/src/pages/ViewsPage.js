@@ -53,8 +53,8 @@ export default function ViewsPage() {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 500,
-        height: 330,
+        width: 415,
+        height: 300,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
@@ -101,14 +101,14 @@ export default function ViewsPage() {
                     Add View
                     </Typography>
                 </Box>
-                <Box paddingTop={1}>
+                <Box paddingTop={2}>
                     <FormControl sx={{ minWidth: 350 }}>
                         <InputLabel id="viewType-select-label">View Type</InputLabel>
                         <Select
                             labelId="viewType-select-label"
                             id="viewType-select"
                             value={viewType}
-                            label="Age"
+                            label="View Type"
                             onChange={(e) => setViewType(e.target.value)}
                         >
                             <MenuItem value={"Table"}>Table</MenuItem>
@@ -123,7 +123,7 @@ export default function ViewsPage() {
                             labelId="dataSource-select-label"
                             id="dataSource-select"
                             value={dataSource}
-                            label="Age"
+                            label="Data Source"
                             onChange={(e) => setDataSource(e.target.value)}
                         >
                             {

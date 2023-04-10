@@ -12,15 +12,23 @@ import GlobalContext from '../components/context/GlobalContext';
 import { useContext, useState } from 'react';
 
 export default function DataSource() {
+    // Import the auth context of S2A 
     const auth = useContext(AuthContext);
+    // Import the gobal state of S2A 
     const store = useContext(GlobalContext);
+
+    // Create a mapping of the ID of the data sources with the name of the key column of each data source! 
+    const dsToKeyName = store.appDataSources.map(item => ({ _id: item._id, keys: item.keys }));
+
+    // CONSOLE DEBUG STATEMENTS TO SEEE WHAT FIELDS ARE RETURNING
     console.log('[DATA SOURCE] USER IS: ', auth.user);
     console.log('[DATA SOURCE] STORE IS: ', store);
     console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
     console.log('[DATA SOURCE] CURRENT App Data Source: ', store.appDataSources)
 
-    // State that opens and shows the modal 
+    // State that opens and shows the modal to create an application 
     const [open, setOpen] = useState(false)
+    // State that opens and shows the modal to delete a data source 
     const [showDelete, setShowDelete] = useState(false);
     // State that takes the user input for the spreadsheet url 
     const [spreadsheetURL, setSpreadSheetURL] = useState();
@@ -34,9 +42,7 @@ export default function DataSource() {
     const [originalDataSourceName, setOriginalDataSourceName] = useState('')
     // State that store the data source that is being modified 
     const [dataSource, setDataSource] = useState({})
-    // State that stored the key column for the data source!
-    const [keyColumn, setKeyColumn] = useState('');
-
+    
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
         // Open the modal! 
@@ -55,8 +61,6 @@ export default function DataSource() {
         // The data source that we are modifying the key column for 
         const dataSource = ds
         
-        // Update the state of the key column
-        setKeyColumn(selectedValue)
         // Update the state of the current data source
         setDataSource(ds)
 
@@ -64,7 +68,7 @@ export default function DataSource() {
         console.log('[DATA SOURCE| The specified key column is: ', selectedValue)
         
         //Update the key column of the data source 
-        store.setKeys(keyColumn, dataSource)
+        store.setKeys(selectedValue, dataSource)
     }
 
     function handleChangeDataSourceName(){
@@ -103,14 +107,24 @@ export default function DataSource() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 500,
-        height: 330,
+        height: 300,
         bgcolor: 'background.paper',
         p: 4,
-        borderRadius: '10px',
-        // alignItems: "center",
-        // textAlign: "center",
-        // justifyContent: "center"
-      };
+        borderRadius: '10px'
+    };
+
+    // Style for the delete modal!
+    const deleteStyle = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 450,
+        height: 250,
+        bgcolor: 'background.paper',
+        p: 4,
+        borderRadius: '10px'
+    };
 
     return (
         <>
@@ -154,7 +168,8 @@ export default function DataSource() {
                                     onChange={(e) => {
                                         setDataSourceName(e.target.value)
                                     }}
-                                    sx={{ width: "35%" }}
+                                    fullWidth
+                                    // sx={{ width: "50%" }}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             handleChangeDataSourceName();
@@ -172,16 +187,16 @@ export default function DataSource() {
                                     (
                                         <>
                                             <IconButton
-                                                sx={{ bgcolor: 'green', color: 'white' }}
-                                                disableRipple
+                                                // sx={{ bgcolor: 'green', color: 'white' }}
+                                                color='success'
                                                 onClick={() => handleChangeDataSourceName()}
                                             >
                                                 <DoneIcon></DoneIcon>
                                             </IconButton>
 
                                             <IconButton
-                                                sx={{ bgcolor: 'red', color: 'white'}}
-                                                disableRipple
+                                                // sx={{ bgcolor: 'red', color: 'white'}}
+                                                color='error'
                                                 onClick={() => setEditMode(false)}
                                             >
                                                 <ClearIcon></ClearIcon>
@@ -235,7 +250,8 @@ export default function DataSource() {
                                                 <InputLabel id="key-column-label">Key Column</InputLabel>
                                                     <Select
                                                         labelId="key-column-label"
-                                                        value = {ds.keys}
+                                                        value={(dsToKeyName.find(obj => obj._id === ds._id)).keys || ''}
+                                                        label="Key Column"
                                                         onChange={(e) => handleKeySelect(e, ds)}
                                                     >
                                                         {ds.columns.map((col) => (
@@ -277,7 +293,7 @@ export default function DataSource() {
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center" 
-                    paddingTop={2}
+                    paddingTop={3}
                 >
                     <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
                     <Button variant="contained" onClick={handleAddDataSource}>Add</Button>
@@ -290,12 +306,12 @@ export default function DataSource() {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx = {style} justifyContent="center" alignItems="center">
+                <Box sx = {deleteStyle} width={450} justifyContent="center" alignItems="center">
                     <Box>
                         <Typography id="modal-modal-title" variant="h5" component="h2">
-                            Are you sure you want to delete the data source: <br/> {dataSource.dataSourceName}?
+                            Are you sure you want to delete the data source <i>{dataSource.dataSourceName}</i>?
                         </Typography>
-                        <Typography id="modal-modal-subtitle" variant="subtitle1" component="h2">
+                        <Typography id="modal-modal-subtitle" variant="subtitle1" component="h2" paddingTop={2}>
                             This will delete any views using it.
                         </Typography>
                     </Box>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput, Divider} from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput} from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -286,12 +286,11 @@ function TableView(props) {
         function closeModal(){
             setOpen(false)
         }
-
+        
         return (
             <>
                 <TableRow>
-                    <TableCell colSpan={length -1} align="center">View Column</TableCell>
-                    <TableCell>
+                    <TableCell colSpan={length -1} align="center">
                         <FormControl sx={{ m: 1, width: 300 }}>
                             <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
                                 <Select
@@ -300,7 +299,7 @@ function TableView(props) {
                                 multiple
                                 value={columnName.map((col) => col.name)}
                                 onChange={handleChange}
-                                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                                input={<OutlinedInput id="select-multiple-chip" label="Select Columns" />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                       {selected.length > 0 &&
@@ -317,7 +316,7 @@ function TableView(props) {
                                     }
                                 </Select>
                         </FormControl>
-                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length == 1}>Submit</Button>
+                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length === 1}>Submit</Button>
                     </TableCell>
                 </TableRow>
                 
@@ -330,33 +329,32 @@ function TableView(props) {
                         alignItems: 'center'
                     }}
                 >
-                    <Box sx={{ width: "75vw" }} component={Paper}>
+                    <Box sx={{ width: "75%", height:"75%", overflow:"scroll" }} component={Paper} padding={5}>
                         <Typography variant="h4" component="h2">
-                        Modal Title
+                        Selected Columns
                         </Typography>
                         <TableContainer component={Paper}>
                             <Table aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                    {
-                                        columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))
-                                    }
+                                        {columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {data.map((row, rowIndex) => (
-                                        <TableRow key={`row-${rowIndex}`}>
-                                        {row.map((info, colIndex) => (
-                                            columnName.some((column) => column.index === colIndex) ?
-                                            <TableCell key={`cell-${rowIndex}-${colIndex}`}>{info}</TableCell> :
-                                            null
-                                        ))}
-                                        </TableRow>
-                                    ))}
+                                {data.map((row, rowIndex) => (
+                                    <TableRow key={`row-${rowIndex}`}>
+                                        {columnName.map((column) => {
+                                            const { name, index } = column;
+                                            return index >= 0 && index < row.length ?
+                                                <TableCell key={`cell-${rowIndex}-${index}`}>{row[index]}</TableCell> :
+                                                null
+                                        })}
+                                    </TableRow>
+                                ))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} component={Paper}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems:'center'}} component={Paper} paddingTop={2}>
                             <Button variant="contained" onClick={closeModal}>
                                 Close
                             </Button>
@@ -388,7 +386,8 @@ function TableView(props) {
                                         onChange={(e) => {
                                             setViewName(e.target.value)
                                         }}
-                                        sx={{ width: "35%" }}
+                                        // sx={{ width: "35%" }}
+                                        fullWidth
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 handleChangeViewName();
@@ -404,16 +403,16 @@ function TableView(props) {
                                         editMode && view._id === viewToEdit._id ? 
                                         <>
                                             <IconButton
-                                                sx={{ bgcolor: 'green', color: 'white' }}
-                                                disableRipple
+                                                // sx={{ bgcolor: 'green', color: 'white' }}
+                                                color='success'
                                                 onClick={() => handleChangeViewName()}
                                             >
                                                 <DoneIcon></DoneIcon>
                                             </IconButton>
 
                                             <IconButton
-                                                    sx={{ bgcolor: 'red', color: 'white'}}
-                                                    disableRipple
+                                                    // sx={{ bgcolor: 'red', color: 'white'}}
+                                                    color='error'
                                                     onClick={() => setEditMode(false)}
                                             >
                                                 <ClearIcon></ClearIcon>
