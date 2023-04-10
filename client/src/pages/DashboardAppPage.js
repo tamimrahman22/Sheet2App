@@ -15,6 +15,7 @@ export default function DashboardAppPage() {
   console.log('[DASHBOARD APP PAGE] Store is: ', store);
 
   useEffect(() => {
+    window.sessionStorage.clear();
     store.loadAppList();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

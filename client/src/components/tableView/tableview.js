@@ -14,6 +14,7 @@ function TableView(props) {
     const { view } = props;
     const store = useContext(GlobalContext);
     // console.log(view);
+    const [url, setUrl] = useState("");
     const length = view.columns.length + 1
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -45,6 +46,7 @@ function TableView(props) {
             setLoading(true);
             let response = await api.getDataSourceById(view.table);
             url = response.data.url;
+            setUrl(url);
             console.log(url);
 
             if (!sessionStorage.getItem(url)) {
@@ -67,9 +69,6 @@ function TableView(props) {
             setLoading(false);
         }
         fetchData();
-        return () => { // ON UNMOUNT
-            window.sessionStorage.clear();
-        }
     }, [view.table, view.updatedAt]);
     
     function handleChangeViewName() {
@@ -95,8 +94,8 @@ function TableView(props) {
         temp.push(inputs);
         setData(temp);
         console.log(data);
+        window.sessionStorage.setItem(url, JSON.stringify(temp));
         store.addRecord(inputs, view.table);
-        
     }
 
     function handleDeleteView() {
@@ -127,7 +126,7 @@ function TableView(props) {
             store.deleteRecord(row, tableId);
             let temp = data.filter(r => !row.includes(r[0]));
             setData(temp);
-            // window.sessionStorage.clear();
+            window.sessionStorage.setItem(url, JSON.stringify(temp));
         }
 
         return (

@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Typography, Box, Card, CardContent, Stack, Link, Button, TextField, IconButton, Modal, FormControl, Select, MenuItem, Chip } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 // import AuthContext from '../auth'
@@ -13,6 +13,10 @@ export default function ViewsPage() {
     const [edit, setEdit] = useState(false);
     const [appName, setAppName] = useState(store.currentApp.name);
     const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+      window.sessionStorage.clear();
+  })
 
     function handleSave() {
       setEdit(false);

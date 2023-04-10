@@ -9,7 +9,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 
 export default function DataSource() {
     // Import the auth context of S2A 
@@ -42,6 +42,10 @@ export default function DataSource() {
     const [originalDataSourceName, setOriginalDataSourceName] = useState('')
     // State that store the data source that is being modified 
     const [dataSource, setDataSource] = useState({})
+
+    useEffect(() => {
+        window.sessionStorage.clear();
+    })
     
     function openModal(event) {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
