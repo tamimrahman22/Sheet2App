@@ -228,7 +228,7 @@ export default function DataSource() {
                             <DeleteIcon />
                         </IconButton>
                     </Stack>
-                    <TableContainer component={Paper}>   
+                    <TableContainer component={Paper} style={{ overflow: 'auto', height: '50vh' }}>   
                         <Table aria-label="simple table">
                             <TableHead>
                                 <TableRow>
@@ -236,7 +236,7 @@ export default function DataSource() {
                                     <TableCell>Sheet Name</TableCell>
                                     <TableCell>URL of Spreadsheet</TableCell>
                                     <TableCell>Sheet Index</TableCell>
-                                    <TableCell>Column Name(s)</TableCell>
+                                    <TableCell>Column Info</TableCell>
                                     <TableCell>Keys</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -248,7 +248,30 @@ export default function DataSource() {
                                         <TableCell>{ds.sheetName}</TableCell>
                                         <TableCell><Link href={ds.url} target="_blank">{ds.url}</Link></TableCell>
                                         <TableCell>{ds.sheetIndex + 1}</TableCell>
-                                        <TableCell>{ds.columns.map(col => col.name).join(", ")}</TableCell>
+                                        <TableCell>
+                                            <TableContainer 
+                                                style={{ overflow: 'auto', height: '45vh' }}
+                                            >
+                                                <Table>
+                                                    <TableHead>
+                                                    <TableRow>
+                                                        <TableCell>Column Name</TableCell>
+                                                        <TableCell>Reference</TableCell>
+                                                        <TableCell>Type</TableCell>
+                                                    </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                    {ds.columns.map((col) => (
+                                                        <TableRow key={col._id.$oid}>
+                                                        <TableCell>{col.name}</TableCell>
+                                                        <TableCell>{store.appDataSources.find(ds => ds._id === col.reference).dataSourceName}</TableCell>
+                                                        <TableCell>{col.type.charAt(0).toUpperCase() + col.type.slice(1)}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        </TableCell>
                                         <TableCell>
                                             <FormControl sx={{ minWidth: 250 }}>
                                                 <InputLabel id="key-column-label">Key Column</InputLabel>
