@@ -15,13 +15,14 @@ export function GlobalContextProvider({children}){
     const [currentApp, setCurrentApp] = useState(null);
     const [appDataSources, setAppDataSources] = useState([]); 
     const [appViews, setAppViews] = useState([]);
+    const [userRole, setUserRole] = useState("");
 
     // Functions to be used to manipulate the global state of our application 
 
     /* ---------- FUNCTION BELOW RELATE TO APPLICATIONS ---------- */
 
     // This function will load the lists of the current user.   
-    const loadAppList = function(){
+    const loadAppList = function() {
         async function getLists() {    
             let payload = {
                 // Get all the list of applications by the name of the user 
@@ -74,11 +75,24 @@ export function GlobalContextProvider({children}){
             const viewResponse = await api.getViews(app._id);
             console.log('[STORE] Getting application views...', viewResponse);
             setAppViews(viewResponse.data);
-            // navigate("/editor");
+            if (auth.user.email === app.creator) {
+                setUserRole("Developer");
+                navigate("/editor");
+            }
+            else {
+                for (let i = 0; i < app.roles.length; i++) {
+                    if (app.roles[i].users.includes(auth.user.email)) {
+                        setUserRole(app.roles[i].name);
+                        break;
+                    }
+                }
+                navigate("/editor/views");
+            }
+            
         }
         // Check if the application already has data sources. If not, navigate to the editor page. 
-        setCurrentApp(app)
-        setAppDetails(app)
+        setCurrentApp(app);
+        setAppDetails(app);
     }
 
     // Function to rename the application! 
@@ -370,6 +384,8 @@ export function GlobalContextProvider({children}){
         setAppDataSources,
         appViews,
         setAppViews,
+        userRole,
+        setUserRole,
 
         // APPS
         loadAppList, 

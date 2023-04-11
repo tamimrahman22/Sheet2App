@@ -1,8 +1,11 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { Box, Link, Drawer } from '@mui/material';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
+import SettingsIcon from '@mui/icons-material/Settings';
 // mock
 // hooks
 import useResponsive from '../../../useResponsive';
@@ -11,8 +14,7 @@ import Logo from '../../../components/logo';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
-import navConfig from './config';
-
+import GlobalContext from '../../../components/context/GlobalContext';
 // ----------------------------------------------------------------------
 
 const NAV_WIDTH = 280;
@@ -28,6 +30,39 @@ export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
 
   const isDesktop = useResponsive('up', 'lg');
+  const store = useContext(GlobalContext);
+  let navConfig = []
+
+  console.log(`[JONATHAN] NAV ROLE ${store.userRole}`)
+
+  if (store.userRole === "Developer") {
+    navConfig = [
+      {
+        title: 'Data Sources',
+        path: '/editor/data',
+        icon: <TableRowsIcon/>,
+      },
+      {
+        title: 'Views',
+        path: '/editor/views',
+        icon: <ViewCarouselIcon/>
+      },
+      {
+        title: 'App Settings',
+        path: '/editor/settings',
+        icon: <SettingsIcon/>
+      }
+    ];
+  }
+  else {
+    navConfig = [
+      {
+        title: 'Views',
+        path: '/editor/views',
+        icon: <ViewCarouselIcon/>
+      },
+    ];
+  }
 
   useEffect(() => {
     if (openNav) {

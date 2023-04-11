@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 // @mui
 import { Container, Typography, List, Stack, Box, Card, CardContent, CardActionArea} from '@mui/material';
 import GlobalContext from '../components/context/GlobalContext';
@@ -10,7 +9,6 @@ import GlobalContext from '../components/context/GlobalContext';
 export default function DashboardAppPage() {
   // const theme = useTheme();
   const store = useContext(GlobalContext);
-  const navigate = useNavigate();
 
   console.log('[DASHBOARD APP PAGE] Store is: ', store);
 
@@ -39,7 +37,6 @@ export default function DashboardAppPage() {
                         console.log ('[DASHBOARD APP] Current list is: ', app)
                         // SET THE CURRENT APPLICATION!
                         store.setApp(app)
-                        navigate("/editor");
                       }}>
                         <CardContent>
                           <Stack direction="row" alignItems="center" spacing={2} >

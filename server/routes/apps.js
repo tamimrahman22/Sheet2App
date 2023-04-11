@@ -109,13 +109,13 @@ router.post('/list', async(req, res) => {
 	try {
 		const list = await appModel.find({ });
 		let finalList = [];
-		for(let i = 0; i < list.length; i++){
+		for (let i = 0; i < list.length; i++) {
 			if(list[i].creator == user){
 				finalList.push(list[i]);
 			}
 			else{
-				for(let j = 0; j < list[i].roles.length; j++){
-					if(list[i].roles[j].name == user && list[i].roles[j].role == 'Developer'){
+				for (let j = 0; j < list[i].roles.length; j++) {
+					if (list[i].roles[j].users.includes(user)) {
 						finalList.push(list[i]);
 					}
 				}

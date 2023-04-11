@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip, OutlinedInput} from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -22,7 +22,6 @@ function TableView(props) {
     const [viewToEdit, setViewtoEdit] = useState(null);
     const [viewName, setViewName] = useState(null);
     const [open, setOpen] = useState(false);
-    const [viewColOpen, setViewColOpen] = useState(false);
 
     const style = {
         position: 'absolute',
@@ -240,137 +239,6 @@ function TableView(props) {
         )
     }
 
-    function ViewColumn(props) {
-        // Destructure the 'col' props from the 'props' object
-        const { col } = props
-        // Destructure the 'view' props from the 'props' object
-        const { view } = props;
-
-        //Import the global state of our application
-        const store = useContext(GlobalContext);
-
-        // Get the data source that is used to build the view 
-        const viewDataSouce = store.appDataSources.find((ds) => (ds._id === view.table))
-        // Get the key column of the data source
-        const keyColumnName = viewDataSouce.keys
-        // Get the list of columns without the key column being in it!
-        const columnOptions = col.filter((col) => (col.name !== keyColumnName))
-
-        const keyIndex = col.findIndex((col) => col.name === keyColumnName);
-
-    
-        // DEBUG CONSOLE STATEMENTS TO SEE WHAT VARIABLES ARE RETURNING!
-        console.log('[VIEW COLUMN] DATA SOURCE IS : ', viewDataSouce)
-        console.log('[VIEW COLUMN] COL IS: ', col);
-        console.log('[VIEW COLUMN] VIEW IS: ', view);
-        console.log('[VIEW COLUMN] OPTIONS ARE: ', columnOptions)
-
-        // Store the column name of the columns the user wants to add to the view columns of the application 
-        const [columnName, setColumnName] = useState([{name: keyColumnName, index: keyIndex}]);
-        // State to manage the opening and closing of the modal
-        const [open, setOpen] = useState(false)
-
-       // Function to handle the change of the what was selected by the user
-        const handleChange = (event) => {
-            const selectedValues = event.target.value;
-            const selectedColumns = selectedValues.map((value) => {
-                const selectedColumn = col.find((col) => col.name === value);
-                return { name: selectedColumn.name, index: col.indexOf(selectedColumn) };
-            });
-            console.log(selectedColumns)
-            setColumnName(selectedColumns);
-        };
-          
-        // Function to generate a detail table with the columns that the user specified 
-        const handleSubmit = (event) => {
-            event.preventDefault();
-            console.log('[VIEW COLUMN] COLUMNS SELECTED WERE: ', columnName);
-            // TODO: Add code to open a modal and generate the table the user specified by the column name!
-            setOpen(true)
-        };
-
-        function closeModal(){
-            setOpen(false)
-        }
-        
-        return (
-            <>
-                <TableRow>
-                    <TableCell colSpan={length -1} align="center">
-                        <FormControl sx={{ m: 1, width: 300 }}>
-                            <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
-                                <Select
-                                labelId="demo-multiple-chip-label"
-                                id="demo-multiple-chip"
-                                multiple
-                                value={columnName.map((col) => col.name)}
-                                onChange={handleChange}
-                                input={<OutlinedInput id="select-multiple-chip" label="Select Columns" />}
-                                renderValue={(selected) => (
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                      {selected.length > 0 &&
-                                        selected.map((value) => (
-                                          <Chip key={value} label={value}/>
-                                        ))}
-                                    </Box>
-                                  )}
-                                >
-                                    {
-                                        columnOptions.map((col, index) => (
-                                            <MenuItem value={col.name} key={index}>{col.name}</MenuItem>
-                                        ))
-                                    }
-                                </Select>
-                        </FormControl>
-                        <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length === 1}>Submit</Button>
-                    </TableCell>
-                </TableRow>
-                
-                <Modal
-                    open={open}
-                    onClose={closeModal}
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}
-                >
-                    <Box sx={{ width: "75%", height:"75%", overflow:"scroll" }} component={Paper} padding={5}>
-                        <Typography variant="h4" component="h2">
-                        Selected Columns
-                        </Typography>
-                        <TableContainer component={Paper}>
-                            <Table aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        {columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                {data.map((row, rowIndex) => (
-                                    <TableRow key={`row-${rowIndex}`}>
-                                        {columnName.map((column) => {
-                                            const { name, index } = column;
-                                            return index >= 0 && index < row.length ?
-                                                <TableCell key={`cell-${rowIndex}-${index}`}>{row[index]}</TableCell> :
-                                                null
-                                        })}
-                                    </TableRow>
-                                ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems:'center'}} component={Paper} paddingTop={2}>
-                            <Button variant="contained" onClick={closeModal}>
-                                Close
-                            </Button>
-                        </Box>
-                    </Box>
-                </Modal>
-            </>
-        )
-    }
-
     return (
         <>
             <Card>
@@ -437,6 +305,7 @@ function TableView(props) {
                                     }
                                 </Box>
                                 <Box display="flex" alignItems="center">
+                                    <InputLabel id="demo-multiple-chip-label">Roles</InputLabel>
                                     <FormControl sx={{ m: 1, width: 500 }}>
                                         <Select
                                         labelId="demo-multiple-chip-label"
@@ -461,6 +330,7 @@ function TableView(props) {
                                                             </MenuItem>
                                                         )
                                                     }
+                                                    return <Box/>                                               
                                                 })
                                             }
                                         </Select>
@@ -500,7 +370,6 @@ function TableView(props) {
                                         }) 
                                     }
                                     <AddRecordRow key={'add-record-' + view._id} col={view.columns} />
-                                    {/* <ViewColumn key={'view-column-' + view._id} col={view.columns} view ={view}/> */}
                                     </TableBody>
                                 </Table>
                             </TableContainer>

@@ -80,11 +80,18 @@ export default function ViewsPage() {
         <Container maxWidth="xl">
             <List sx={{ width: '100%' }}>
             {
-                store.appViews.map((view) => (
-                    <Box component="span" sx={{ p: 2 }} key={view._id}>
-                        <TableView key={view._id} view={view} />
-                    </Box>
-                ))
+                store.appViews.map((view) => {
+                    if (store.userRole === "Developer" || view.roles.includes(store.userRole)) {
+                        return (
+                            <Box component="span" sx={{ p: 2 }} key={view._id}>
+                                <TableView key={view._id} view={view} />
+                            </Box>
+                        )
+                    }
+                    else {
+                        return (<Box />);
+                    }
+                })
             }
             </List>
         </Container>
