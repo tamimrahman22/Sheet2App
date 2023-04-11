@@ -77,7 +77,6 @@ export function GlobalContextProvider({children}){
             setAppViews(viewResponse.data);
             if (auth.user.email === app.creator) {
                 setUserRole("Developer");
-                navigate("/editor");
             }
             else {
                 for (let i = 0; i < app.roles.length; i++) {
@@ -86,9 +85,7 @@ export function GlobalContextProvider({children}){
                         break;
                     }
                 }
-                navigate("/editor/views");
             }
-            
         }
         // Check if the application already has data sources. If not, navigate to the editor page. 
         setCurrentApp(app);
@@ -336,7 +333,7 @@ export function GlobalContextProvider({children}){
                 console.log('[STORE] Reloading views for current application' );
                 const res = await api.getViews(currentApp._id);
                 setAppViews(res.data);
-                navigate("/editor/views")
+                // navigate("/editor/views")
             }
         }
         addRecordToView(record, tableId);
@@ -354,7 +351,7 @@ export function GlobalContextProvider({children}){
                 console.log('[STORE] Reloading views for current application' );
                 const res = await api.getViews(currentApp._id);
                 setAppViews(res.data);
-                navigate("/editor/views")
+                // navigate("/editor/views")
             }
         }
         deleteRecordFromSheet(record, tableId);
@@ -373,6 +370,21 @@ export function GlobalContextProvider({children}){
             setAppViews(res.data);
         }
         setRolesForView(viewId, roles);
+    }
+
+    const addDetailView = function(viewId, row) {
+        async function addRowToViewDetails(viewId, row) {
+            let payload = {
+                viewId: viewId,
+                row: row
+            }
+            console.log(`[STORE] Creating a detail view for ${row} in ${viewId}`);
+            await api.addDetailView(payload);
+            console.log('[STORE] Reloading views for current application' );
+            const res = await api.getViews(currentApp._id);
+            setAppViews(res.data);
+        }
+        addRowToViewDetails(viewId, row);
     }
 
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
@@ -411,6 +423,7 @@ export function GlobalContextProvider({children}){
         addRecord,
         deleteRecord,
         setViewRoles,
+        addDetailView,
     }
 
     return(

@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import api from "../../api";
 import GlobalContext from '../../components/context/GlobalContext';
 
@@ -23,7 +24,6 @@ function TableView(props) {
     const [viewToEdit, setViewtoEdit] = useState(null);
     const [viewName, setViewName] = useState(null);
     const [open, setOpen] = useState(false);
-    const [indices, setIndices] = useState([]);
 
     const style = {
         position: 'absolute',
@@ -61,7 +61,8 @@ function TableView(props) {
                 console.log("SHEET DATA ADDED TO SESSION STORAGE");
             }
             else {
-                const cache = JSON.parse(sessionStorage.getItem(url))
+                const cache = JSON.parse(sessionStorage.getItem(url));
+                console.log(cache);
                 setColumns(cache.shift());
                 setData(cache);
                 console.log("SHEET DATA RETRIEVED FROM SESSION STORAGE");
@@ -86,7 +87,7 @@ function TableView(props) {
     function handleAddRecord() {
         console.log('[VIEWS] Handle adding new record to view');
         const inputs = [];
-        for (let i = 0; i < length - 1; i++) {
+        for (let i = 0; i < columns.length; i++) {
             // console.log(document.getElementById("add-record-" + i).value);
             inputs.push(document.getElementById("add-record-value-" + i).value);
         }
@@ -95,6 +96,7 @@ function TableView(props) {
         temp.push(inputs);
         setData(temp);
         console.log(data);
+        temp.unshift(columns);
         window.sessionStorage.setItem(url, JSON.stringify(temp));
         store.addRecord(inputs, view.table);
     }
@@ -124,13 +126,80 @@ function TableView(props) {
         store.setViewRoles(view._id, value);
     }
 
+    function compareArrays(a, b) {
+        return a.length === b.length && a.every((element, index) => element === b[index]);
+    }
+
+    function checkIfDetail(row) {
+        for (let i = 0; i < view.details.length; i++) {
+            if (compareArrays(view.details[i], row)) {
+                return true
+            }
+        }
+        return false;
+    }
+
+    function Row(props) {
+        const { row, tableId, viewId } = props;
+
+        const indices = [];
+        view.columns.forEach(c => indices.push(columns.indexOf(c)));
+        // console.log(indices);
+        
+        function handleDeleteRecord(event) {
+            event.stopPropagation();
+            console.log(row);
+            console.log(tableId);
+            store.deleteRecord(row, tableId);
+            let temp = data.filter(r => !row.includes(r[0]));
+            setData(temp);
+            temp.unshift(columns);
+            window.sessionStorage.setItem(url, JSON.stringify(temp));
+        }
+
+        function handleAddDetailView(event) {
+            event.stopPropagation();
+            console.log(row);
+            console.log(viewId);
+            store.addDetailView(viewId, row);
+        }
+
+        return (
+            <>
+                <TableRow>
+                {
+                    row.map((cell, index) => {
+                        if (indices.includes(index)) {
+                            return (
+                                <TableCell key={"cell-value-" + cell}>{cell}</TableCell>
+                            )
+                        }
+                        return null;
+                    })
+                }
+                    <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
+                        <IconButton onClick={handleDeleteRecord}>
+                            <DeleteIcon fontSize='small'/>
+                        </IconButton>
+                        <IconButton onClick={handleAddDetailView}>
+                            <AddCircleIcon/>
+                        </IconButton>
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length}/>
+                </TableRow>
+            </>
+        );
+    }
+
     function DetailedRow(props) {
         const { row, tableId } = props;
         const [open, setOpen] = useState(false);
 
         const indices = [];
         view.columns.forEach(c => indices.push(columns.indexOf(c)));
-        console.log(indices);
+        // console.log(indices);
 
         function handleDeleteRecord(event) {
             event.stopPropagation();
@@ -160,11 +229,11 @@ function TableView(props) {
                             <DeleteIcon fontSize='small'/>
                         </IconButton>
                         {open ? 
-                        <IconButton onClick={() => {setOpen(!open)}} >
+                        <IconButton disableRipple onClick={() => {setOpen(!open)}} >
                             <KeyboardArrowUpIcon />
                         </IconButton>
                         : 
-                        <IconButton onClick={() => {setOpen(!open)}} >
+                        <IconButton disableRipple onClick={() => {setOpen(!open)}} >
                             <KeyboardArrowDownIcon />
                         </IconButton>
                         } 
@@ -226,7 +295,7 @@ function TableView(props) {
                                                 <Fragment key={"add-record-" + index}>
                                                     <Grid item xs={1} justifyContent="center" display="flex" alignItems="center">
                                                         <Typography variant="h6">
-                                                            {c.name}:
+                                                            {c}:
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={11}>
@@ -373,12 +442,19 @@ function TableView(props) {
                                         </TableCell>
                                     </TableRow> :
                                         data.map((row, index) => {
-                                            return (
-                                                <DetailedRow key={"detail-row-" + index} row={row} tableId={view.table} />
-                                            )
+                                            if (checkIfDetail(row)) {
+                                                return (
+                                                    <DetailedRow key={"detail-row-" + index} row={row} tableId={view.table} />
+                                                )
+                                            }
+                                            else {
+                                                return (
+                                                    <Row key={"row-" + index} row={row} tableId={view.table} viewId={view._id} />
+                                                )
+                                            }
                                         }) 
                                     }
-                                    <AddRecordRow key={'add-record-' + view._id} col={view.columns} />
+                                    <AddRecordRow key={'add-record-' + view._id} col={columns} />
                                     </TableBody>
                                 </Table>
                             </TableContainer>

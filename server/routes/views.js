@@ -244,6 +244,26 @@ router.post("/setRoles", async(req, res) => {
 		console.error('Error: ', err);
 		res.status(400).json({ message: `Error in setting up role for ${viewId}` });
 	}
+});
+
+router.post("/addDetailView", async(req, res) => {
+    const { viewId, row } = req.body;
+    try {
+        const currentView = await viewsModel.findOne({ _id: viewId });
+        console.log(currentView);
+        let details = currentView.details
+        details.push(row);
+        const updatedView = await viewsModel.findOneAndUpdate(
+            { _id: viewId },
+            { details: details },
+            { new: true }
+        );
+        res.send(updatedView);
+    }
+    catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in creating a detail view for the record ${row} in ${viewId}` });
+	}
 })
 
 module.exports = router;

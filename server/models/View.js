@@ -20,6 +20,9 @@ const viewSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	details: {
+		type: [[String]]
+	},
 	// allowed actions, different based on which view. add record for table view, edit record for detail view
 	allowedActions: {
 		type: [String],
