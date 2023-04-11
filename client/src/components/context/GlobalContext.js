@@ -34,9 +34,9 @@ export function GlobalContextProvider({children}){
             // Set the app list with the new lists that were found! 
             if (response.status === 200) {
                 setAppList(response.data);
-                setCurrentApp(null);
-                setAppDataSources([]);
-                setAppViews([]);
+                // setCurrentApp(null);
+                // setAppDataSources([]);
+                // setAppViews([]);
             }
         }
         getLists();
@@ -269,17 +269,17 @@ export function GlobalContextProvider({children}){
     /* ---------- FUNCTIONS BELOW RELATE TO THE VIEW ---------- */
 
     // Function to add a specified view type to the application
-    const addView = function(tableId, viewType, columnName) {
-        async function createView(tableId, viewType, columnName) {
+    const addView = function(tableId, columns) {
+        async function createView(tableId, columns) {
             let payload = {
                 // The id of the application we will be adding the view to
                 appId: currentApp._id,
                 // The id of the data source that was specified by the user
                 tableId: tableId,
                 // The view type that was specified by the user 
-                viewType: viewType,
+                viewType: "table",
                 //The selected columns to be shown
-                columnName: columnName
+                columns: columns
             }
             console.log('[STORE] Sending request to create view... : ',payload)
             const response = await api.addView(payload);
@@ -287,7 +287,7 @@ export function GlobalContextProvider({children}){
             setApp(response.data);
             navigate("/editor/views");
         }
-        createView(tableId, viewType, columnName);
+        createView(tableId, columns);
     }
 
     const renameView = function(name, viewId) {

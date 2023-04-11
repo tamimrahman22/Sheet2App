@@ -29,7 +29,7 @@ export default function ViewsPage() {
     const [keyIndex, setKeyIndex] = useState("");
 
     // Store the column name of the columns the user wants to add to the view columns of the application 
-    const [columnName, setColumnName] = useState([]);
+    const [columns, setColumns] = useState([]);
 
 
     // Function to open the modal 
@@ -50,11 +50,11 @@ export default function ViewsPage() {
 
     // Function to handle when the add button is hit on the modal in order to process the view being made for the app
     function handleAddView(event) {
-        console.log('[VIEWS] View Type: ', viewType)
+        // console.log('[VIEWS] View Type: ', viewType)
         console.log('[VIEWS] Data Source Name is: ', dataSource)
-        console.log('[VIEWS] Column Names are: ',columnName)
+        console.log('[VIEWS] Column Names are: ', columns)
         // Data source is the object itself, pass the id to the function in order to generate the view + the view type the person specified 
-        store.addView(dataSource._id, viewType, columnName);
+        store.addView(dataSource._id, columns);
         // Hide the modal 
         setOpen(false);
     }
@@ -63,25 +63,31 @@ export default function ViewsPage() {
         setDataSource(event.target.value);
         console.log("DATA SOURCE IS: ",event.target.value);
         setKeyColumnName(event.target.value.keys);
-        setColumnOptions(event.target.value.columns.filter((col) => (col.name !== keyColumnName)));
+        setColumnOptions(event.target.value.columns.map((col) => col['name']));
         setKeyIndex(event.target.value.columns.findIndex((col) => col.name === keyColumnName));
+        setColumns([]);
     }
 
     // Function to handle the change of the what was selected by the user
     const handleChange = (event) => {
         const selectedValues = event.target.value;
-        const selectedColumns = selectedValues.map((value) => {
-            const selectedColumn = dataSource.columns.find((col) => col.name === value);
-            return { name: selectedColumn.name, index: dataSource.columns.indexOf(selectedColumn) };
-        });
-        console.log(selectedColumns)
-        setColumnName(selectedColumns);
+        console.log(`[JONATHAN] ${selectedValues}`);
+        // // const selectedColumns = selectedValues.map((value) => {
+        // //     const selectedColumn = dataSource.columns.find((col) => col.name === value);
+        // //     return { name: selectedColumn.name, index: dataSource.columns.indexOf(selectedColumn) };
+        // // });
+        // // console.log(selectedColumns)
+        // var names = selectedValues.map(function(item) {
+        //     return item['name'];
+        // });
+        // console.log(`[JONATHAN] ${names}`);
+        setColumns(selectedValues);
     };
       
     // Function to generate a detail table with the columns that the user specified 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log('[VIEW COLUMN] COLUMNS SELECTED WERE: ', columnName);
+        console.log('[VIEW COLUMN] COLUMNS SELECTED WERE: ', columns);
         // TODO: Add code to open a modal and generate the table the user specified by the column name!
         handleAddView();
     };
@@ -170,12 +176,12 @@ export default function ViewsPage() {
                 </Box>
                 <Box paddingTop={2}>
                     <FormControl sx={{ minWidth: 350}} >
-                        <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
+                        <InputLabel id="demo-multiple-chip-label">Select Columns</InputLabel>
                         <Select
                         labelId="demo-multiple-chip-label"
                         id="demo-multiple-chip"
                         multiple
-                        value={columnName.map((col) => col.name)}
+                        value={columns}
                         onChange={handleChange}
                         input={<OutlinedInput id="select-multiple-chip" label="Select Columns" />}
                         renderValue={(selected) => (
@@ -190,7 +196,7 @@ export default function ViewsPage() {
                         >
                             {
                                 columnOptions.map((col, index) => (
-                                    <MenuItem value={col.name} key={index}>{col.name}</MenuItem>
+                                    <MenuItem value={col} key={index}>{col}</MenuItem>
                                 ))
                             }
                         </Select>
@@ -202,7 +208,7 @@ export default function ViewsPage() {
                         paddingTop={2}
                     >
                         <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
-                        <Button variant="contained" onClick={handleSubmit} disabled={columnName.length === 1}>Add</Button>
+                        <Button variant="contained" onClick={handleSubmit} disabled={columns.length === 1}>Add</Button>
                     </Box>
                 </Box>
             </Box>

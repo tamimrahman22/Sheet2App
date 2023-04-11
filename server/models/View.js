@@ -12,48 +12,9 @@ const viewSchema = new mongoose.Schema({
 		required: true,
 	},
 	// columns from data source
-	columns: [
-        {
-			// name of column
-            name: {
-				type: String,
-				required: true,
-			},
-			// initial value of empty cell, optional
-			initialValue: {
-				type: String,
-			},
-			// indicates whether column is used as the link text for references to record, set to true for at msot one column per table
-			label: {
-				type: Boolean,
-				required: true,
-			},
-			// whether the column is a reference to another data source
-			reference: {
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'DataSource',
-			},
-			// type of values in the row: boolean number text url
-			type: {
-				type: String,
-				required: true,
-			},
-			//selected columns
-			columnName: [
-				{
-					// name of column
-					name: {
-						type: String,
-						required: true,
-					},
-					// index of column
-					index: {
-						type: Number,
-					},
-				}
-			]
-        }
-    ],
+	columns: {
+		type: [String],
+	},
 	// detailed or table view
 	viewType: {
 		type: String,

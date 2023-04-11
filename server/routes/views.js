@@ -13,7 +13,8 @@ const auth = new google.auth.GoogleAuth({
 
 router.post('/add', async (req, res) => {
     // get name, table, columns, and roles from appId, 
-    const { appId, tableId, viewType, columnName } = req.body;
+    const { appId, tableId, viewType, columns } = req.body;
+    console.log(columns);
     try{
         // get necessary information for views
         const currentApp = await appModel.findById( { _id: appId } );
@@ -21,7 +22,6 @@ router.post('/add', async (req, res) => {
         console.log(currentApp);
         console.log(table)
         const name = currentApp.name;
-        const columns = table.columns;
         const allowedActions = [];
 
         // add the proper allowed actions based on the viewType
@@ -39,7 +39,6 @@ router.post('/add', async (req, res) => {
             columns: columns,
             viewType: viewType,
             allowedActions: allowedActions,
-            columnName: columnName
         });
 
         // add views to the respective application
