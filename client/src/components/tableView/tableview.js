@@ -22,7 +22,7 @@ function TableView(props) {
     const [viewToEdit, setViewtoEdit] = useState(null);
     const [viewName, setViewName] = useState(null);
     const [open, setOpen] = useState(false);
-    const selectedColumns = view.columnName;
+    const selectedColumns = view.columns.columnName;
 
     console.log("COLUMN NAMES ARE: ",selectedColumns);
 
@@ -142,7 +142,7 @@ function TableView(props) {
             <>
                 {data.map((row, rowIndex) => (
                     <TableRow key={`row-${rowIndex}`} onClick={() => {setOpen(!open)}}>
-                        {view.columnName.map((column) => {
+                        {view.columns.columnName.map((column) => {
                             const { name, index } = column;
                             return index >= 0 && index < row.length ?
                                 <TableCell key={`cell-${rowIndex}-${index}`}>{row[index]}</TableCell> :
@@ -468,7 +468,7 @@ function TableView(props) {
                                                 })
                                             }
                                         </Select>
-                                    </FormControl> */}
+                                    </FormControl> 
                                     <IconButton onClick={openModal} sx={{ verticalAlign: 'top' }}>
                                         <DeleteIcon />
                                     </IconButton>
@@ -480,7 +480,7 @@ function TableView(props) {
                                 <Table aria-label="simple table">
                                     <TableHead>
                                         <TableRow>
-                                            {view.columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))}
+                                            {view.columns.columnName.map((col, index) => (<TableCell key={"column-" + index}>{col.name}</TableCell>))}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>

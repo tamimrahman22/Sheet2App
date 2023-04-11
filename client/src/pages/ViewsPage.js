@@ -16,11 +16,10 @@ export default function ViewsPage() {
 
     // State to either show or hide the modal
     const [open, setOpen] = useState(false);
-    const [optionOpen, setOptionOpen] = useState(false);
     // State to be updated about the view type the user wants to be added to the app 
     const [viewType, setViewType] = useState("Table");
     // State to store the data source object 
-    const [dataSource, setDataSource] = useState("");
+    const [dataSource, setDataSource] = useState(null);
 
     // Get the key column of the data source
     const [keyColumnName, setKeyColumnName] = useState("");
@@ -31,6 +30,7 @@ export default function ViewsPage() {
 
     // Store the column name of the columns the user wants to add to the view columns of the application 
     const [columnName, setColumnName] = useState([]);
+
 
     // Function to open the modal 
     function openModal(event) {
@@ -56,22 +56,15 @@ export default function ViewsPage() {
         // Data source is the object itself, pass the id to the function in order to generate the view + the view type the person specified 
         store.addView(dataSource._id, viewType, columnName);
         // Hide the modal 
-        setOptionOpen(false);
-    }
-
-    function openOptionModal() {
-        setKeyColumnName(dataSource.keys);
-        setColumnOptions(dataSource.columns.filter((col) => (col.name !== keyColumnName)));
-        setKeyIndex(dataSource.columns.findIndex((col) => col.name === keyColumnName));
         setOpen(false);
-        setOptionOpen(true);
     }
 
-    function closeOptionModal() {
-        setOptionOpen(false);
-        // Reset the state values
-        setViewType("Table");
-        setDataSource(null);
+    const handleDataSourceChange = (event) => {
+        setDataSource(event.target.value);
+        console.log("DATA SOURCE IS: ",event.target.value);
+        setKeyColumnName(event.target.value.keys);
+        setColumnOptions(event.target.value.columns.filter((col) => (col.name !== keyColumnName)));
+        setKeyIndex(event.target.value.columns.findIndex((col) => col.name === keyColumnName));
     }
 
     // Function to handle the change of the what was selected by the user
@@ -101,7 +94,7 @@ export default function ViewsPage() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 415,
-        height: 235,
+        height: 300,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
@@ -163,7 +156,7 @@ export default function ViewsPage() {
                             id="dataSource-select"
                             value={dataSource}
                             label="Data Source"
-                            onChange={(e) => setDataSource(e.target.value)}
+                            onChange={handleDataSourceChange}
                         >
                             {
                                 store.appDataSources.map(ds => {
@@ -175,33 +168,9 @@ export default function ViewsPage() {
                         </Select>
                     </FormControl>
                 </Box>
-                <Box m={1}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center" 
-                    paddingTop={2}
-                >
-                    <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
-                    <Button variant="contained" onClick={openOptionModal}>Add</Button>
-                </Box>
-            </Box>
-        </Modal>
-
-        <Modal
-            open={optionOpen}
-            onClose={closeOptionModal}
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}
-        >
-            <Box sx={{ width: "400", height:"300", overflow:"scroll" }} component={Paper} padding={5}>
-                <Typography variant="h4" component="h2" textAlign="center" paddingBottom={2}>
-                Select Columns to View
-                </Typography>
-                <FormControl sx={{ m: 1, width: 300 }} >
-                    <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
+                <Box paddingTop={2}>
+                    <FormControl sx={{ minWidth: 350}} >
+                        <InputLabel id="demo-multiple-chip-label">Select Columns:</InputLabel>
                         <Select
                         labelId="demo-multiple-chip-label"
                         id="demo-multiple-chip"
@@ -217,6 +186,7 @@ export default function ViewsPage() {
                                 ))}
                             </Box>
                             )}
+                        overflow="scroll"
                         >
                             {
                                 columnOptions.map((col, index) => (
@@ -224,17 +194,21 @@ export default function ViewsPage() {
                                 ))
                             }
                         </Select>
-                </FormControl>
-                <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}>
-                <Button type="submit" variant="contained" sx={{ mt: 2 }} onClick={handleSubmit} disabled={columnName.length === 1}>Submit</Button>
+                    </FormControl>
+                    <Box m={1}
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center" 
+                        paddingTop={2}
+                    >
+                        <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
+                        <Button variant="contained" onClick={handleSubmit} disabled={columnName.length === 1}>Add</Button>
+                    </Box>
                 </Box>
             </Box>
         </Modal>
+
+        
         </>
     );
 }

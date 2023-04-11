@@ -38,6 +38,20 @@ const viewSchema = new mongoose.Schema({
 				type: String,
 				required: true,
 			},
+			//selected columns
+			columnName: [
+				{
+					// name of column
+					name: {
+						type: String,
+						required: true,
+					},
+					// index of column
+					index: {
+						type: Number,
+					},
+				}
+			]
         }
     ],
 	// detailed or table view
@@ -70,19 +84,6 @@ const viewSchema = new mongoose.Schema({
 	editable: {
 		type: [String],
 	},
-	columnName: [
-		{
-			// name of column
-            name: {
-				type: String,
-				required: true,
-			},
-			// index of column
-			index: {
-				type: Number,
-			},
-        }
-	]
 }, { timestamps: true });
 
 const View = mongoose.model("View", viewSchema);
