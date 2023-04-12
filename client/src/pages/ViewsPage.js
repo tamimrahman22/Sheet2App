@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
 import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl, OutlinedInput, Chip, Paper } from '@mui/material';
-import TableView from '../components/TableView';
+import TableView from '../components/tableView';
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
 
@@ -100,10 +100,11 @@ export default function ViewsPage() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 415,
-        height: 300,
+        height: 315,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
+        overflow:"scroll"
     };
 
     return (
