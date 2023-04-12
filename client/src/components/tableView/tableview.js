@@ -208,6 +208,7 @@ function TableView(props) {
             store.deleteRecord(row, viewId, tableId);
             let temp = data.filter(r => !row.includes(r[0]));
             setData(temp);
+            temp.unshift(columns);
             window.sessionStorage.setItem(url, JSON.stringify(temp));
         }
 
