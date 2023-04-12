@@ -254,24 +254,25 @@ async function updateAppRoles(){
 	
 			// get each column and put into array
 			let roles = [];
-			for(let i = 0; i < readData.data.values[0].length; i++){
+
+			for(let k = 0; k < readData.data.values[0].length; k++){
 				let tempList = [];
 				for(let j = 0; j < readData.data.values.length; j++){
-					if (readData.data.values[j][i] != undefined)
-						tempList.push(readData.data.values[j][i]);
+					if (readData.data.values[j][k] != undefined)
+						tempList.push(readData.data.values[j][k]);
 				}
 				roleName = tempList.shift();
-				let actions = [];
-				for (let i = 0; i < list[i].roles.length; i++) {
-					if (list[i].roles[i].name === roleName) {
-						actions = list[i].roles[i].allowedActions;
+				for (let l = 0; l < list[i].roles.length; l++) {
+					if (list[i].roles[l].name === roleName) {
+						actions = list[i].roles[l].allowedActions;
 						break;
 					}
 				}
+
 				roles.push({
 					name: roleName,
 					users: tempList,
-					allowedActions: actions
+					allowedActions: []
 				});
 			}
 			console.log(list[i].name);

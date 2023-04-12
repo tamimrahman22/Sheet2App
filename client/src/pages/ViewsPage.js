@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
 import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl, OutlinedInput, Chip, Paper } from '@mui/material';
-import TableView from '../components/TableView';
+import TableView from '../components/tableView';
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
 
