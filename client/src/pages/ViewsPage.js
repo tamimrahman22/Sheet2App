@@ -100,10 +100,11 @@ export default function ViewsPage() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 415,
-        height: 300,
+        height: 315,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
+        overflow:"scroll"
     };
 
     return (
