@@ -150,7 +150,7 @@ function TableView(props) {
             event.stopPropagation();
             console.log(row);
             console.log(tableId);
-            store.deleteRecord(row, tableId);
+            store.deleteRecord(row, viewId, tableId);
             let temp = data.filter(r => !row.includes(r[0]));
             setData(temp);
             temp.unshift(columns);
@@ -194,7 +194,7 @@ function TableView(props) {
     }
 
     function DetailedRow(props) {
-        const { row, tableId } = props;
+        const { row, tableId, viewId } = props;
         const [open, setOpen] = useState(false);
 
         const indices = [];
@@ -205,7 +205,7 @@ function TableView(props) {
             event.stopPropagation();
             console.log(row);
             console.log(tableId);
-            store.deleteRecord(row, tableId);
+            store.deleteRecord(row, viewId, tableId);
             let temp = data.filter(r => !row.includes(r[0]));
             setData(temp);
             window.sessionStorage.setItem(url, JSON.stringify(temp));
@@ -444,7 +444,7 @@ function TableView(props) {
                                         data.map((row, index) => {
                                             if (checkIfDetail(row)) {
                                                 return (
-                                                    <DetailedRow key={"detail-row-" + index} row={row} tableId={view.table} />
+                                                    <DetailedRow key={"detail-row-" + index} row={row} tableId={view.table} viewId={view._id}/>
                                                 )
                                             }
                                             else {

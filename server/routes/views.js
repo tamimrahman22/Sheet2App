@@ -181,7 +181,7 @@ router.post('/addRecord', async (req, res) => {
 });
 
 router.post("/deleteRecord", async (req, res) => {
-    const { record, tableId } = req.body;
+    const { record, viewId, tableId } = req.body;
     const authClientObject = await auth.getClient();
 	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
     const table = await dataSourceModel.findById( { _id: tableId });
@@ -218,6 +218,17 @@ router.post("/deleteRecord", async (req, res) => {
         await googleSheetsInstance.spreadsheets.values.update(updateRequest)
         console.log(`Deleted rows with values: ${record}`);
 
+        // Find specific view and remove detail view if necessary
+        const view = await viewsModel.findById({ _id: viewId });
+        const details = view.details.filter(v => !compareArrays(v, record));
+
+        // Update that view with removed detail view
+        await viewsModel.findByIdAndUpdate(
+            { _id: viewId },
+            { details: details },
+        )
+
+        // Update all views that use the data source
         await viewsModel.updateMany(
             { table: tableId },
             { updatedAt: Date.now() },
@@ -265,5 +276,9 @@ router.post("/addDetailView", async(req, res) => {
 		res.status(400).json({ message: `Error in creating a detail view for the record ${row} in ${viewId}` });
 	}
 })
+
+function compareArrays(a, b) {
+    return a.length === b.length && a.every((element, index) => element === b[index]);
+}
 
 module.exports = router;

@@ -339,10 +339,11 @@ export function GlobalContextProvider({children}){
         addRecordToView(record, tableId);
     }
 
-    const deleteRecord = function(record, tableId) {
-        async function deleteRecordFromSheet(record, tableId) {
+    const deleteRecord = function(record, viewId, tableId) {
+        async function deleteRecordFromSheet(record, viewId, tableId) {
             let payload = {
                 record: record,
+                viewId: viewId,
                 tableId: tableId
             }
             console.log(`[STORE] Sending request to delete record ${record} from ${tableId}`);
@@ -354,7 +355,7 @@ export function GlobalContextProvider({children}){
                 // navigate("/editor/views")
             }
         }
-        deleteRecordFromSheet(record, tableId);
+        deleteRecordFromSheet(record, viewId, tableId);
     }
 
     const setViewRoles = function(viewId, roles) {
