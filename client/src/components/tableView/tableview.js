@@ -126,72 +126,59 @@ function TableView(props) {
         store.setViewRoles(view._id, value);
     }
 
-    function compareArrays(a, b) {
-        return a.length === b.length && a.every((element, index) => element === b[index]);
-    }
+    // function Row(props) {
+    //     const { row, tableId, viewId } = props;
 
-    function checkIfDetail(row) {
-        for (let i = 0; i < view.details.length; i++) {
-            if (compareArrays(view.details[i], row)) {
-                return true
-            }
-        }
-        return false;
-    }
-
-    function Row(props) {
-        const { row, tableId, viewId } = props;
-
-        const indices = [];
-        view.columns.forEach(c => indices.push(columns.indexOf(c)));
-        // console.log(indices);
+    //     const indices = [];
+    //     view.columns.forEach(c => indices.push(columns.indexOf(c)));
+    //     // console.log(indices);
         
-        function handleDeleteRecord(event) {
-            event.stopPropagation();
-            console.log(row);
-            console.log(tableId);
-            store.deleteRecord(row, viewId, tableId);
-            let temp = data.filter(r => !row.includes(r[0]));
-            setData(temp);
-            temp.unshift(columns);
-            window.sessionStorage.setItem(url, JSON.stringify(temp));
-        }
+    //     function handleDeleteRecord(event) {
+    //         event.stopPropagation();
+    //         console.log(row);
+    //         console.log(tableId);
+    //         store.deleteRecord(row, viewId, tableId);
+    //         let temp = data.filter(r => !row.includes(r[0]));
+    //         setData(temp);
+    //         temp.unshift(columns);
+    //         window.sessionStorage.setItem(url, JSON.stringify(temp));
+    //     }
 
-        function handleAddDetailView(event) {
-            event.stopPropagation();
-            console.log(row);
-            console.log(viewId);
-            store.addDetailView(viewId, row);
-        }
+    //     function handleAddDetailView(event) {
+    //         event.stopPropagation();
+    //         console.log(row);
+    //         console.log(viewId);
+    //         store.addDetailView(viewId, row);
+    //     }
 
-        return (
-            <>
-                <TableRow>
-                {
-                    row.map((cell, index) => {
-                        if (indices.includes(index)) {
-                            return (
-                                <TableCell key={"cell-value-" + cell}>{cell}</TableCell>
-                            )
-                        }
-                        return null;
-                    })
-                }
-                    <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
-                        <IconButton onClick={handleDeleteRecord}>
-                            <DeleteIcon fontSize='small'/>
-                        </IconButton>
-                        <IconButton onClick={handleAddDetailView}>
-                            <AddCircleIcon/>
-                        </IconButton>
-                    </TableCell>
-                </TableRow>
-                <TableRow>
-                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length}/>
-                </TableRow>
-            </>
-        );
-    }
+    //     return (
+    //         <>
+    //             <TableRow>
+    //             {
+    //                 row.map((cell, index) => {
+    //                     if (indices.includes(index)) {
+    //                         return (
+    //                             <TableCell key={"cell-value-" + cell}>{cell}</TableCell>
+    //                         )
+    //                     }
+    //                     return null;
+    //                 })
+    //             }
+    //                 <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
+    //                     <IconButton onClick={handleDeleteRecord}>
+    //                         <DeleteIcon fontSize='small'/>
+    //                     </IconButton>
+    //                     <IconButton onClick={handleAddDetailView}>
+    //                         <AddCircleIcon/>
+    //                     </IconButton>
+    //                 </TableCell>
+    //             </TableRow>
+    //             <TableRow>
+    //                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length}/>
+    //             </TableRow>
+    //         </>
+    //     );
+    // }
 
     function DetailedRow(props) {
         const { row, tableId, viewId } = props;
@@ -443,16 +430,9 @@ function TableView(props) {
                                         </TableCell>
                                     </TableRow> :
                                         data.map((row, index) => {
-                                            if (checkIfDetail(row)) {
-                                                return (
-                                                    <DetailedRow key={"detail-row-" + index} row={row} tableId={view.table} viewId={view._id}/>
-                                                )
-                                            }
-                                            else {
-                                                return (
-                                                    <Row key={"row-" + index} row={row} tableId={view.table} viewId={view._id} />
-                                                )
-                                            }
+                                            return (
+                                                <DetailedRow key={"detail-row-" + index} row={row} tableId={view.table} viewId={view._id}/>
+                                            )
                                         }) 
                                     }
                                     <AddRecordRow key={'add-record-' + view._id} col={columns} />

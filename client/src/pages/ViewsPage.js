@@ -37,6 +37,7 @@ export default function ViewsPage() {
         console.log('[VIEWS] CURRENT App: ', store.currentApp)
         // Open the modal! 
         setOpen(true);
+        setColumnOptions([]);
     }
 
     // Function to close the modal 
@@ -46,6 +47,7 @@ export default function ViewsPage() {
         // Reset the state values
         setViewType("Table");
         setDataSource(null);
+        setColumnOptions([]);
     }
 
     // Function to handle when the add button is hit on the modal in order to process the view being made for the app
@@ -57,6 +59,7 @@ export default function ViewsPage() {
         store.addView(dataSource._id, columns);
         // Hide the modal 
         setOpen(false);
+        setColumnOptions([]);
     }
 
     const handleDataSourceChange = (event) => {

@@ -373,21 +373,6 @@ export function GlobalContextProvider({children}){
         setRolesForView(viewId, roles);
     }
 
-    const addDetailView = function(viewId, row) {
-        async function addRowToViewDetails(viewId, row) {
-            let payload = {
-                viewId: viewId,
-                row: row
-            }
-            console.log(`[STORE] Creating a detail view for ${row} in ${viewId}`);
-            await api.addDetailView(payload);
-            console.log('[STORE] Reloading views for current application' );
-            const res = await api.getViews(currentApp._id);
-            setAppViews(res.data);
-        }
-        addRowToViewDetails(viewId, row);
-    }
-
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
     const funcs = {
         // STATES
@@ -424,7 +409,6 @@ export function GlobalContextProvider({children}){
         addRecord,
         deleteRecord,
         setViewRoles,
-        addDetailView,
     }
 
     return(

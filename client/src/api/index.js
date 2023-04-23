@@ -32,7 +32,6 @@ export const deleteView = (payload) => api.post("/views/delete", payload);
 export const addRecord = (payload) => api.post("/views/addRecord", payload);
 export const deleteRecord = (payload) => api.post("/views/deleteRecord", payload);
 export const setViewRoles = (payload) => api.post("/views/setRoles", payload);
-export const addDetailView = (payload) => api.post("/views/addDetailView", payload);
 
 const apis = {
     getAppList,
@@ -59,7 +58,6 @@ const apis = {
     addRecord,
     deleteRecord,
     setViewRoles,
-    addDetailView,
 };
 
 export default apis;
