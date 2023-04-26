@@ -154,30 +154,63 @@ router.post('/addRecord', async (req, res) => {
     values.push(record);
     const resource = { values };
 
+    const columns = table.columns;
+    // console.log(columns);
+
+    // TYPE CHECKING, check for number, boolean or url, otherwise it is a string
+    let check = true;
+    let urlRegex = /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
+    for(let i = 0; i < columns.length; i++){
+        // console.log(columns[i]);
+        console.log(typeof record[i]);
+        if(!isNaN(record[i])){
+            if(columns[i].type !== 'number'){
+                check = false;
+            }
+        }
+        else if(typeof record[i] === 'boolean' || record[i] == 'FALSE' || record[i] == 'TRUE' || record[i] == 'false' || record[i] == 'true'){
+            if(columns[i].type !== 'boolean'){
+                check = false;
+            }
+        }
+        else if(urlRegex.test(record[i])) {
+            if(columns[i].type !== 'url'){
+                check = false;
+            }
+        }
+    }
+
     console.log(spreadsheetId);
     console.log(range);
     console.log.apply(resource);
 
-    // add record to datasource
-    try {
-        const writeData = googleSheetsInstance.spreadsheets.values.append({
-            spreadsheetId,
-            range,
-            valueInputOption: "USER_ENTERED",
-            resource,
-        });
-      console.log("successfully wrote to sheet");
+    if(check == true){
+        // add record to datasource
+        try {
+            const writeData = googleSheetsInstance.spreadsheets.values.append({
+                spreadsheetId,
+                range,
+                valueInputOption: "USER_ENTERED",
+                resource,
+            });
+            console.log("successfully wrote to sheet");
 
-    await viewsModel.updateMany(
-        { table: tableId },
-        { updatedAt: Date.now() },
-    );
-      res.status(200).json({ tableId: tableId });
+            await viewsModel.updateMany(
+                { table: tableId },
+                { updatedAt: Date.now() },
+            );
+            res.status(200).json({ tableId: tableId });
+        }
+        catch (err){
+            console.error('Error: ', err);
+            res.status(400).json({ message: `Error in adding record` });
+        }
     }
-    catch (err){
-        console.error('Error: ', err);
-		res.status(400).json({ message: `Error in adding record` });
+    else{
+        console.log('Wrong type');
+        res.status(400).json({ message: `Error in adding record: wrong type` });
     }
+    
 });
 
 router.post("/deleteRecord", async (req, res) => {
