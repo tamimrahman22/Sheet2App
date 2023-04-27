@@ -205,6 +205,99 @@ router.post('/addRecord', async (req, res) => {
     
 });
 
+router.post('/editRecord', async (req, res) => {
+    // get dataSource
+    const { oldRecord, newRecord, tableId } = req.body;
+    const authClientObject = await auth.getClient();
+	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+    const table = await dataSourceModel.findById( { _id: tableId });
+
+    const regex = /\/d\/(.*?)\/edit/;
+    const match = table.url.match(regex);
+    const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+    let range = table.sheetName;
+    let sheetName = table.sheetName;
+
+    const columns = table.columns;
+    // console.log(columns);
+
+    // TYPE CHECKING, check for number, boolean or url, otherwise it is a string
+    let check = true;
+    let urlRegex = /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
+    for(let i = 0; i < columns.length; i++){
+        // console.log(columns[i]);
+        console.log(typeof newRecord[i]);
+        if(!isNaN(newRecord[i])){
+            if(columns[i].type !== 'number'){
+                check = false;
+            }
+        }
+        else if(typeof newRecord[i] === 'boolean' || newRecord[i] == 'FALSE' || newRecord[i] == 'TRUE' || newRecord[i] == 'false' || newRecord[i] == 'true'){
+            if(columns[i].type !== 'boolean'){
+                check = false;
+            }
+        }
+        else if(urlRegex.test(newRecord[i])) {
+            if(columns[i].type !== 'url'){
+                check = false;
+            }
+        }
+    }
+
+    if(check == false){
+        console.log('Wrong type');
+        res.status(400).json({ message: `Error in editing record: wrong type` });
+    }
+    else{
+        const response = await googleSheetsInstance.spreadsheets.get({
+			spreadsheetId,
+			auth,
+		});
+
+		const readData = await googleSheetsInstance.spreadsheets.values.get({
+			auth, //auth object
+			spreadsheetId, // spreadsheet id
+			range, //range of cells to read from.
+		})
+
+
+        await googleSheetsInstance.spreadsheets.values.clear({
+            spreadsheetId,
+            range: `${sheetName}!A2:ZZ`,
+        })
+        
+
+        for(let i = 1; i < readData.data.values.length; i++){
+            if(readData.data.values[i][0] === oldRecord[0]){
+                let values = [];
+                values.push(newRecord);
+                const resource = { values };
+                await googleSheetsInstance.spreadsheets.values.append({
+                    spreadsheetId,
+                    range,
+                    valueInputOption: "USER_ENTERED",
+                    resource,
+                });
+            }
+            else{
+                let values = [];
+                values.push(readData.data.values[i]);
+                const resource = { values };
+                await googleSheetsInstance.spreadsheets.values.append({
+                    spreadsheetId,
+                    range,
+                    valueInputOption: "USER_ENTERED",
+                    resource,
+                });
+            }
+        }
+
+        res.status(200).json({ tableId: tableId });
+    }
+
+})
+
+
 router.post("/deleteRecord", async (req, res) => {
     const { record, viewId, tableId } = req.body;
     const authClientObject = await auth.getClient();
