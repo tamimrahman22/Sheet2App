@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl, OutlinedInput, Chip, Paper } from '@mui/material';
+import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl, Chip } from '@mui/material';
 import TableView from '../components/TableView';
 import DeveloperView from '../components/DeveloperView';
 import AuthContext from '../components/context/AuthContext';
@@ -116,7 +116,7 @@ export default function ViewsPage() {
             <Typography variant="h4" >
                 Views
             </Typography>
-            <Button variant="contained" onClick={openModal}>Add View</Button>
+            { store.userRole === "Developer" && <Button variant="contained" onClick={openModal}>Add View</Button> }
         </Stack>
 
         <Container maxWidth="xl">
@@ -138,7 +138,7 @@ export default function ViewsPage() {
                         )
                     }
                     else {
-                        return (<Box />);
+                        return null;
                     }
                 })
             }

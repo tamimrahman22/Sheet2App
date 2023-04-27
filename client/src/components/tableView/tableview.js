@@ -17,6 +17,7 @@ function TableView(props) {
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
     const [open, setOpen] = useState(false);
+    const [detailView, setDetailView] = useState(null);
 
     const style = {
         position: 'absolute',
@@ -63,7 +64,17 @@ function TableView(props) {
             setLoading(false);
         }
         fetchData();
-    }, [view.table, view.updatedAt]);
+    }, [store.appViews, store.userRole, view.table, view.updatedAt]);
+
+    useEffect(() => {
+        for (let i = 0; i < store.appViews.length; i++) {
+            let v = store.appViews[i]
+            if (v.viewType === "Detail" && v.table === view.table && v.roles.includes(store.userRole)) {
+                setDetailView(v);
+                break;
+            }
+        }
+    }, [store.appViews, store.userRole, view.table])
 
     function handleAddRecord() {
         console.log('[VIEWS] Handle adding new record to view');
@@ -99,63 +110,55 @@ function TableView(props) {
         setOpen(false)
     }
 
-    // function Row(props) {
-    //     const { row, tableId, viewId } = props;
+    function Row(props) {
+        const { row, tableId, viewId } = props;
 
-    //     const indices = [];
-    //     view.columns.forEach(c => indices.push(columns.indexOf(c)));
-    //     // console.log(indices);
+        const indices = [];
+        view.columns.forEach(c => indices.push(columns.indexOf(c)));
+        // console.log(indices);
         
-    //     function handleDeleteRecord(event) {
-    //         event.stopPropagation();
-    //         console.log(row);
-    //         console.log(tableId);
-    //         store.deleteRecord(row, viewId, tableId);
-    //         let temp = data.filter(r => !row.includes(r[0]));
-    //         setData(temp);
-    //         temp.unshift(columns);
-    //         window.sessionStorage.setItem(url, JSON.stringify(temp));
-    //     }
+        function handleDeleteRecord(event) {
+            event.stopPropagation();
+            console.log(row);
+            console.log(tableId);
+            store.deleteRecord(row, viewId, tableId);
+            let temp = data.filter(r => !row.includes(r[0]));
+            setData(temp);
+            temp.unshift(columns);
+            window.sessionStorage.setItem(url, JSON.stringify(temp));
+        }
 
-    //     function handleAddDetailView(event) {
-    //         event.stopPropagation();
-    //         console.log(row);
-    //         console.log(viewId);
-    //         store.addDetailView(viewId, row);
-    //     }
-
-    //     return (
-    //         <>
-    //             <TableRow>
-    //             {
-    //                 row.map((cell, index) => {
-    //                     if (indices.includes(index)) {
-    //                         return (
-    //                             <TableCell key={"cell-value-" + cell}>{cell}</TableCell>
-    //                         )
-    //                     }
-    //                     return null;
-    //                 })
-    //             }
-    //                 <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
-    //                     <IconButton onClick={handleDeleteRecord}>
-    //                         <DeleteIcon fontSize='small'/>
-    //                     </IconButton>
-    //                     <IconButton onClick={handleAddDetailView}>
-    //                         <AddCircleIcon/>
-    //                     </IconButton>
-    //                 </TableCell>
-    //             </TableRow>
-    //             <TableRow>
-    //                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length}/>
-    //             </TableRow>
-    //         </>
-    //     );
-    // }
+        return (
+            <>
+                <TableRow>
+                {
+                    row.map((cell, index) => {
+                        if (indices.includes(index)) {
+                            return (
+                                <TableCell key={"cell-value-" + cell}>{cell}</TableCell>
+                            )
+                        }
+                        return null;
+                    })
+                }
+                    <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
+                        { view.allowedActions.includes("Delete Record") && 
+                        <IconButton onClick={handleDeleteRecord}>
+                            <DeleteIcon fontSize='small'/>
+                        </IconButton> }
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={length}/>
+                </TableRow>
+            </>
+        );
+    }
 
     function DetailedRow(props) {
         const { row, tableId, viewId } = props;
         const [open, setOpen] = useState(false);
+        const [edit, setEdit] = useState(false);
 
         const indices = [];
         view.columns.forEach(c => indices.push(columns.indexOf(c)));
@@ -186,9 +189,10 @@ function TableView(props) {
                         })
                     }
                     <TableCell align="right" sx={{ verticalAlign: 'top' }}> 
+                        { view.allowedActions.includes("Delete Record") && 
                         <IconButton onClick={handleDeleteRecord}>
                             <DeleteIcon fontSize='small'/>
-                        </IconButton>
+                        </IconButton> }
                         {open ? 
                         <IconButton disableRipple onClick={() => {setOpen(!open)}} >
                             <KeyboardArrowUpIcon />
@@ -222,9 +226,10 @@ function TableView(props) {
                                             )
                                         })
                                     }
+                                    { detailView.allowedActions.includes("Edit Record") && 
                                     <Grid item xs={12} justifyContent="center" display="flex" alignItems="center">
                                         <Button variant="contained">Update Record</Button>
-                                    </Grid>
+                                    </Grid> }
                                 </Grid>
                             </Box>
                         </Collapse>
@@ -242,7 +247,7 @@ function TableView(props) {
             <>
                 <TableRow onClick={() => {setOpen(!open)}}>
                     <TableCell colSpan={length -1} align="center">Add Record</TableCell>
-                    <TableCell align="right"> {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} </TableCell>
+                    <TableCell align="right" sx={{ verticalAlign: 'top' }}> {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />} </TableCell>
                 </TableRow>
 
                 <TableRow>
@@ -312,11 +317,14 @@ function TableView(props) {
                                     </TableRow> :
                                         data.map((row, index) => {
                                             return (
+                                                detailView ? 
                                                 <DetailedRow key={"detail-row-" + index} row={row} tableId={view.table} viewId={view._id}/>
+                                                :
+                                                <Row key={"detail-row-" + index} row={row} tableId={view.table} viewId={view._id} />
                                             )
                                         }) 
                                     }
-                                    <AddRecordRow key={'add-record-' + view._id} col={columns} />
+                                    {view.allowedActions.includes("Add Record") && <AddRecordRow key={'add-record-' + view._id} col={columns} /> }
                                     </TableBody>
                                 </Table>
                             </TableContainer>
