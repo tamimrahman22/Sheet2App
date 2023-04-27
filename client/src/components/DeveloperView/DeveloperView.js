@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
-import { Card, CardContent, Stack, Box, TextField, Typography, IconButton, InputLabel, FormControl, Select, MenuItem, Chip, Modal, Button, OutlinedInput } from "@mui/material";
+import { Card, CardContent, Stack, Box, TextField, Typography, IconButton, InputLabel, FormControl, Select, MenuItem, Chip, Modal, Button, } from "@mui/material";
 import api from "../../api";
 import GlobalContext from '../../components/context/GlobalContext';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,8 +14,8 @@ function DeveloperView(props) {
     const [viewToEdit, setViewtoEdit] = useState(null);
     const [viewName, setViewName] = useState(null);
     const [open, setOpen] = useState(false);
-    const [url, setUrl] = useState("");
-    const [data, setData] = useState([]);
+    // const [url, setUrl] = useState("");
+    // const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
     const tableActions = ["Add Record", "Delete Record"];
     const detailActions = ["Edit Record"];
@@ -25,7 +25,7 @@ function DeveloperView(props) {
             let url = ""
             let response = await api.getDataSourceById(view.table);
             url = response.data.url;
-            setUrl(url);
+            // setUrl(url);
             console.log(url);
 
             if (!sessionStorage.getItem(url)) {
@@ -37,7 +37,7 @@ function DeveloperView(props) {
                 console.log(response.data);
                 window.sessionStorage.setItem(url, JSON.stringify(response.data));
                 setColumns(response.data.shift());
-                setData(response.data);
+                // setData(response.data);
             
                 console.log("SHEET DATA ADDED TO SESSION STORAGE");
             }
@@ -45,7 +45,7 @@ function DeveloperView(props) {
                 const cache = JSON.parse(sessionStorage.getItem(url));
                 console.log(cache);
                 setColumns(cache.shift());
-                setData(cache);
+                // setData(cache);
                 console.log("SHEET DATA RETRIEVED FROM SESSION STORAGE");
             }
         }
