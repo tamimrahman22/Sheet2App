@@ -13,8 +13,7 @@ const auth = new google.auth.GoogleAuth({
 
 router.post('/add', async (req, res) => {
     // get name, table, columns, and roles from appId, 
-    const { appId, tableId, viewType, columns } = req.body;
-    console.log(columns);
+    const { appId, tableId, viewType, actions, roles } = req.body;
     try{
         // get necessary information for views
         const currentApp = await appModel.findById( { _id: appId } );
@@ -22,15 +21,7 @@ router.post('/add', async (req, res) => {
         console.log(currentApp);
         console.log(table)
         const name = currentApp.name;
-        const allowedActions = [];
-
-        // add the proper allowed actions based on the viewType
-        if(viewType == 'Table'){
-            allowedActions.push('addRecord');
-        }
-        else{
-            allowedActions.push('editRecord');
-        }
+        const columns = table.columns.map((col) => col['name']);
 
         // create a view
         const newViews = await viewsModel.create({
@@ -38,7 +29,8 @@ router.post('/add', async (req, res) => {
             table: tableId,
             columns: columns,
             viewType: viewType,
-            allowedActions: allowedActions,
+            allowedActions: actions,
+            roles: roles
         });
 
         // add views to the respective application
@@ -289,5 +281,50 @@ router.post("/setRoles", async(req, res) => {
 		res.status(400).json({ message: `Error in setting up role for ${viewId}` });
 	}
 });
+
+router.post("/setColumns", async(req, res) => {
+    const { viewId, viewType, columns } = req.body;
+    try {
+        if (viewType === "Table") {
+            const updatedView = await viewsModel.findOneAndUpdate(
+                { _id: viewId },
+                { columns: columns },
+                { new: true }
+            )
+            res.send(updatedView);
+        }
+        else if (viewType === "Detail") {
+            const updatedView = await viewsModel.findOneAndUpdate(
+                { _id: viewId },
+                { editable: columns },
+                { new: true }
+            )
+            res.send(updatedView);
+        }
+        else {
+            res.status(400).json({ message: `Invalid view type of ${viewType} given!` });
+        }
+    }
+    catch (err) {
+        console.error('Error: ', err);
+		res.status(400).json({ message: `Error in setting up columns for ${viewId}` });
+    }
+});
+
+router.post("/setActions", async(req, res) => {
+    const { viewId, actions } = req.body;
+    try {
+        const updatedView = await viewsModel.findOneAndUpdate(
+            { _id: viewId },
+            { allowedActions: actions },
+            { new: true }
+        )
+        res.send(updatedView);
+    }
+    catch (err) {
+		console.error('Error: ', err);
+		res.status(400).json({ message: `Error in setting up role for ${viewId}` });
+	}
+})
 
 module.exports = router;

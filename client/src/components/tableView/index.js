@@ -1,1 +1,1 @@
-export { default } from './tableview';
+export { default } from './TableView';

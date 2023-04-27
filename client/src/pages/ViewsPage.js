@@ -2,7 +2,8 @@ import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
 import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl, OutlinedInput, Chip, Paper } from '@mui/material';
-import TableView from '../components/tableView';
+import TableView from '../components/TableView';
+import DeveloperView from '../components/DeveloperView';
 import AuthContext from '../components/context/AuthContext';
 import GlobalContext from '../components/context/GlobalContext';
 
@@ -14,12 +15,20 @@ export default function ViewsPage() {
     console.log('[VIEWS] Current application is: ', store.currentApp);
     console.log('[VIEWS] Current application data source(s) are: ', store.appDataSources);
 
+    
     // State to either show or hide the modal
     const [open, setOpen] = useState(false);
     // State to be updated about the view type the user wants to be added to the app 
-    const [viewType, setViewType] = useState("Table");
-    // State to store the data source object 
+    const [viewType, setViewType] = useState("");
+    // State to store new view data source object 
     const [dataSource, setDataSource] = useState(null);
+    // State to store the new view allowed actions
+    const [actions, setActions] = useState([]);
+    // State to store the new view roles
+    const [roles, setRoles] = useState([]);
+    // Defining actions
+    const tableActions = ["Add Record", "Delete Record"];
+    const detailActions = ["Edit Record"];
 
     // Get the key column of the data source
     const [keyColumnName, setKeyColumnName] = useState("");
@@ -45,9 +54,10 @@ export default function ViewsPage() {
         // Close the modal! 
         setOpen(false);
         // Reset the state values
-        setViewType("Table");
+        setViewType("");
         setDataSource(null);
-        setColumnOptions([]);
+        setActions([]);
+        setRoles([]);
     }
 
     // Function to handle when the add button is hit on the modal in order to process the view being made for the app
@@ -56,19 +66,18 @@ export default function ViewsPage() {
         console.log('[VIEWS] Data Source Name is: ', dataSource)
         console.log('[VIEWS] Column Names are: ', columns)
         // Data source is the object itself, pass the id to the function in order to generate the view + the view type the person specified 
-        store.addView(dataSource._id, columns);
+        store.addView(dataSource._id, viewType, actions, roles);
         // Hide the modal 
-        setOpen(false);
-        setColumnOptions([]);
+        closeModal();
     }
 
     const handleDataSourceChange = (event) => {
         setDataSource(event.target.value);
         console.log("DATA SOURCE IS: ",event.target.value);
-        setKeyColumnName(event.target.value.keys);
-        setColumnOptions(event.target.value.columns.map((col) => col['name']));
-        setKeyIndex(event.target.value.columns.findIndex((col) => col.name === keyColumnName));
-        setColumns([]);
+        // setKeyColumnName(event.target.value.keys);
+        // setColumnOptions(event.target.value.columns.map((col) => col['name']));
+        // setKeyIndex(event.target.value.columns.findIndex((col) => col.name === keyColumnName));
+        // setColumns([]);
     }
 
     // Function to handle the change of the what was selected by the user
@@ -103,11 +112,11 @@ export default function ViewsPage() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 415,
-        height: 315,
+        height: 445,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
-        overflow:"scroll"
+        // overflow:"scroll"
     };
 
     return (
@@ -131,7 +140,14 @@ export default function ViewsPage() {
             <List sx={{ width: '100%' }}>
             {
                 store.appViews.map((view) => {
-                    if (store.userRole === "Developer" || view.roles.includes(store.userRole)) {
+                    if (store.userRole === "Developer") {
+                        return (
+                            <Box component="span" sx={{ p: 2 }} key={view._id}>
+                                <DeveloperView key={view._id} view={view} />
+                            </Box>
+                        )
+                    }
+                    else if (view.roles.includes(store.userRole) && view.viewType !== "Detail") {
                         return (
                             <Box component="span" sx={{ p: 2 }} key={view._id}>
                                 <TableView key={view._id} view={view} />
@@ -160,11 +176,26 @@ export default function ViewsPage() {
                 </Box>
                 <Box paddingTop={2}>
                     <FormControl sx={{ minWidth: 350}}>
+                        <InputLabel id="table-type-select-label">Table Type</InputLabel>
+                        <Select
+                            labelId="table-type-select-label"
+                            id="table-type-select"
+                            value={viewType}
+                            label="Table Type"
+                            onChange={(e) => setViewType(e.target.value)}
+                        >
+                            <MenuItem key={"table"} value={"Table"}>Table</MenuItem>
+                            <MenuItem key={"detail"} value={"Detail"}>Detail</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box paddingTop={2}>
+                    <FormControl sx={{ minWidth: 350}}>
                         <InputLabel id="dataSource-select-label">Data Source</InputLabel>
                         <Select
                             labelId="dataSource-select-label"
                             id="dataSource-select"
-                            value={dataSource}
+                            value={dataSource || ""}
                             label="Data Source"
                             onChange={handleDataSourceChange}
                         >
@@ -179,7 +210,73 @@ export default function ViewsPage() {
                     </FormControl>
                 </Box>
                 <Box paddingTop={2}>
-                    <FormControl sx={{ minWidth: 350}} >
+                    <FormControl sx={{ minWidth: 350}}>
+                        <InputLabel id="roles-select-label">Roles</InputLabel>
+                        <Select
+                            labelId="roles-select-label"
+                            id="roles-select"
+                            multiple
+                            value={roles}
+                            label="Roles"
+                            onChange={(e) => setRoles(e.target.value)}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {selected.map((value) => (
+                                <Chip key={value} label={value} />
+                                ))}
+                                </Box>
+                            )}
+                        >
+                            {
+                                store.currentApp.roles.map(r => {
+                                    if (r.name === "Developer") {
+                                        return null;
+                                    }
+                                    return (
+                                        <MenuItem key={r.name} value={r.name}>{r.name}</MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box paddingTop={2}>
+                    <FormControl sx={{ minWidth: 350}}>
+                        <InputLabel id="allowedActions-select-label">Allowed Actions</InputLabel>
+                        <Select
+                            labelId="allowedActions-select-label"
+                            id="allowedActions-select"
+                            multiple
+                            value={actions}
+                            label="Allowed Actions"
+                            onChange={(e) => setActions(e.target.value)}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {selected.map((value) => (
+                                <Chip key={value} label={value} />
+                                ))}
+                                </Box>
+                            )}
+                        >
+                            {
+                                viewType === "Table" ?
+                                tableActions.map(a => {
+                                    return (
+                                        <MenuItem key={a} value={a}>{a}</MenuItem>
+                                    )
+                                })
+                                :
+                                detailActions.map(a => {
+                                    return (
+                                        <MenuItem key={a} value={a}>{a}</MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box paddingTop={2}>
+                    {/* <FormControl sx={{ minWidth: 350}} >
                         <InputLabel id="demo-multiple-chip-label">Select Columns</InputLabel>
                         <Select
                         labelId="demo-multiple-chip-label"
@@ -204,12 +301,11 @@ export default function ViewsPage() {
                                 ))
                             }
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
                     <Box m={1}
                         display="flex"
                         justifyContent="space-between"
                         alignItems="center" 
-                        paddingTop={2}
                     >
                         <Button variant="outlined" color="error" onClick={closeModal}>Cancel</Button>
                         <Button variant="contained" onClick={handleSubmit} disabled={columns.length === 1}>Add</Button>

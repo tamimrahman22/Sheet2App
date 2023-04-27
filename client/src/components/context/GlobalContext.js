@@ -266,17 +266,19 @@ export function GlobalContextProvider({children}){
     /* ---------- FUNCTIONS BELOW RELATE TO THE VIEW ---------- */
 
     // Function to add a specified view type to the application
-    const addView = function(tableId, columns) {
-        async function createView(tableId, columns) {
+    const addView = function(tableId, viewType, actions, roles) {
+        async function createView(tableId, viewType, actions, roles) {
             let payload = {
                 // The id of the application we will be adding the view to
                 appId: currentApp._id,
                 // The id of the data source that was specified by the user
                 tableId: tableId,
                 // The view type that was specified by the user 
-                viewType: "table",
-                //The selected columns to be shown
-                columns: columns
+                viewType: viewType,
+                //The selected actions
+                actions: actions,
+                //The selected roles
+                roles: roles
             }
             console.log('[STORE] Sending request to create view... : ',payload)
             const response = await api.addView(payload);
@@ -284,7 +286,7 @@ export function GlobalContextProvider({children}){
             setApp(response.data);
             navigate("/editor/views");
         }
-        createView(tableId, columns);
+        createView(tableId, viewType, actions, roles);
     }
 
     const renameView = function(name, viewId) {
@@ -373,6 +375,36 @@ export function GlobalContextProvider({children}){
         setRolesForView(viewId, roles);
     }
 
+    const setViewColumns = function(viewId, viewType, columns) {
+        async function setColumnsForView(viewId, viewType, columns) {
+            let payload = {
+                viewId: viewId,
+                viewType: viewType,
+                columns: columns
+            }
+            console.log(`[STORE] Setting columns for view ${viewId}`);
+            await api.setViewColumns(payload);
+            const res = await api.getViews(currentApp._id);
+            setAppViews(res.data);
+        }
+        setColumnsForView(viewId, viewType, columns);
+    }
+
+    const setViewActions = function(viewId, actions) {
+        async function setAllowedActionsForView(viewId, actions) {
+            let payload = {
+                viewId: viewId,
+                actions: actions
+            }
+            console.log(`[STORE] Setting actions for view ${viewId}`);
+            await api.setViewAllowedActions(payload);
+            console.log('[STORE] Reloading views for current application' );
+            const res = await api.getViews(currentApp._id);
+            setAppViews(res.data);
+        }
+        setAllowedActionsForView(viewId, actions);
+    }
+
     // IF THIS GETS BIG WE MIGHT NEED A REDUCER
     const funcs = {
         // STATES
@@ -409,6 +441,8 @@ export function GlobalContextProvider({children}){
         addRecord,
         deleteRecord,
         setViewRoles,
+        setViewColumns,
+        setViewActions,
     }
 
     return(
