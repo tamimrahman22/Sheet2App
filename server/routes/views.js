@@ -13,7 +13,7 @@ const auth = new google.auth.GoogleAuth({
 
 router.post('/add', async (req, res) => {
     // get name, table, columns, and roles from appId, 
-    const { appId, tableId, viewType, actions, roles } = req.body;
+    const { appId, tableId, viewType, columns, actions, roles } = req.body;
     try{
         // get necessary information for views
         const currentApp = await appModel.findById( { _id: appId } );
@@ -21,21 +21,34 @@ router.post('/add', async (req, res) => {
         console.log(currentApp);
         console.log(table)
         const name = currentApp.name;
-        const columns = table.columns.map((col) => col['name']);
 
         // create a view
-        const newViews = await viewsModel.create({
-            name: "New View",
-            table: tableId,
-            columns: columns,
-            viewType: viewType,
-            allowedActions: actions,
-            roles: roles
-        });
+        let newView = null;
+
+        if (viewType === "Table") {
+            newView = await viewsModel.create({
+                name: "New View",
+                table: tableId,
+                columns: columns,
+                viewType: viewType,
+                allowedActions: actions,
+                roles: roles
+            });
+        }
+        else if (viewType === "Detail") {
+            newView = await viewsModel.create({
+                name: "New View",
+                table: tableId,
+                viewType: viewType,
+                allowedActions: actions,
+                roles: roles,
+                editable: columns,
+            });
+        }
 
         // add views to the respective application
         let currentViews = currentApp.views;
-        currentViews.push(newViews);
+        currentViews.push(newView);
         const updatedApp = await appModel.findOneAndUpdate(
             { _id: appId },
             {views: currentViews},

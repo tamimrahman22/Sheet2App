@@ -1,11 +1,8 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, FormControl, InputLabel, Select, MenuItem, Chip } from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import EditIcon from '@mui/icons-material/Edit';
-import DoneIcon from '@mui/icons-material/Done';
-import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from "../../api";
 import GlobalContext from '../../components/context/GlobalContext';
@@ -19,9 +16,6 @@ function TableView(props) {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [editMode, setEditMode] = useState(false);
-    const [viewToEdit, setViewtoEdit] = useState(null);
-    const [viewName, setViewName] = useState(null);
     const [open, setOpen] = useState(false);
 
     const style = {
@@ -71,18 +65,6 @@ function TableView(props) {
         fetchData();
     }, [view.table, view.updatedAt]);
 
-    
-    function handleChangeViewName() {
-        console.log('[VIEWS] Handle name change of view!')
-        console.log('[VIEWS] Original view name: ', view.name);
-        console.log('[VIEWS] New view name: ', viewName);
-        if (viewName.trim() !== '' && viewName !== view.name) {
-            // Update the name of the data source
-            store.renameView(viewName, view._id);
-        }
-        setEditMode(false);
-    }
-
     function handleAddRecord() {
         console.log('[VIEWS] Handle adding new record to view');
         const inputs = [];
@@ -106,11 +88,11 @@ function TableView(props) {
         store.deleteView(view._id);
     }
 
-    function openModal(event) {
-        // Close the modal! 
-        console.log(view._id);
-        setOpen(true)
-    }
+    // function openModal(event) {
+    //     // Close the modal! 
+    //     console.log(view._id);
+    //     setOpen(true)
+    // }
 
     function closeModal(event) {
         // Close the modal! 

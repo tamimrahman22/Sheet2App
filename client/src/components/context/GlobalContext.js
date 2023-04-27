@@ -266,8 +266,8 @@ export function GlobalContextProvider({children}){
     /* ---------- FUNCTIONS BELOW RELATE TO THE VIEW ---------- */
 
     // Function to add a specified view type to the application
-    const addView = function(tableId, viewType, actions, roles) {
-        async function createView(tableId, viewType, actions, roles) {
+    const addView = function(tableId, viewType, columns, actions, roles) {
+        async function createView(tableId, viewType, columns, actions, roles) {
             let payload = {
                 // The id of the application we will be adding the view to
                 appId: currentApp._id,
@@ -275,9 +275,11 @@ export function GlobalContextProvider({children}){
                 tableId: tableId,
                 // The view type that was specified by the user 
                 viewType: viewType,
-                //The selected actions
+                // The selected columns
+                columns: columns,
+                // The selected actions
                 actions: actions,
-                //The selected roles
+                // The selected roles
                 roles: roles
             }
             console.log('[STORE] Sending request to create view... : ',payload)
@@ -286,7 +288,7 @@ export function GlobalContextProvider({children}){
             setApp(response.data);
             navigate("/editor/views");
         }
-        createView(tableId, viewType, actions, roles);
+        createView(tableId, viewType, columns, actions, roles);
     }
 
     const renameView = function(name, viewId) {
