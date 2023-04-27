@@ -362,6 +362,24 @@ export function GlobalContextProvider({children}){
         deleteRecordFromSheet(record, viewId, tableId);
     }
 
+    const editRecord = function(oldRecord, newRecord, tableId) {
+        async function editRecordInSheet(oldRecord, newRecord, tableId) {
+            let payload = {
+                oldRecord: oldRecord,
+                newRecord: newRecord,
+                tableId: tableId,
+            }
+            console.log(`[STORE] Sending request to edit record ${oldRecord} from ${tableId}`);
+            const response = await api.editRecord(payload);
+            if (response.status === 200) {
+                console.log('[STORE] Reloading views for current application' );
+                // const res = await api.getViews(currentApp._id);
+                // setAppViews(res.data);
+            }
+        }
+        editRecordInSheet(oldRecord, newRecord, tableId);
+    }
+
     const setViewRoles = function(viewId, roles) {
         async function setRolesForView(viewId, roles) {
             let payload = {
@@ -442,6 +460,7 @@ export function GlobalContextProvider({children}){
         deleteView,
         addRecord,
         deleteRecord,
+        editRecord,
         setViewRoles,
         setViewColumns,
         setViewActions,

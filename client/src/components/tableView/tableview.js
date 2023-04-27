@@ -3,6 +3,9 @@ import Paper from '@mui/material/Paper';
 import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import EditIcon from '@mui/icons-material/Edit';
+import DoneIcon from '@mui/icons-material/Done';
+import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from "../../api";
 import GlobalContext from '../../components/context/GlobalContext';
@@ -75,23 +78,6 @@ function TableView(props) {
             }
         }
     }, [store.appViews, store.userRole, view.table])
-
-    function handleAddRecord() {
-        console.log('[VIEWS] Handle adding new record to view');
-        const inputs = [];
-        for (let i = 0; i < columns.length; i++) {
-            // console.log(document.getElementById("add-record-" + i).value);
-            inputs.push(document.getElementById("add-record-value-" + i).value);
-        }
-        console.log(inputs);
-        let temp = data;
-        temp.push(inputs);
-        setData(temp);
-        console.log(data);
-        temp.unshift(columns);
-        window.sessionStorage.setItem(url, JSON.stringify(temp));
-        store.addRecord(inputs, view.table);
-    }
 
     function handleDeleteView() {
         console.log(view._id);
@@ -175,6 +161,24 @@ function TableView(props) {
             window.sessionStorage.setItem(url, JSON.stringify(temp));
         }
 
+        function handleEditRecord(event) {
+            console.log('[VIEWS] Handle editing a record');
+            const inputs = [];
+            for (let i = 0; i < columns.length; i++) {
+                inputs.push(document.getElementById("edit-record-value-" + i).value);
+            }
+            console.log(row);
+            console.log(inputs);
+            let temp = data;
+            temp[temp.indexOf(row)] = inputs
+            setData(temp);
+            temp.unshift(columns);
+            console.log(temp);
+            window.sessionStorage.setItem(url, JSON.stringify(temp));
+            store.editRecord(row, inputs, view.table);
+            setEdit(false);
+        }
+
         return (
             <>
                 <TableRow onClick={() => {setOpen(!open)}}>
@@ -220,7 +224,7 @@ function TableView(props) {
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={11}>
-                                                        <TextField fullWidth id="textfield" variant="outlined" defaultValue={row[index]}/>
+                                                        <TextField fullWidth id={"edit-record-value-" + index}  variant="outlined" InputProps={{ readOnly: !edit }} defaultValue={row[index]}/>
                                                     </Grid>
                                                 </Fragment>
                                             )
@@ -228,7 +232,33 @@ function TableView(props) {
                                     }
                                     { detailView.allowedActions.includes("Edit Record") && 
                                     <Grid item xs={12} justifyContent="center" display="flex" alignItems="center">
-                                        <Button variant="contained">Update Record</Button>
+                                        {
+                                            edit 
+                                            ?
+                                            <>
+                                                <IconButton
+                                                    // sx={{ bgcolor: 'green', color: 'white' }}
+                                                    color='success'
+                                                    onClick={handleEditRecord}
+                                                >
+                                                    <DoneIcon></DoneIcon>
+                                                </IconButton>
+
+                                                <IconButton
+                                                    // sx={{ bgcolor: 'red', color: 'white'}}
+                                                    color='error'
+                                                    onClick={() => setEdit(false)}
+                                                >
+                                                    <ClearIcon></ClearIcon>
+                                                </IconButton>
+                                            </>
+                                            :
+                                            <IconButton
+                                                onClick={() => setEdit(true)}
+                                            >
+                                                <EditIcon />
+                                            </IconButton>
+                                        }
                                     </Grid> }
                                 </Grid>
                             </Box>
@@ -242,6 +272,23 @@ function TableView(props) {
     function AddRecordRow(props) {
         const { col } = props;
         const [open, setOpen] = useState(false);
+
+        function handleAddRecord() {
+            console.log('[VIEWS] Handle adding new record to view');
+            const inputs = [];
+            for (let i = 0; i < columns.length; i++) {
+                // console.log(document.getElementById("add-record-" + i).value);
+                inputs.push(document.getElementById("add-record-value-" + i).value);
+            }
+            console.log(inputs);
+            let temp = data;
+            temp.push(inputs);
+            setData(temp);
+            console.log(data);
+            temp.unshift(columns);
+            window.sessionStorage.setItem(url, JSON.stringify(temp));
+            store.addRecord(inputs, view.table);
+        }
         
         return (
             <>

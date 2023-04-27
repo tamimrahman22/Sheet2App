@@ -31,6 +31,7 @@ export const renameView = (payload) => api.post("/views/rename", payload);
 export const deleteView = (payload) => api.post("/views/delete", payload);
 export const addRecord = (payload) => api.post("/views/addRecord", payload);
 export const deleteRecord = (payload) => api.post("/views/deleteRecord", payload);
+export const editRecord = (payload) => api.post("/views/editRecord", payload);
 export const setViewRoles = (payload) => api.post("/views/setRoles", payload);
 export const setViewAllowedActions = (payload) => api.post("/views/setActions", payload);
 export const setViewColumns = (payload) => api.post("/views/setColumns", payload);
@@ -59,6 +60,7 @@ const apis = {
     deleteView,
     addRecord,
     deleteRecord,
+    editRecord,
     setViewRoles,
     setViewAllowedActions,
     setViewColumns,
