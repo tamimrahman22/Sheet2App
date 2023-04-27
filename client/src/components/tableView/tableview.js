@@ -224,7 +224,7 @@ function TableView(props) {
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={11}>
-                                                        <TextField fullWidth id={"edit-record-value-" + index}  variant="outlined" InputProps={{ readOnly: !edit }} defaultValue={row[index]}/>
+                                                        <TextField fullWidth id={"edit-record-value-" + index} variant="outlined" disabled={!detailView.editable.includes(c)} InputProps={{ readOnly: !edit }} defaultValue={row[index]}/>
                                                     </Grid>
                                                 </Fragment>
                                             )
