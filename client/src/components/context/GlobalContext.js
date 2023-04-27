@@ -75,17 +75,17 @@ export function GlobalContextProvider({children}){
             const viewResponse = await api.getViews(app._id);
             console.log('[STORE] Getting application views...', viewResponse);
             setAppViews(viewResponse.data);
-            if (auth.user.email === app.creator) {
-                setUserRole("Developer");
-            }
-            else {
-                for (let i = 0; i < app.roles.length; i++) {
-                    if (app.roles[i].users.includes(auth.user.email)) {
-                        setUserRole(app.roles[i].name);
-                        break;
-                    }
-                }
-            }
+            // if (auth.user.email === app.creator) {
+            //     setUserRole("Developer");
+            // }
+            // else {
+            //     for (let i = 0; i < app.roles.length; i++) {
+            //         if (app.roles[i].users.includes(auth.user.email)) {
+            //             setUserRole(app.roles[i].name);
+            //             break;
+            //         }
+            //     }
+            // }
         }
         // Check if the application already has data sources. If not, navigate to the editor page. 
         setCurrentApp(app);
