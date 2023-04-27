@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl, Chip } from '@mui/material';
+import { Container, Typography, List, Stack, Button, Modal, InputLabel, Select, MenuItem, FormControl, OutlinedInput, Chip, Paper } from '@mui/material';
 import TableView from '../components/TableView';
 import DeveloperView from '../components/DeveloperView';
 import AuthContext from '../components/context/AuthContext';
@@ -22,6 +22,8 @@ export default function ViewsPage() {
     const [viewType, setViewType] = useState("");
     // State to store new view data source object 
     const [dataSource, setDataSource] = useState(null);
+    // Store the column name of the columns the user wants to add to the view columns of the application 
+    const [columns, setColumns] = useState([]);
     // State to store the new view allowed actions
     const [actions, setActions] = useState([]);
     // State to store the new view roles
@@ -29,7 +31,8 @@ export default function ViewsPage() {
     // Defining actions
     const tableActions = ["Add Record", "Delete Record"];
     const detailActions = ["Edit Record"];
-
+    // Get the list of columns without the key column being in it!
+    const [columnOptions, setColumnOptions] = useState([]);
 
     // Function to open the modal 
     function openModal(event) {
@@ -46,6 +49,7 @@ export default function ViewsPage() {
         // Reset the state values
         setViewType("");
         setDataSource(null);
+        setColumns([]);
         setActions([]);
         setRoles([]);
     }
@@ -56,7 +60,7 @@ export default function ViewsPage() {
         console.log('[VIEWS] Data Source Name is: ', dataSource)
         // console.log('[VIEWS] Column Names are: ', columns)
         // Data source is the object itself, pass the id to the function in order to generate the view + the view type the person specified 
-        store.addView(dataSource._id, viewType, actions, roles);
+        store.addView(dataSource._id, viewType, columns, actions, roles);
         // Hide the modal 
         closeModal();
     }
@@ -64,8 +68,17 @@ export default function ViewsPage() {
     const handleDataSourceChange = (event) => {
         setDataSource(event.target.value);
         console.log("DATA SOURCE IS: ",event.target.value);
+        const cols = event.target.value.columns.map((col) => col['name']);
+        setColumnOptions(cols);
+        setColumns(cols);
     }
 
+    // Function to handle the change of the what was selected by the user
+    const handleChange = (event) => {
+        const selectedValues = event.target.value;
+        setColumns(selectedValues);
+    };
+      
     // Function to generate a detail table with the columns that the user specified 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -82,7 +95,7 @@ export default function ViewsPage() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 415,
-        height: 445,
+        height: 530,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px',
@@ -180,7 +193,35 @@ export default function ViewsPage() {
                     </FormControl>
                 </Box>
                 <Box paddingTop={2}>
-                    <FormControl sx={{ minWidth: 350}}>
+                    <FormControl sx={{ minWidth: 350}} disabled={viewType === "" || dataSource === null}>
+                        <InputLabel id="columns-chip-label">{viewType === "Detail" ? "Editable Columns" : "Columns"}</InputLabel>
+                        <Select
+                        labelId="columns-chip-label"
+                        label={viewType === "Detail" ? "Editable Columns" : "Columns"}
+                        id="columns-chip"
+                        multiple
+                        value={columns}
+                        onChange={handleChange}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {selected.length > 0 &&
+                                selected.map((value) => (
+                                    <Chip key={value} label={value}/>
+                                ))}
+                            </Box>
+                            )}
+                        overflow="scroll"
+                        >
+                            {
+                                columnOptions.map((col, index) => (
+                                    <MenuItem value={col} key={index}>{col}</MenuItem>
+                                ))
+                            }
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Box paddingTop={2}>
+                    <FormControl sx={{ minWidth: 350}} disabled={viewType === "" || dataSource === null}>
                         <InputLabel id="roles-select-label">Roles</InputLabel>
                         <Select
                             labelId="roles-select-label"
@@ -211,7 +252,7 @@ export default function ViewsPage() {
                     </FormControl>
                 </Box>
                 <Box paddingTop={2}>
-                    <FormControl sx={{ minWidth: 350}}>
+                    <FormControl sx={{ minWidth: 350}} disabled={viewType === "" || dataSource === null}>
                         <InputLabel id="allowedActions-select-label">Allowed Actions</InputLabel>
                         <Select
                             labelId="allowedActions-select-label"
