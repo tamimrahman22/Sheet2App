@@ -10,6 +10,7 @@ const auth = new google.auth.GoogleAuth({
 	keyFile: "keys.json",
 	scopes: "https://www.googleapis.com/auth/spreadsheets"
 });
+const fs = require('fs');
 
 router.post('/add', async (req, res) => {
     // get name, table, columns, and roles from appId, 

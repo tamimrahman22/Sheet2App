@@ -4,6 +4,7 @@ const appModel = require('../models/Apps');
 const dataSourceModel = require('../models/DataSource');
 const viewsModel = require('../models/View');
 const { google } = require("googleapis");
+const fs = require('fs');
 
 const auth = new google.auth.GoogleAuth({
 	// keyFile: "./keys.json",
@@ -72,6 +73,7 @@ router.post('/create', async(req, res) => {
 		});
         console.log(newApp);
 		// res.status(201).json({ message: `${name} app created` });
+		await logFile(newApp.id, name + " app created");
 		res.send(newApp);
     }
     catch (error) {
@@ -94,10 +96,12 @@ router.post('/delete', async(req, res) => {
 		console.log(result);
 		console.log(result2);
 		console.log(result3);
+		await logFile(appId, app.name + " app deleted");
 		res.send(result);
 	}
 	catch (error) {
 		console.error('Error: ', error);
+		await logFile(appId, "Error in deleting app ");
 		res.status(400).json({ message: `Error in app deletion for app ${appId}` });
 	}	
 });
@@ -185,10 +189,12 @@ router.post('/publish', async(req, res) => {
 			{ published: newPublished },
 			{ new: true },
 		);
+		await logFile(appId, updatedApp.name + " " + newPublished);
 		res.send(updatedApp);
 	}
 	catch (err) {
 		console.error('Error: ', err);
+		await logFile(appId, "Error in publishing/unpublishing");
 		res.status(400).json({ message: `Error in publishing app` });
 	}
 });
@@ -233,6 +239,11 @@ router.post("/setRoles", async(req, res) => {
 		res.status(400).json({ message: `Error in editing ${role.name} allowed actions` });
 	}
 })
+
+router.post("/test", async(req, res) => {
+	logFile("dsafdsaf", "First log");
+	return res.status(200).send("Testing 1 2 3");
+});
 
 async function updateAppRoles(){
 	const authClientObject = await auth.getClient();
@@ -288,6 +299,15 @@ async function updateAppRoles(){
 	catch (err) {
 		console.error('Error in updating app roles: ', err);
 	}
+}
+
+async function logFile(appId, content){
+	let filePath = './log-files/' + appId + '.txt';
+	content = new Date() + ": " + content + '\n';
+	await fs.appendFile(filePath, content, (err) => {
+		if (err) throw err;
+		console.log('New file created');
+	});
 }
 
 module.exports = router;

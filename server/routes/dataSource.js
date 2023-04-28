@@ -4,6 +4,7 @@ const appModel = require('../models/Apps');
 const dataSourceModel = require('../models/DataSource');
 const viewsModel = require('../models/View');
 const { google } = require("googleapis");
+const fs = require('fs');
 
 const auth = new google.auth.GoogleAuth({
 	// keyFile: "./keys.json",
@@ -102,7 +103,8 @@ router.post('/add', async (req, res) => {
 				);
 
 				console.log(currentApp);
-
+				
+				await logFile(appId, url + " " + sheetIndex + " data source added to app " + updatedApp.name);
 				// Send the updated applicationg back to the user!
 				res.send(await appModel.findById({ _id: appId }))
 			}
@@ -112,6 +114,7 @@ router.post('/add', async (req, res) => {
 	}
 	catch (error){
 		console.error('Error: ', error);
+		await logFile(appId, "Error in adding data source: " + url);
 		res.status(400).json({ message: `Error in adding data source for app ${appId}` });
 	}
 });
@@ -227,17 +230,28 @@ router.get('/get/:id', async(req, res) => {
 
 router.post("/rename", async(req, res) => {
 	// update the name of an application
-	const {appID, name, dataSourceID} = req.body;
+	const {appId, name, dataSourceID} = req.body;
 	try {
 		// Change the name of the data source! 
 		const updatedDataSource = await dataSourceModel.findOneAndUpdate(
 			{ _id: dataSourceID },
 			{ dataSourceName: name },
 		);
+		
+		const list = await appModel.find({ });
+		let newAppId = '';
+		for(let i = 0; i < list.length; i++){
+			if(list[i].dataSources.includes(dataSourceID)){
+				newAppId = list[i].id;
+			}
+		}
+
+		await logFile(newAppId, name + " data source renamed");
 		res.send(updatedDataSource);
 	}
 	catch (err) {
 		console.error('Error: ', err);
+		await logFile(appId, "Error in renaming the data source " + dataSourceID);
 		res.status(400).json({ message: `Error in renaming the data source!`});
 	}
 })
@@ -312,12 +326,23 @@ router.post("/delete", async(req, res) => {
 			{ views: app.views },
 			{ new: true},
 		);
+		await logFile(appId, dataSourceID + " data source removed");
 		res.send(update);
 	}
 	catch (err) {
 		console.log('Error: ', err);
+		await logFile(appId, "Error in removing data source " + dataSourceID);
 		res.status(400).json({ message: `Error in data source deletion for ${dataSourceID}` });
 	}
 })
+
+async function logFile(appId, content){
+	let filePath = './log-files/' + appId + '.txt';
+	content = new Date() + ": " + content + '\n';
+	await fs.appendFile(filePath, content, (err) => {
+		if (err) throw err;
+		console.log('New file created');
+	});
+}
 
 module.exports = router;
