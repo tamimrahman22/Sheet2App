@@ -167,8 +167,10 @@ router.post('/addRecord', async (req, res) => {
     let urlRegex = /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
     for(let i = 0; i < columns.length; i++){
         // console.log(columns[i]);
-        console.log(typeof record[i]);
+        // console.log(typeof record[i]);
+        console.log(!isNaN(record[i]));
         if(!isNaN(record[i])){
+            console.log(record[i]);
             if(columns[i].type !== 'number'){
                 check = false;
             }
@@ -182,6 +184,9 @@ router.post('/addRecord', async (req, res) => {
             if(columns[i].type !== 'url'){
                 check = false;
             }
+        }
+        else if(columns[i].type !== 'string'){
+            check = false;
         }
     }
 
@@ -254,6 +259,9 @@ router.post('/editRecord', async (req, res) => {
             if(columns[i].type !== 'url'){
                 check = false;
             }
+        }
+        else if(columns[i].type !== 'string'){
+            check = false;
         }
     }
 
