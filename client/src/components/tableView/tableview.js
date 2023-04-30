@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
+import { useSnackbar } from 'notistack';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Modal, } from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,27 +14,15 @@ import GlobalContext from '../../components/context/GlobalContext';
 function TableView(props) {
     const { view } = props;
     const store = useContext(GlobalContext);
+    const { enqueueSnackbar } = useSnackbar();
     // console.log(view);
     const [url, setUrl] = useState("");
     const length = view.columns.length + 1
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [tableColumns, setTableColumns] = useState([]);
     const [detailView, setDetailView] = useState(null);
-
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 500,
-        height: 200,
-        bgcolor: 'background.paper',
-        p: 4,
-        borderRadius: '10px'
-      };
-  
 
     useEffect(() => {
         async function fetchData() {
@@ -42,6 +31,7 @@ function TableView(props) {
             let response = await api.getDataSourceById(view.table);
             url = response.data.url;
             setUrl(url);
+            setTableColumns(response.data.columns)
             console.log(url);
 
             if (!sessionStorage.getItem(url)) {
@@ -79,21 +69,32 @@ function TableView(props) {
         }
     }, [store.appViews, store.userRole, view.table])
 
-    function handleDeleteView() {
-        console.log(view._id);
-        closeModal();
-        store.deleteView(view._id);
-    }
-
-    // function openModal(event) {
-    //     // Close the modal! 
-    //     console.log(view._id);
-    //     setOpen(true)
-    // }
-
-    function closeModal(event) {
-        // Close the modal! 
-        setOpen(false)
+    function checkInputs(inputs) {
+        let check = true;
+        let urlRegex = /^(http|https):\/\/[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
+        for(let i = 0; i < tableColumns.length; i++){
+            // console.log(columns[i]);
+            console.log(typeof inputs[i]);
+            if(!isNaN(inputs[i])){
+                if(tableColumns[i].type !== 'number'){
+                    check = false;
+                }
+            }
+            else if(typeof inputs[i] === 'boolean' || inputs[i] === 'FALSE' || inputs[i] === 'TRUE' || inputs[i] === 'false' || inputs[i] === 'true'){
+                if(tableColumns[i].type !== 'boolean'){
+                    check = false;
+                }
+            }
+            else if(urlRegex.test(inputs[i])) {
+                if(tableColumns[i].type !== 'url'){
+                    check = false;
+                }
+            }
+            else if(tableColumns[i].type !== 'string'){
+                check = false;
+            }
+        }
+        return check;
     }
 
     function Row(props) {
@@ -169,14 +170,22 @@ function TableView(props) {
             }
             console.log(row);
             console.log(inputs);
-            let temp = data;
-            temp[temp.indexOf(row)] = inputs
-            setData(temp);
-            temp.unshift(columns);
-            console.log(temp);
-            window.sessionStorage.setItem(url, JSON.stringify(temp));
-            store.editRecord(row, inputs, view.table);
-            setEdit(false);
+            if (checkInputs(inputs)) {
+                // Check if inputs are valid
+                let temp = data;
+                temp[temp.indexOf(row)] = inputs
+                setData(temp);
+                temp.unshift(columns);
+                console.log(temp);
+                window.sessionStorage.setItem(url, JSON.stringify(temp));
+                store.editRecord(row, inputs, view.table);
+                setEdit(false);
+            }
+            else {
+                // If not, display Snackbar
+                enqueueSnackbar("Record cannot be edited. Check your inputs and try again.", { variant: 'error' });
+            }
+            
         }
 
         return (
@@ -281,13 +290,20 @@ function TableView(props) {
                 inputs.push(document.getElementById("add-record-value-" + i).value);
             }
             console.log(inputs);
-            let temp = data;
-            temp.push(inputs);
-            setData(temp);
-            console.log(data);
-            temp.unshift(columns);
-            window.sessionStorage.setItem(url, JSON.stringify(temp));
-            store.addRecord(inputs, view.table);
+            if (checkInputs(inputs)) {
+                // Check if inputs are valid
+                let temp = data;
+                temp.push(inputs);
+                setData(temp);
+                console.log(data);
+                temp.unshift(columns);
+                window.sessionStorage.setItem(url, JSON.stringify(temp));
+                store.addRecord(inputs, view.table);
+            }
+            else {
+                // If not, display Snackbar
+                enqueueSnackbar("Record cannot be added. Check your inputs and try again.", { variant: 'error' });
+            }
         }
         
         return (
@@ -347,6 +363,7 @@ function TableView(props) {
                                         <TableRow>
                                             {
                                                 view.columns.map((c, index) => {
+                                                    console.log(c);
                                                     return (
                                                         <TableCell key={"column-" + index}>{c}</TableCell>
                                                     )
@@ -375,38 +392,10 @@ function TableView(props) {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                        </Box>
-                        {/*                       
-                        <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
-                            View Type: {view.viewType}
-                        </Typography> */}
-                                
+                        </Box>  
                     </Stack>
                 </CardContent>
             </Card>
-            <Modal
-                open={open}
-                onClose={closeModal}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx = {style} justifyContent="center" alignItems="center">
-                    <Box>
-                        <Typography id="modal-modal-title" variant="h5" component="h2">
-                            Are you sure you want to delete the view: <br/> {view.name}?
-                        </Typography>
-                    </Box>
-                    <Box m={1}
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center" 
-                        paddingTop={2}
-                    >
-                        <Button variant="outlined" onClick={closeModal}>Cancel</Button>
-                        <Button variant="contained" color="error" onClick={handleDeleteView}>Delete</Button>
-                    </Box>
-                </Box>
-            </Modal>
         </>
     )
 }
