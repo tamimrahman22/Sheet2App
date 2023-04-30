@@ -42,16 +42,23 @@ const dataSourceSchema = new mongoose.Schema({
 			// initial value of empty cell, optional
 			initialValue: {
 				type: String,
+				default: null
 			},
 			// indicates whether column is used as the link text for references to record, set to true for at msot one column per table
 			label: {
 				type: Boolean,
 				required: true,
 			},
-			// whether the column is a reference to another data source
-			reference: {
+			// if we are referencing another data source, which data source? 
+			dataSourceReference: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'DataSource',
+				default: null,
+			},
+			// what column of the data source are we referencing? 
+			columnReference:{
+				type: mongoose.Schema.Types.ObjectId, 
+				default: null 
 			},
 			// type of values in the row: boolean number text url
 			type: {

@@ -23,6 +23,10 @@ export const getRows = (payload) => api.post("/datasource/getRows", payload);
 export const renameDataSource = (payload) => api.post("/datasource/rename", payload);
 export const setKeys = (payload) => api.post("/datasource/setKeys", payload);
 export const deleteDataSource = (payload) => api.post("/datasource/delete", payload);
+export const setInitialValue = (payload) => api.post("/datasource/setInitialValue", payload);
+export const setLabel = (payload) => api.post("/datasource/setLabel", payload);
+export const setDataSourceRef = (payload) => api.post("/datasource/setDataSourceRef", payload);
+export const setColumnRef = (payload) => api.post("/datasource/setColumnRef", payload);
 
 // views
 export const getViews = (id) => api.get(`/views/get/${id}`);
@@ -53,6 +57,10 @@ const apis = {
     renameDataSource,
     setKeys,
     deleteDataSource,
+    setInitialValue,
+    setLabel,
+    setDataSourceRef,
+    setColumnRef, 
 
     getViews,
     addView,

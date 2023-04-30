@@ -15,7 +15,7 @@ const auth = new google.auth.GoogleAuth({
 // add data sources to application that was created, need id of application (created by mongo when app is created), url to sheet, 
 // sheet index (which sheet is being looked at), and keys
 router.post('/add', async (req, res) => {
-	const { appId, url, sheetIndex, keys } = req.body;
+	const { appId, dataSourceName, url, sheetIndex, keys } = req.body;
 
 	const authClientObject = await auth.getClient();
 	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
@@ -30,7 +30,7 @@ router.post('/add', async (req, res) => {
 			auth,
 		});
 
-		//Get the name of the spreadsheet --> we're also going to be using this to serve as the name of the data source 
+		//Get the name of the spreadsheet
 		const spreadSheetName = response.data.properties.title;
 
 		for(let i = 0; i < response.data.sheets.length; i++){
@@ -62,7 +62,7 @@ router.post('/add', async (req, res) => {
 					// Name of the spredsheet
 					spreadSheetName: spreadSheetName,
 					// Name of the data source --> default to the name of the data source
-					dataSourceName: spreadSheetName, 
+					dataSourceName: dataSourceName, 
 					// URL to the Spreadsheet
 					url: url,
 					// Index of the sheet 
@@ -81,7 +81,7 @@ router.post('/add', async (req, res) => {
 					columns.push({
 						name: columnNames[j],
 						label: false,
-						reference: referenceId,
+						// reference: referenceId,
 						type: typeof columnFirstValues[j]
 					})
 				}
@@ -273,69 +273,191 @@ router.post("/setKeys", async(req, res) => {
 	}
 })
 
-router.post("/delete", async(req, res) => {
+router.post("/delete", async (req, res) => {
 	const { appId, dataSourceID } = req.body;
 	try {
+	  // DELETE FROM THE DATA SOURCES COLLECTION
+	  const response = await dataSourceModel.deleteOne({ _id: dataSourceID });
+	  console.log(response);
+	  if (response.deletedCount != 1) {
+		throw new Error("Deletion unsuccessful or incorrect amount");
+	  }
+  
+	  // DELETE VIEWS USING DATA SOURCE
+	  const views = await viewsModel.find({ table: dataSourceID });
+	  console.log(views);
+	  views.forEach((element) => {
+		console.log(element._id);
+	  });
+	  const resp = await viewsModel.deleteMany({ table: dataSourceID });
+	  console.log(resp);
+	  if (res.acknowledged === false) {
+		throw new Error("Deletion unsuccessful or incorrect amount");
+	  }
+  
+	  // DELETE FROM LIST OF DATA SOURCES IN APP
+	  const app = await appModel.findOne({ _id: appId });
+	  console.log(app.dataSources);
+	  console.log(app.dataSources.indexOf(dataSourceID));
+	  let index = app.dataSources.indexOf(dataSourceID);
+	  if (index === -1) {
+		throw new Error("Data source not found in app");
+	  }
+	  app.dataSources.splice(index, 1);
+	  console.log(app.dataSources);
+  
+	  // DELETE REMOVED VIEWS FROM LIST OF VIEWS IN APP
+	  console.log(app.views);
+	  views.forEach((v) => {
+		let index = app.views.indexOf(v._id);
+		console.log(index);
+		app.views.splice(index, 1);
+	  });
+	  console.log(app.views);
+  
+	  let update = await appModel.findOneAndUpdate(
+		{ _id: appId },
+		{ dataSources: app.dataSources },
+		{ new: true }
+	  );
+	  update = await appModel.findOneAndUpdate(
+		{ _id: appId },
+		{ views: app.views },
+		{ new: true }
+	  );
+  
+	// FIND AND UPDATE DATA SOURCES REFERENCING THE DELETED DATA SOURCE
+	const dataSourcesToUpdate = await dataSourceModel.find({ "columns.dataSourceReference": dataSourceID });
 
-		// DELETE FROM THE DATA SOURCES COLLECTION
-		const response = await dataSourceModel.deleteOne({ _id: dataSourceID });
-		console.log(response);
-        if (response.deletedCount != 1) {
-            throw new Error("Deletion unsuccessful or incorrect amount")
-        }
-
-		// DELETE VIEWS USING DATA SOURCE
-		const views = await viewsModel.find({ table: dataSourceID });
-		console.log(views);
-		views.forEach(element => {
-			console.log(element._id);
-		});
-		const resp = await viewsModel.deleteMany({ table: dataSourceID });
-		console.log(resp);
-		if (res.acknowledged === false) {
-			throw new Error("Deletion unsuccessful or incorrect amount")
-		}
-
-		// DELETE FROM LIST OF DATA SOURCES IN APP
-		const app = await appModel.findOne({ _id: appId });
-		console.log(app.dataSources);
-		console.log(app.dataSources.indexOf(dataSourceID));
-		let index = app.dataSources.indexOf(dataSourceID);
-		if (index === -1) {
-            throw new Error("Data source not found in app");
-        }
-		app.dataSources.splice(index, 1);
-		console.log(app.dataSources);
-
-		// DELETE REMOVED VIEWS FROM LIST OF VIEWS IN APP
-		console.log(app.views);
-		views.forEach(v => {
-			let index = app.views.indexOf(v._id);
-			console.log(index)
-			app.views.splice(index, 1);
-		})
-		console.log(app.views);
-
-		let update = await appModel.findOneAndUpdate(
-			{ _id: appId },
-			{ dataSources: app.dataSources },
-			{ new: true},
-		);
-		update = await appModel.findOneAndUpdate(
-			{ _id: appId },
-			{ views: app.views },
-			{ new: true},
-		);
-		await logFile(appId, dataSourceID + " data source removed");
-		res.send(update);
+	for (const dataSource of dataSourcesToUpdate) {
+		dataSource.columns.forEach((column) => {
+		if (column.dataSourceReference && column.dataSourceReference.toString() === dataSourceID) {
+			column.dataSourceReference = null;
+			column.columnReference = null;
+			column.label = false;
+		}});
+		await dataSource.save();}
+		
+	  await logFile(appId, dataSourceID + " data source removed");
+	  res.send(update);
+	} catch (err) {
+	  console.log("Error: ", err);
+	  await logFile(appId, "Error in removing data source " + dataSourceID);
+	  res.status(400).json({ message: `Error in data source deletion for ${dataSourceID}` });
 	}
-	catch (err) {
-		console.log('Error: ', err);
-		await logFile(appId, "Error in removing data source " + dataSourceID);
-		res.status(400).json({ message: `Error in data source deletion for ${dataSourceID}` });
+  });
+    
+router.post("/setInitialValue", async (req, res) => {
+	// De-struct the payload that was sent
+	const { dataSourceID, columnID, value } = req.body;
+	// Find the datasource that matched the ID of the request
+	try {
+	  // Find the data source object by ID
+	  const dataSource = await dataSourceModel.findById(dataSourceID);
+  
+	  // Find the index of the column with the given ID in the columns array
+	  const columnIndex = dataSource.columns.findIndex(
+		(column) => column._id.toString() === columnID
+	  );
+  
+	  // Update the initial value of the column at the specified index
+	  dataSource.columns[columnIndex].initialValue = value;
+  
+	  // Save the updated data source object
+	  const updatedDataSource = await dataSource.save();
+  
+	  // Send the updated data source object as the response
+	  res.status(200).json(updatedDataSource);
+	} catch (error) {
+	  // Send an error response if an error occurred
+	  res.status(500).send(
+		`Error updating initial value of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`
+	  );
+	}
+});
+
+router.post("/setLabel", async (req, res) => {
+	// De-struct the payload that was sent
+	const { dataSourceID, columnID, value } = req.body;
+	try {
+	  // Find the data source object by ID
+	  const dataSource = await dataSourceModel.findById(dataSourceID);
+  
+	  // Find the index of the column with the given ID in the columns array
+	  const columnIndex = dataSource.columns.findIndex((column) => column._id.toString() === columnID);
+  
+	  // Update the label value of the column at the specified index
+	  dataSource.columns[columnIndex].label = value;
+  
+	  // If the value is set to false, then we need to remove the references for this column cause it doesn't need it anymore!
+	  if (!value) {
+		dataSource.columns[columnIndex].dataSourceReference = null;
+		dataSource.columns[columnIndex].columnReference = null;
+	  }
+  
+	  // Save the updated data source object
+	  const updatedDataSource = await dataSource.save();
+  
+	  // Send the updated data source object as the response
+	  res.status(200).json(updatedDataSource);
+	} catch (error) {
+	  // Send an error response if an error occurred
+	  res
+		.status(500)
+		.send(`Error updating label value of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`);
+	}
+});
+  
+router.post("/setDataSourceRef", async (req, res) => {
+	// De-struct the payload that was sent
+	const { dataSourceID, columnID, dataSourceRefValue } = req.body;
+
+	try {
+	  // Find the data source object by ID
+	  const dataSource = await dataSourceModel.findById(dataSourceID);
+		
+	  // Find the index of the column with the given ID in the columns array
+	  const columnIndex = dataSource.columns.findIndex(column => column._id.toString() === columnID);
+		
+	  // Update the dataSourcereference value of the column at the specified index
+	  dataSource.columns[columnIndex].dataSourceReference = dataSourceRefValue;
+		
+	  // Save the updated data source object
+	  const updatedDataSource = await dataSource.save();
+		
+	  // Send the updated data source object as the response
+	  res.status(200).json(updatedDataSource);
+	} catch (error) {
+	  // Send an error response if an error occurred
+	  res.status(500).send(`Error updating data source reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`);
+	}
+});
+
+router.post("/setColumnRef", async(req, res) =>{
+	// De-struct the payload that was sent
+	const { dataSourceID, columnID, columnRefValue } = req.body;
+
+	try {
+	  // Find the data source object by ID
+	  const dataSource = await dataSourceModel.findById(dataSourceID);
+		
+	  // Find the index of the column with the given ID in the columns array
+	  const columnIndex = dataSource.columns.findIndex(column => column._id.toString() === columnID);
+		
+	  // Update the columnReference value of the column at the specified index
+	  dataSource.columns[columnIndex].columnReference = columnRefValue;
+		
+	  // Save the updated data source object
+	  const updatedDataSource = await dataSource.save();
+		
+	  // Send the updated data source object as the response
+	  res.status(200).json(updatedDataSource);
+	} catch (error) {
+	  // Send an error response if an error occurred
+	  res.status(500).send(`Error updating column reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`);
 	}
 })
-
+  
 async function logFile(appId, content){
 	let filePath = './log-files/' + appId + '.txt';
 	content = new Date() + ": " + content + '\n';

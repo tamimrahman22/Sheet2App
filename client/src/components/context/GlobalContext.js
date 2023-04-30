@@ -156,11 +156,13 @@ export function GlobalContextProvider({children}){
     /* ---------- FUNCTIONS BELOW RELATE TO THE DATA SOURCES ---------- */
     
     // Add the spreadsheet as a data source to review 
-    const addDataSource = function (appID, sheetURL, sheetIndex, keys){
-        async function addDataSource(){
+    const addDataSource = function (appID, dataSourceName, sheetURL, sheetIndex, keys){
+        async function addDataSource(appID, dataSourceName, sheetURL, sheetIndex, keys){
             let payload = {
                 // Application ID of where we will be adding the data source to
                 appId:appID, 
+                // Name of the data source 
+                dataSourceName: dataSourceName, 
                 // The URL to the Google SpreadSheet 
                 url:sheetURL, 
                 // Sheet index of where the data source is being generated from 
@@ -188,10 +190,11 @@ export function GlobalContextProvider({children}){
             }
             getLists();
         }
-        addDataSource(appID, sheetURL, sheetIndex, keys); 
+        addDataSource(appID, dataSourceName, sheetURL, sheetIndex, keys); 
         // Verify we got the input we need!
         console.log('[STORE] Creating data source....')
         console.log('[STORE] Application ID: ', appID)
+        console.log('[STORE] Data Source Name: ', dataSourceName)
         console.log('[STORE] Spreadsheet: ', sheetURL)
         console.log('[STORE] Sheet Index: ', sheetIndex-1)
         console.log('[STORE] Keys: ', keys)
@@ -261,6 +264,70 @@ export function GlobalContextProvider({children}){
             }
         }
         deleteDataSourceById(dataSourceID);
+    }
+
+    const updateInitialValue = function (dsID, colID, value){
+        async function setInitialValue(dsID, colID, value){
+            let payload = {
+                dataSourceID: dsID,
+                columnID: colID,
+                value: value
+            }
+            console.log('[STORE] Sending request to update initial value of column....', payload)
+            const response = await api.setInitialValue(payload);
+            console.log('[STORE] Reloading data sources list for current application' )
+            const res = await api.getDataSourcesByAppId(currentApp._id);
+            setAppDataSources(res.data)
+        }
+        setInitialValue(dsID,colID,value);
+    }
+
+    const updateLabel = function(dsID, colID, value){
+        async function setLabel(dsID, colID, value){
+            let payload = {
+                dataSourceID: dsID,
+                columnID: colID,
+                value: value
+            }
+            console.log('[STORE] Sending request to update the label of a column of a data source... ', payload)
+            const response = await api.setLabel(payload);
+            console.log('[STORE] Reloading data sources list for current application' )
+            const res = await api.getDataSourcesByAppId(currentApp._id);
+            setAppDataSources(res.data)
+        }
+        setLabel(dsID, colID, value);
+    }
+
+    const updateDataSourceReference = function(dsID, colID, dsRefValue){
+        async function setDataSourceRef (dsID, colID, dsRefValue){
+            let payload = {
+                dataSourceID: dsID,
+                columnID: colID,
+                dataSourceRefValue: dsRefValue
+            }
+            console.log('[STORE] Sending request to update the data source reference of a column of a data source... ', payload)
+            const response = await api.setDataSourceRef(payload);
+            console.log('[STORE] Reloading data sources list for current application' )
+            const res = await api.getDataSourcesByAppId(currentApp._id);
+            setAppDataSources(res.data)
+        }
+        setDataSourceRef(dsID, colID, dsRefValue)
+    }
+
+    const updateColumnReference = function (dsID, colID, colRefValue){
+        async function setColumnReference (dsID, colID, colRefValue){
+            let payload = {
+                dataSourceID: dsID,
+                columnID: colID,
+                columnRefValue: colRefValue
+            }
+            console.log('[STORE] Sending request to update the column reference of a column of a data source... ', payload)
+            const response = await api.setColumnRef(payload);
+            console.log('[STORE] Reloading data sources list for current application' )
+            const res = await api.getDataSourcesByAppId(currentApp._id);
+            setAppDataSources(res.data)
+        }
+        setColumnReference(dsID, colID, colRefValue);
     }
 
     /* ---------- FUNCTIONS BELOW RELATE TO THE VIEW ---------- */
@@ -453,6 +520,10 @@ export function GlobalContextProvider({children}){
         renameDataSource,
         setKeys,
         deleteDataSource,
+        updateInitialValue,
+        updateLabel,
+        updateDataSourceReference,
+        updateColumnReference,
         
         // VIEWS
         addView,

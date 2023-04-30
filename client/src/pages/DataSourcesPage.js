@@ -19,6 +19,7 @@ export default function DataSource() {
 
     // Create a mapping of the ID of the data sources with the name of the key column of each data source! 
     const dsToKeyName = store.appDataSources.map(item => ({ _id: item._id, keys: item.keys }));
+    console.log(dsToKeyName)
 
     // CONSOLE DEBUG STATEMENTS TO SEEE WHAT FIELDS ARE RETURNING
     console.log('[DATA SOURCE] USER IS: ', auth.user);
@@ -34,6 +35,8 @@ export default function DataSource() {
     const [spreadsheetURL, setSpreadSheetURL] = useState();
     // State that takes the user input for index of the sheet they want to be added as a data source
     const [index, setIndex] = useState();
+    // State that takes the user input for the name of the data source that they want to be made
+    const [dsName, setDsName] = useState();
     // State that allows the user to change the name of the data source
     const [editMode, setEditMode] = useState(false);
     // State that stores the change named of the data source being modified
@@ -42,6 +45,7 @@ export default function DataSource() {
     const [originalDataSourceName, setOriginalDataSourceName] = useState('')
     // State that store the data source that is being modified 
     const [dataSource, setDataSource] = useState({})
+
 
     useEffect(() => {
         window.sessionStorage.clear();
@@ -88,12 +92,44 @@ export default function DataSource() {
         setEditMode(false)
     }
 
+    // Function to handle setting the initial value of a column
+    function handleInitialValueChange(dsID, colID, value){
+        // dsID --> the ID of the data source we are going to update the initial Value for a specified column for
+        // colID --> the ID of the column in the data source that we are going to update the initial value
+        // value --> the intial value of that the customer specified 
+        store.updateInitialValue(dsID, colID, value); 
+    } 
+
+    // Function to handle a change in the value of the label 
+    function handleLabelChange(dsID, colID, value){ 
+        // dsID --> the ID of the data source we are going to update the the column's value of label for 
+        // colID --> the ID of the column in the specified DS that we're gonna update the boolean value to 
+        // value --> yes == true and no == false
+        store.updateLabel(dsID, colID, value);
+    }
+
+    // Function to handle a change in the value of the data source reference for a column of the current data source
+    function handleDataSourceReferenceChange(dsID, colID, dsRefValue){
+        // dsID --> the ID of the data source we are going to update that specified column's dataSourceReference value to
+        // colID --> the ID of column with the data source that we're going to update the dataSourceReference value to
+        // dsRefValue --> the ID of the data source we are referencing 
+        store.updateDataSourceReference(dsID, colID, dsRefValue);
+    }
+
+    function handleColumnReferenceChange(dsID, colID, colRefValue){
+        // dsID --> the ID of the data source we are going to update that specified column's columnReference value to
+        // colID --> the ID of column with the data source that we're going to update the columnReference value to
+        // colRefValue --> the ID of the column of the data source we are referencing
+        store.updateColumnReference(dsID, colID, colRefValue)
+    }
+
     function handleAddDataSource(event){
         console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp._id)
+        console.log('[DATA SOURCE] Name of Data Source: ', dsName)
         console.log('[DATA SOURCE] Spreadsheet: ', spreadsheetURL)
         console.log('[DATA SOURCE] Sheet Index: ', index)
         // Pass this infomration to our store to create the data source! 
-        store.addDataSource(store.currentApp._id, spreadsheetURL, index, '')
+        store.addDataSource(store.currentApp._id, dsName, spreadsheetURL, index, '')
         // Close the modal! 
         setOpen(false)
     }
@@ -111,7 +147,6 @@ export default function DataSource() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 500,
-        height: 300,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px'
@@ -124,7 +159,6 @@ export default function DataSource() {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 450,
-        height: 250,
         bgcolor: 'background.paper',
         p: 4,
         borderRadius: '10px'
@@ -250,22 +284,108 @@ export default function DataSource() {
                                         <TableCell>{ds.sheetIndex + 1}</TableCell>
                                         <TableCell>
                                             <TableContainer 
-                                                style={{ overflow: 'auto', height: '45vh' }}
+                                                style={{ overflow: 'auto', height: '35vh', width: '40vw'}}
                                             >
-                                                <Table>
+                                                <Table size="small">
                                                     <TableHead>
                                                     <TableRow>
-                                                        <TableCell>Column Name</TableCell>
-                                                        <TableCell>Reference</TableCell>
+                                                        <TableCell>Name</TableCell>
                                                         <TableCell>Type</TableCell>
+                                                        <TableCell>Initial Value</TableCell>
+                                                        <TableCell>Label?</TableCell>
+                                                        <TableCell>Reference</TableCell>
+                                                        <TableCell>Reference Column</TableCell>
                                                     </TableRow>
                                                     </TableHead>
                                                     <TableBody>
                                                     {ds.columns.map((col) => (
                                                         <TableRow key={col._id.$oid}>
-                                                        <TableCell>{col.name}</TableCell>
-                                                        <TableCell>{store.appDataSources.find(ds => ds._id === col.reference).dataSourceName}</TableCell>
-                                                        <TableCell>{col.type.charAt(0).toUpperCase() + col.type.slice(1)}</TableCell>
+                                                            <TableCell>{col.name}</TableCell>
+                                                            <TableCell>{col.type.charAt(0).toUpperCase() + col.type.slice(1)}</TableCell>
+                                                            <TableCell>
+                                                                <TextField
+                                                                    defaultValue={col.initialValue ? col.initialValue : ''}
+                                                                    style={{width: '150px'}}
+                                                                    inputProps={{ style: { textAlign: 'center' } }}
+                                                                    onBlur={(e) => handleInitialValueChange(ds._id, col._id, e.target.value)}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormControl
+                                                                    // FORM CONTROL FOR SAYING THAT THIS COLUMN WILL BE LINKED TO ANOTHER COLUMN OF ANOTHER DATA SOURCE
+                                                                    style={{width: '85px'}}
+                                                                    disabled={store.appDataSources.length == 1}
+                                                                >
+                                                                    <InputLabel>
+                                                                        Label?
+                                                                    </InputLabel>
+                                                                    <Select
+                                                                        value={col.label}
+                                                                        label="Label?"
+                                                                        onChange={(e) => handleLabelChange(ds._id, col._id, e.target.value)}
+                                                                    >
+                                                                        <MenuItem value={false}>No</MenuItem>
+                                                                        <MenuItem value={true}>Yes</MenuItem>
+                                                                    </Select>
+                                                                </FormControl>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormControl
+                                                                    // FORM CONTROL FOR SELECTING THE DATA SOURCE WE ARE REFERENCING 
+                                                                    style={{width: '150px'}}
+                                                                    disabled={(!col.label) || (ds.length <= 1)}
+                                                                >
+                                                                        <InputLabel>Data Source?</InputLabel>
+                                                                        <Select
+                                                                            value={col.dataSourceReference || ""}
+                                                                            label="Data Source?"
+                                                                            onChange={(e) =>
+                                                                                handleDataSourceReferenceChange(
+                                                                                  ds._id,
+                                                                                  col._id,
+                                                                                  e.target.value
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            {store.appDataSources
+                                                                            .filter((d) => d._id !== ds._id)
+                                                                            .map((d) => (
+                                                                                <MenuItem key={d._id} value={d._id}>
+                                                                                    {d.dataSourceName}
+                                                                                </MenuItem>
+                                                                            ))}
+                                                                        </Select>
+                                                                </FormControl>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormControl 
+                                                                    style={{ width: '150px' }} 
+                                                                    disabled={!col.dataSourceReference}
+                                                                >
+                                                                    <InputLabel>Column?</InputLabel>
+                                                                    <Select 
+                                                                        label="Column?" 
+                                                                        value={col.columnReference || ""}
+                                                                        onChange={(e) => {
+                                                                            handleColumnReferenceChange(
+                                                                                ds._id,
+                                                                                col._id,
+                                                                                e.target.value
+                                                                            )
+                                                                        }}
+                                                                    >
+                                                                    {store.appDataSources
+                                                                        .find(ds => ds._id === col.dataSourceReference)
+                                                                        ?.columns
+                                                                        ?.map(column => (
+                                                                        <MenuItem key={column._id} value={column._id}>
+                                                                            {column.name}
+                                                                        </MenuItem>
+                                                                        ))
+                                                                    }
+                                                                    </Select>
+                                                                </FormControl>
+                                                            </TableCell>
                                                         </TableRow>
                                                     ))}
                                                     </TableBody>
@@ -311,6 +431,9 @@ export default function DataSource() {
                     </Typography>
                 </Box>
                 <Box paddingTop={1}>
+                    <TextField fullWidth id="standard-basic" label="Data Source Name" variant="standard" onChange={(e) => setDsName(e.target.value)}/>
+                </Box>
+                <Box paddingTop={1}>
                     <TextField fullWidth id="standard-basic" label="Spreadsheet URL" variant="standard" onChange={(e) => setSpreadSheetURL(e.target.value)}/>
                 </Box>
                 <Box paddingTop={2}>
@@ -327,12 +450,13 @@ export default function DataSource() {
                 </Box>
             </Box>
         </Modal>
+
         <Modal
-                open={showDelete}
-                onClose={closeModal}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
+            open={showDelete}
+            onClose={closeModal}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
                 <Box sx = {deleteStyle} width={450} justifyContent="center" alignItems="center">
                     <Box>
                         <Typography id="modal-modal-title" variant="h5" component="h2">
