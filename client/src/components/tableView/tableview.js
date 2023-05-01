@@ -224,16 +224,21 @@ function TableView(props) {
                             <Box sx={{ margin: 1 }}>
                                 <Grid container spacing={1}>
                                     {
-                                        columns.map((c, index) => {
+                                        tableColumns.map((c, index) => {
                                             return (
                                                 <Fragment key={"update-record-" + index}>
                                                     <Grid item xs={1} justifyContent="center" display="flex" alignItems="center">
                                                         <Typography variant="h6">
-                                                            {c}:
+                                                            {c.name}:
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={11}>
-                                                        <TextField fullWidth id={"edit-record-value-" + index} variant="outlined" disabled={!detailView.editable.includes(c)} InputProps={{ readOnly: !edit }} defaultValue={row[index]}/>
+                                                        <TextField 
+                                                            fullWidth id={"edit-record-value-" + index} 
+                                                            variant="outlined"
+                                                            disabled={!detailView.editable.includes(c.name)} 
+                                                            InputProps={{ readOnly: !edit }} 
+                                                            defaultValue={row[index] === "" ? c.initialValue : row[index]}/>
                                                     </Grid>
                                                 </Fragment>
                                             )
@@ -324,11 +329,11 @@ function TableView(props) {
                                                 <Fragment key={"add-record-" + index}>
                                                     <Grid item xs={1} justifyContent="center" display="flex" alignItems="center">
                                                         <Typography variant="h6">
-                                                            {c}:
+                                                            {c.name}:
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={11}>
-                                                        <TextField fullWidth id={"add-record-value-" + index} variant="outlined"/>
+                                                        <TextField fullWidth id={"add-record-value-" + index} variant="outlined" defaultValue={c.initialValue}/>
                                                     </Grid>
                                                 </Fragment>
                                             )
@@ -388,7 +393,7 @@ function TableView(props) {
                                             )
                                         }) 
                                     }
-                                    {view.allowedActions.includes("Add Record") && <AddRecordRow key={'add-record-' + view._id} col={columns} /> }
+                                    {view.allowedActions.includes("Add Record") && <AddRecordRow key={'add-record-' + view._id} col={tableColumns} /> }
                                     </TableBody>
                                 </Table>
                             </TableContainer>
