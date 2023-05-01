@@ -93,9 +93,10 @@ export default function DashboardAppPage() {
                       </Box>
                       <Snackbar
                         open = {store.errorMessage !== null}
-                        autoHideDuration={4500}
+                        autoHideDuration={6000}
                         sx = {{
                           border: "2px solid #ff1a1a",
+                          borderRadius: '6px',
                         }}
                         onClose={() => store.setErrorMessage(null)}
                       >
@@ -104,7 +105,8 @@ export default function DashboardAppPage() {
                           onClose={() => store.setErrorMessage(null)}
                           sx={{
                             color: "black",
-                            fontSize: "14pt",
+                            fontWeight: 'bold',
+                            fontSize: "12pt",
                           }}
                         >
                           {store.errorMessage ? store.errorMessage : ''}
