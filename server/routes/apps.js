@@ -23,7 +23,7 @@ router.post('/create', async (req, res) => {
   
 	if (!name) {
 		console.log("Error: No name was given!")
-	  	return res.status(400).json({ message: 'App name cannot be empty!' });
+	  	return res.status(400).json({ message: 'App name cannot be empty.' });
 	}
   
 	const roles = [];
@@ -47,7 +47,7 @@ router.post('/create', async (req, res) => {
   
 	  if (!readData || !readData.data || !readData.data.values || readData.data.values.length < 2) {
 		console.error('Error: No roles are given in the sheet!');
-		return res.status(400).json({ message: 'Role membership sheet should have at least one role!' });
+		return res.status(400).json({ message: 'Role membership sheet should have at least one role.' });
 	  }
   
 	  // get each column and put into array
@@ -67,7 +67,7 @@ router.post('/create', async (req, res) => {
 	  }
 	} catch (error) {
 	  console.error('Error: ', error);
-	  return res.status(400).json({ message: `Error in reading membership sheet information for app ${name}!` });
+	  return res.status(400).json({ message: `Error in reading membership sheet information for app ${name}.` });
 	}
 
 	// create new app with payload and roles that were acquired in previous block
@@ -83,7 +83,7 @@ router.post('/create', async (req, res) => {
 	  res.send(newApp);
 	} catch (error) {
 	  console.error('Error: ', error);
-	  res.status(400).json({ message: `Error in app creation for app ${name}!` });
+	  res.status(400).json({ message: `Error in app creation for app ${name}.` });
 	}
 });
 

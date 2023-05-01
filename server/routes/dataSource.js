@@ -21,6 +21,13 @@ router.post('/add', async (req, res) => {
 	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
 
 	try {
+		
+		// Check if the data source name is not empty!-
+		if (!dataSourceName) {
+			console.error('Error: No data source name was given!');
+			return res.status(400).json({ message: 'Data source name cannot be empty.' });
+		}
+
 		// get spreadsheet Id of dataSource
 		const regex = /\/d\/(.*?)\/edit/;
 		const match = url.match(regex);
@@ -29,6 +36,12 @@ router.post('/add', async (req, res) => {
 			spreadsheetId,
 			auth,
 		});
+
+		// Check if the the index that was specified by the user is in range 
+		if (sheetIndex < 0 || sheetIndex >= response.data.sheets.length) {
+			console.error('Error: Invalid sheet index provided!');
+			return res.status(400).json({ message: 'Invalid sheet index provided.' });
+		}
 
 		//Get the name of the spreadsheet
 		const spreadSheetName = response.data.properties.title;
@@ -55,6 +68,13 @@ router.post('/add', async (req, res) => {
 					valueRenderOption: 'UNFORMATTED_VALUE',
     				dateTimeRenderOption: 'SERIAL_NUMBER'
 				})
+
+				// check if we received any data
+				if (!readColumns.data.values || !readData.data.values) {
+					console.error('Error: No data parsed!');
+					return res.status(400).json({ message: 'The specified sheet does not contain data.' });
+				}
+
 				// create dataSource, need to add columns next
 				const newDataSource = await dataSourceModel.create({
 					// Name of the sheet
@@ -109,13 +129,12 @@ router.post('/add', async (req, res) => {
 				res.send(await appModel.findById({ _id: appId }))
 			}
 		}
-		console.log(response.data.sheets);
-		
 	}
 	catch (error){
 		console.error('Error: ', error);
 		await logFile(appId, "Error in adding data source: " + url);
-		res.status(400).json({ message: `Error in adding data source for app ${appId}` });
+		const currentApp = await appModel.findById( { _id: appId } );
+		res.status(400).json({ message: `Error in adding data source for app ${currentApp.name}` });
 	}
 });
 

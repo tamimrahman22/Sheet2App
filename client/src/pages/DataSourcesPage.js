@@ -51,13 +51,13 @@ export default function DataSource() {
         window.sessionStorage.clear();
     })
     
-    function openModal(event) {
+    function openModal() {
         console.log('[DATA SOURCE] CURRENT App: ', store.currentApp)
         // Open the modal! 
         setOpen(true);
     }
 
-    function closeModal(event) {
+    function closeModal() {
         // Close the modal! 
         setOpen(false);
         setShowDelete(false);
@@ -123,7 +123,7 @@ export default function DataSource() {
         store.updateColumnReference(dsID, colID, colRefValue)
     }
 
-    function handleAddDataSource(event){
+    function handleAddDataSource(){
         console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp._id)
         console.log('[DATA SOURCE] Name of Data Source: ', dsName)
         console.log('[DATA SOURCE] Spreadsheet: ', spreadsheetURL)
