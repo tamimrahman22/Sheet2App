@@ -98,12 +98,23 @@ router.post('/add', async (req, res) => {
 
 				let referenceId = newDataSource.id;
 				for(let j = 0; j < columnNames.length; j++){
-					columns.push({
-						name: columnNames[j],
-						label: false,
-						// reference: referenceId,
-						type: typeof columnFirstValues[j]
-					})
+					let urlRegex = /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i;
+					if(urlRegex.test(columnFirstValues[j])) {
+						columns.push({
+							name: columnNames[j],
+							label: false,
+							// reference: referenceId,
+							type: "url"
+						})
+					}
+					else{
+						columns.push({
+							name: columnNames[j],
+							label: false,
+							// reference: referenceId,
+							type: typeof columnFirstValues[j]
+						})
+					}
 				}
 			
 				// update the columns of datasource
