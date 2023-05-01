@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
-import { Container, Typography, List, Stack, Box, Card, CardContent, CardActionArea} from '@mui/material';
+import { Container, Typography, List, Stack, Box, Card, CardContent, CardActionArea, Snackbar, Alert } from '@mui/material';
 import GlobalContext from '../components/context/GlobalContext';
 import AuthContext from "../components/context/AuthContext";
 
@@ -55,41 +55,62 @@ export default function DashboardAppPage() {
                     return null;
                   }
                   return (
-                    <Box component="span" sx={{ p: 2 }} key={app._id}>
-                      <Card>
-                        <CardActionArea sx={{ display: 'contents' }} onClick={() => {
-                          console.log ('[DASHBOARD APP] Current list is: ', app)
-                          // SET THE CURRENT APPLICATION!
-                          store.setApp(app)
-                          store.setUserRole(userRole)
-                          if (store.userRole === "Developer") {
-                            navigate("/editor");
-                          }
-                          else {
-                            navigate("/editor/views");
-                          }
-                        }}>
-                          <CardContent>
-                            <Stack direction="row" alignItems="center" spacing={2} >
-                              <Box sx={{ minWidth: 240, flexGrow: 1 }}>
-                                <Typography color="inherit" variant="subtitle2" underline="hover" noWrap>
-                                  {app.name}
+                    <>
+                      <Box component="span" sx={{ p: 2 }} key={app._id}>
+                        <Card>
+                          <CardActionArea sx={{ display: 'contents' }} onClick={() => {
+                            console.log ('[DASHBOARD APP] Current list is: ', app)
+                            // SET THE CURRENT APPLICATION!
+                            store.setApp(app)
+                            store.setUserRole(userRole)
+                            if (store.userRole === "Developer") {
+                              navigate("/editor");
+                            }
+                            else {
+                              navigate("/editor/views");
+                            }
+                          }}>
+                            <CardContent>
+                              <Stack direction="row" alignItems="center" spacing={2} >
+                                <Box sx={{ minWidth: 240, flexGrow: 1 }}>
+                                  <Typography color="inherit" variant="subtitle2" underline="hover" noWrap>
+                                    {app.name}
+                                  </Typography>
+                          
+                                  <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                    {app.creator}
+                                  </Typography>
+                                </Box>
+                          
+                                <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
+                                  {app.published ? "Published" : "Unpublished"}
                                 </Typography>
-                        
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                  {app.creator}
-                                </Typography>
-                              </Box>
-                        
-                              <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
-                                {app.published ? "Published" : "Unpublished"}
-                              </Typography>
-                              
-                            </Stack>
-                          </CardContent>
-                        </CardActionArea>
-                      </Card>
-                    </Box>
+                                
+                              </Stack>
+                            </CardContent>
+                          </CardActionArea>
+                        </Card>
+                      </Box>
+                      <Snackbar
+                        open = {store.errorMessage !== null}
+                        autoHideDuration={4500}
+                        sx = {{
+                          border: "2px solid #ff1a1a",
+                        }}
+                        onClose={() => store.setErrorMessage(null)}
+                      >
+                        <Alert
+                          severity="error"
+                          onClose={() => store.setErrorMessage(null)}
+                          sx={{
+                            color: "black",
+                            fontSize: "14pt",
+                          }}
+                        >
+                          {store.errorMessage ? store.errorMessage : ''}
+                        </Alert>
+                      </Snackbar>
+                    </>
                   )
                 })
             }

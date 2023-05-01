@@ -16,6 +16,8 @@ export function GlobalContextProvider({children}){
     const [appDataSources, setAppDataSources] = useState([]); 
     const [appViews, setAppViews] = useState([]);
     const [userRole, setUserRole] = useState("");
+    // Global state for informing the user of errors when communicating on the backend 
+    const [errorMessage, setErrorMessage] = useState(null)
 
     // Functions to be used to manipulate the global state of our application 
 
@@ -42,27 +44,32 @@ export function GlobalContextProvider({children}){
         getLists();
     }
 
-    // This function is for creating an application to S2A for the user. 
     const createApp = function(appName, userEmail, roleSheet){
         async function createApplication (appName, userEmail, roleSheet){
-            let payload = {
-                // Get the name of the app
-                name: appName,
-                // Using who is logged in, use the email of the user as the creator of this application 
-                creator: userEmail,
-                // This is the URL to that is going to be used to define the roles of the app. 
-                roleMembershipSheet: roleSheet,
-            };
-            console.log('[STORE] Creating application... sending: ',payload)
+          let payload = {
+            // Get the name of the app
+            name: appName,
+            // Using who is logged in, use the email of the user as the creator of this application 
+            creator: userEmail,
+            // This is the URL to that is going to be used to define the roles of the app. 
+            roleMembershipSheet: roleSheet,
+          };
+          console.log('[STORE] Creating application... sending: ',payload)
+          try {
             // Send the request with the payload and wait for a response back. 
             const response = await api.createApp(payload);
             console.log('[STORE] Created application...', response)
             // After application has been created, reload the app list. 
             navigate('/dashboard', { replace: true })
+          } catch (error) {
+            console.error('[STORE] Error creating application', error);
+            // handle the error here, e.g. show a snackbar or toast message
+            setErrorMessage('Error creating app: ' + error.response.data.message);
+          }
         }
         createApplication(appName, userEmail, roleSheet)
     } 
-    
+
     // This function will be used in order to set the current app for S2A and also getting the required information regarding existing data sources for the user. 
     const setApp = function(app){
         async function setAppDetails(app){
@@ -509,6 +516,8 @@ export function GlobalContextProvider({children}){
         setAppViews,
         userRole,
         setUserRole,
+        errorMessage,
+        setErrorMessage,
 
         // APPS
         loadAppList, 

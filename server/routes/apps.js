@@ -18,67 +18,77 @@ router.get('/test', async(req, res) => {
 
 // route to create application, broken up into two routes, this one (/app/create) and a datasource route (/datasource/add)
 // first route is used to create application and add roles, second route is used to add datasource tables
-router.post('/create', async(req, res) => {
-    const { name, creator, roleMembershipSheet } = req.body;
+router.post('/create', async (req, res) => {
+	const { name, creator, roleMembershipSheet } = req.body;
+  
+	if (!name) {
+		console.log("Error: No name was given!")
+	  	return res.status(400).json({ message: 'App name cannot be empty!' });
+	}
+  
 	const roles = [];
-
+  
 	const authClientObject = await auth.getClient();
 	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
-
+  
 	// get all roles from role membership sheet
 	try {
-		// regex to get just the spreadsheet id
-		const regex = /\/d\/(.*?)\/edit/;
-		const match = roleMembershipSheet.match(regex);
-		const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
-
-		// get the values in the role membership sheet
-		const readData = await googleSheetsInstance.spreadsheets.values.get({
-			auth, //auth object
-			spreadsheetId, // spreadsheet id
-			range: `Sheet1`, //range of cells to read from.
-		})
-
-		// get each column and put into array
-		console.log(readData.data.values);
-		for(let i = 0; i < readData.data.values[0].length; i++){
-			let tempList = [];
-			for(let j = 0; j < readData.data.values.length; j++){
-				if (readData.data.values[j][i] != undefined)
-					tempList.push(readData.data.values[j][i]);
-			}
-			roleName = tempList.shift();
-			roles.push({
-				name: roleName,
-				users: tempList,
-				allowedActions: []
-			});
+	  // regex to get just the spreadsheet id
+	  const regex = /\/d\/(.*?)\/edit/;
+	  const match = roleMembershipSheet.match(regex);
+	  const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+  
+	  // get the values in the role membership sheet
+	  const readData = await googleSheetsInstance.spreadsheets.values.get({
+		auth, //auth object
+		spreadsheetId, // spreadsheet id
+		range: `Sheet1`, //range of cells to read from.
+	  });
+  
+	  if (!readData || !readData.data || !readData.data.values || readData.data.values.length < 2) {
+		console.error('Error: No roles are given in the sheet!');
+		return res.status(400).json({ message: 'Role membership sheet should have at least one role!' });
+	  }
+  
+	  // get each column and put into array
+	  console.log(readData.data.values);
+	  for (let i = 0; i < readData.data.values[0].length; i++) {
+		let tempList = [];
+		for (let j = 0; j < readData.data.values.length; j++) {
+		  if (readData.data.values[j][i] != undefined)
+			tempList.push(readData.data.values[j][i]);
 		}
-		console.log(roles);
+		roleName = tempList.shift();
+		roles.push({
+		  name: roleName,
+		  users: tempList,
+		  allowedActions: []
+		});
+	  }
+	} catch (error) {
+	  console.error('Error: ', error);
+	  return res.status(400).json({ message: `Error in reading membership sheet information for app ${name}!` });
 	}
-	catch (error){
-		console.error('Error: ', error);
-		return res.status(400).json({ message: `Error in reading membership sheet information for app ${name}` });
+	// Check if there is a developer role in the role membership sheet
+	if (!roles.some(role => role.name.toLowerCase() === 'developers')) {
+		console.error('Error: No developer roler specified!');
+		return res.status(400).json({ message: `The role membership sheet for ${name} does not include a developers role.` });
 	}
-	
-	console.log(req.body);
 
 	// create new app with payload and roles that were acquired in previous block
-    try {
-		const newApp = await appModel.create({
-			name: name,
-			creator: creator,
-			roleMembershipSheet: roleMembershipSheet,
-			roles: roles
-		});
-        console.log(newApp);
-		// res.status(201).json({ message: `${name} app created` });
-		await logFile(newApp.id, name + " app created");
-		res.send(newApp);
-    }
-    catch (error) {
-		console.error('Error: ', error);
-		res.status(400).json({ message: `Error in app creation for app ${name}` });
+	try {
+	  const newApp = await appModel.create({
+		name: name,
+		creator: creator,
+		roleMembershipSheet: roleMembershipSheet,
+		roles: roles
+	  });
+	  // res.status(201).json({ message: `${name} app created` });
+	  await logFile(newApp.id, name + " app created");
+	  res.send(newApp);
+	} catch (error) {
+	  console.error('Error: ', error);
+	  res.status(400).json({ message: `Error in app creation for app ${name}!` });
 	}
 });
 
