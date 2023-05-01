@@ -79,6 +79,9 @@ export default function Nav({ openNav, onCloseNav }) {
     event.stopPropagation()
     setOpen(false);
     store.createApp(appName, auth.user.email, roleSheet);
+    // Set the states back to their default value! 
+    setAppName('');
+    setRoleSheet('');
   }
 
   const renderContent = (
