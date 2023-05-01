@@ -69,11 +69,6 @@ router.post('/create', async (req, res) => {
 	  console.error('Error: ', error);
 	  return res.status(400).json({ message: `Error in reading membership sheet information for app ${name}!` });
 	}
-	// Check if there is a developer role in the role membership sheet
-	if (!roles.some(role => role.name.toLowerCase() === 'developers')) {
-		console.error('Error: No developer roler specified!');
-		return res.status(400).json({ message: `The role membership sheet for ${name} does not include a developers role.` });
-	}
 
 	// create new app with payload and roles that were acquired in previous block
 	try {
@@ -320,16 +315,16 @@ async function logFile(appId, content){
 	  // Check if the folder exists
 	  if (!fs.existsSync(folderPath)) {
 		// If it doesn't exist, create it
-		fs.mkdirSync(folderPath);
+		await fs.mkdirSync(folderPath);
 	  }
   
 	  // Check if the file exists
 	  if (!fs.existsSync(filePath)) {
 		// If it doesn't exist, create it and write the content
-		fs.writeFileSync(filePath, content);
+		await fs.writeFileSync(filePath, content);
 	  } else {
 		// If it exists, append the content
-		fs.appendFileSync(filePath, content);
+		await fs.appendFileSync(filePath, content);
 	  }
 	  console.log('Log File updated successfully.');
 	} catch (err) {
