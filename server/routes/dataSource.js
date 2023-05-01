@@ -493,11 +493,28 @@ router.post("/setColumnRef", async(req, res) =>{
 })
   
 async function logFile(appId, content){
-	let filePath = './log-files/' + appId + '.txt';
+	const folderPath = './log-files';
+	const filePath = `${folderPath}/${appId}.txt`;
 	content = new Date() + ": " + content + '\n';
-	await fs.appendFile(filePath, content, (err) => {
-		if (err) throw err;
-		console.log('New file created');
-	});
+	
+	try {
+	  // Check if the folder exists
+	  if (!fs.existsSync(folderPath)) {
+		// If it doesn't exist, create it
+		await fs.mkdirSync(folderPath);
+	  }
+  
+	  // Check if the file exists
+	  if (!fs.existsSync(filePath)) {
+		// If it doesn't exist, create it and write the content
+		await fs.writeFileSync(filePath, content);
+	  } else {
+		// If it exists, append the content
+		await fs.appendFileSync(filePath, content);
+	  }
+	  console.log('Log File updated successfully.');
+	} catch (err) {
+	  console.error(err);
+	}
 }
 module.exports = router;
