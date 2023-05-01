@@ -265,10 +265,17 @@ router.post("/setKeys", async(req, res) => {
 			{ _id: dataSourceID },
 			{ keys: keyName },
 		);
+		// Write to the log file
+		const logMessage = `Data source ${dataSourceID} key name set to ${keyName}`
+		await logFile(appID, logMessage);
+
 		res.send(updatedDataSource);
 	}
 	catch (err) {
-		console.error('Error: ', err);
+		// Write to log file
+		const logMessage = `Error in setting data source ${dataSourceID} key name`
+		await logFile(appID, logMessage);
+
 		res.status(400).json({ message: `Error in renaming the data source!`});
 	}
 })
@@ -337,7 +344,7 @@ router.post("/delete", async (req, res) => {
 			column.label = false;
 		}});
 		await dataSource.save();}
-		
+	  // Write to the log file
 	  await logFile(appId, dataSourceID + " data source removed");
 	  res.send(update);
 	} catch (err) {
@@ -349,7 +356,7 @@ router.post("/delete", async (req, res) => {
     
 router.post("/setInitialValue", async (req, res) => {
 	// De-struct the payload that was sent
-	const { dataSourceID, columnID, value } = req.body;
+	const { appID, dataSourceID, columnID, value } = req.body;
 	// Find the datasource that matched the ID of the request
 	try {
 	  // Find the data source object by ID
@@ -365,20 +372,25 @@ router.post("/setInitialValue", async (req, res) => {
   
 	  // Save the updated data source object
 	  const updatedDataSource = await dataSource.save();
-  
+
+	 // Write to the log file
+	  const logMessage = `Initial value of column with ID ${columnID} in data source with ID ${dataSourceID} updated to ${value}`
+  	  await logFile(appID, logMessage);
+
 	  // Send the updated data source object as the response
 	  res.status(200).json(updatedDataSource);
 	} catch (error) {
-	  // Send an error response if an error occurred
-	  res.status(500).send(
-		`Error updating initial value of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`
-	  );
+	    // Write to the log file
+		const logMessage = `Error updating initial value of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`
+	    await logFile(dataSourceID, logMessage);
+	  	// Send an error response if an error occurred
+		res.status(500).send(logMessage);
 	}
 });
 
 router.post("/setLabel", async (req, res) => {
 	// De-struct the payload that was sent
-	const { dataSourceID, columnID, value } = req.body;
+	const { appID, dataSourceID, columnID, value } = req.body;
 	try {
 	  // Find the data source object by ID
 	  const dataSource = await dataSourceModel.findById(dataSourceID);
@@ -397,20 +409,26 @@ router.post("/setLabel", async (req, res) => {
   
 	  // Save the updated data source object
 	  const updatedDataSource = await dataSource.save();
-  
+
+	  // Write to the log file
+	  const content = `Label value of column with ID ${columnID} in data source with ID ${dataSourceID} set to ${value}`;
+	  await logFile(appID, content);
+
 	  // Send the updated data source object as the response
 	  res.status(200).json(updatedDataSource);
 	} catch (error) {
+	  // Write to the log file
+	  const logMessage = `Error updating label value of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`;
+	  await logFile(appID, logMessage);
+
 	  // Send an error response if an error occurred
-	  res
-		.status(500)
-		.send(`Error updating label value of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`);
+	  res.status(500).send(logMessage);
 	}
 });
   
 router.post("/setDataSourceRef", async (req, res) => {
 	// De-struct the payload that was sent
-	const { dataSourceID, columnID, dataSourceRefValue } = req.body;
+	const { appID, dataSourceID, columnID, dataSourceRefValue } = req.body;
 
 	try {
 	  // Find the data source object by ID
@@ -424,18 +442,26 @@ router.post("/setDataSourceRef", async (req, res) => {
 		
 	  // Save the updated data source object
 	  const updatedDataSource = await dataSource.save();
+
+	  // Write to the log file
+	  const logMessage = `Data source reference updated for column with ID ${columnID} in data source with ID ${dataSourceID}`;
+	  await logFile(appID, logMessage);
 		
 	  // Send the updated data source object as the response
 	  res.status(200).json(updatedDataSource);
 	} catch (error) {
+	  // Write to the log file
+	  const logMessage = `Error updating data source reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`;
+	  await logFile(appID, logMessage);
+
 	  // Send an error response if an error occurred
-	  res.status(500).send(`Error updating data source reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`);
+	  res.status(500).send(logMessage);
 	}
 });
 
 router.post("/setColumnRef", async(req, res) =>{
 	// De-struct the payload that was sent
-	const { dataSourceID, columnID, columnRefValue } = req.body;
+	const { appID, dataSourceID, columnID, columnRefValue } = req.body;
 
 	try {
 	  // Find the data source object by ID
@@ -449,12 +475,20 @@ router.post("/setColumnRef", async(req, res) =>{
 		
 	  // Save the updated data source object
 	  const updatedDataSource = await dataSource.save();
-		
+	  
+	  // Write to the log file
+	  const logMessage = `Data source reference of column with ID ${columnID} in data source with ID ${dataSourceID} updated to ${dataSourceRefValue}`;
+      await logFile(appID, logMessage);
+
 	  // Send the updated data source object as the response
 	  res.status(200).json(updatedDataSource);
 	} catch (error) {
+	  // Write to the log file
+	  const logMessage = `Error updating data source reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`;
+	  await logFile(appID, logMessage);
+
 	  // Send an error response if an error occurred
-	  res.status(500).send(`Error updating column reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`);
+	  res.status(500).send(logMessage);
 	}
 })
   
@@ -466,5 +500,4 @@ async function logFile(appId, content){
 		console.log('New file created');
 	});
 }
-
 module.exports = router;

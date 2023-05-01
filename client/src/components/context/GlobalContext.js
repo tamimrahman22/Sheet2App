@@ -269,6 +269,7 @@ export function GlobalContextProvider({children}){
     const updateInitialValue = function (dsID, colID, value){
         async function setInitialValue(dsID, colID, value){
             let payload = {
+                appID: currentApp._id,
                 dataSourceID: dsID,
                 columnID: colID,
                 value: value
@@ -285,6 +286,7 @@ export function GlobalContextProvider({children}){
     const updateLabel = function(dsID, colID, value){
         async function setLabel(dsID, colID, value){
             let payload = {
+                appID: currentApp._id,
                 dataSourceID: dsID,
                 columnID: colID,
                 value: value
@@ -301,6 +303,7 @@ export function GlobalContextProvider({children}){
     const updateDataSourceReference = function(dsID, colID, dsRefValue){
         async function setDataSourceRef (dsID, colID, dsRefValue){
             let payload = {
+                appID: currentApp._id,
                 dataSourceID: dsID,
                 columnID: colID,
                 dataSourceRefValue: dsRefValue
@@ -317,6 +320,7 @@ export function GlobalContextProvider({children}){
     const updateColumnReference = function (dsID, colID, colRefValue){
         async function setColumnReference (dsID, colID, colRefValue){
             let payload = {
+                appID: currentApp._id,
                 dataSourceID: dsID,
                 columnID: colID,
                 columnRefValue: colRefValue
