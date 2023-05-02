@@ -320,7 +320,10 @@ export default function DataSource() {
                                                                 <FormControl
                                                                     // FORM CONTROL FOR SAYING THAT THIS COLUMN WILL BE LINKED TO ANOTHER COLUMN OF ANOTHER DATA SOURCE
                                                                     style={{width: '85px'}}
-                                                                    disabled={store.appDataSources.length == 1}
+                                                                    disabled={
+                                                                        store.appDataSources.length == 1 ||
+                                                                        (ds.columns.some((column) => column.label) && col.label === false)
+                                                                    }
                                                                 >
                                                                     <InputLabel>
                                                                         Label?
