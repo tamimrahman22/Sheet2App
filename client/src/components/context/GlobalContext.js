@@ -1,6 +1,7 @@
 import { createContext, useState, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import api from '../../api'
 
 const GlobalContext = createContext();
@@ -9,6 +10,7 @@ console.log('Creating store context...')
 export function GlobalContextProvider({children}){
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     // GLOBAL STATE OF THE APPLICATION 
     const [appList, setAppList] = useState([]); 
@@ -16,9 +18,6 @@ export function GlobalContextProvider({children}){
     const [appDataSources, setAppDataSources] = useState([]); 
     const [appViews, setAppViews] = useState([]);
     const [userRole, setUserRole] = useState("");
-    // Global state for informing the user of errors when communicating on the backend 
-    const [errorMessage, setErrorMessage] = useState(null)
-
     // Functions to be used to manipulate the global state of our application 
 
     /* ---------- FUNCTION BELOW RELATE TO APPLICATIONS ---------- */
@@ -64,7 +63,8 @@ export function GlobalContextProvider({children}){
           } catch (error) {
             console.error('[STORE] Error creating application', error);
             // handle the error here, e.g. show a snackbar or toast message
-            setErrorMessage('Error creating app: ' + error.response.data.message);
+            const message = 'Error creating app: ' + error.response.data.message
+            enqueueSnackbar(message, { variant: 'error' });
           }
         }
         createApplication(appName, userEmail, roleSheet)
@@ -516,8 +516,6 @@ export function GlobalContextProvider({children}){
         setAppViews,
         userRole,
         setUserRole,
-        errorMessage,
-        setErrorMessage,
 
         // APPS
         loadAppList, 

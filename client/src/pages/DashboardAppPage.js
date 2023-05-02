@@ -91,27 +91,6 @@ export default function DashboardAppPage() {
                           </CardActionArea>
                         </Card>
                       </Box>
-                      <Snackbar
-                        open = {store.errorMessage !== null}
-                        autoHideDuration={6000}
-                        sx = {{
-                          border: "2px solid #ff1a1a",
-                          borderRadius: '6px',
-                        }}
-                        onClose={() => store.setErrorMessage(null)}
-                      >
-                        <Alert
-                          severity="error"
-                          onClose={() => store.setErrorMessage(null)}
-                          sx={{
-                            color: "black",
-                            fontWeight: 'bold',
-                            fontSize: "12pt",
-                          }}
-                        >
-                          {store.errorMessage ? store.errorMessage : ''}
-                        </Alert>
-                      </Snackbar>
                     </>
                   )
                 })
