@@ -191,11 +191,16 @@ router.post('/addRecord', async (req, res) => {
         }
     }
 
+    // KEY INTEGRITY
+    const check2 = await keyIntegrity(record, googleSheetsInstance, auth, spreadsheetId, range);
+    // console.log(check2);
+    // res.send(await keyIntegrity(record, googleSheetsInstance, auth, spreadsheetId, range));
+
     console.log(spreadsheetId);
     console.log(range);
     console.log.apply(resource);
 
-    if(check == true){
+    if(check == true && check2 == false){
         // add record to datasource
         try {
             const writeData = googleSheetsInstance.spreadsheets.values.append({
@@ -217,9 +222,13 @@ router.post('/addRecord', async (req, res) => {
             res.status(400).json({ message: `Error in adding record` });
         }
     }
-    else{
+    else if(check == false){
         console.log('Wrong type');
         res.status(400).json({ message: `Error in adding record: wrong type` });
+    }
+    else{
+        console.log('Key already exists for record');
+        res.status(400).json({ message: `Error in adding record: key for record already exists` });
     }
     
 });
@@ -266,9 +275,16 @@ router.post('/editRecord', async (req, res) => {
         }
     }
 
+    // KEY INTEGRITY
+    const check2 = await keyIntegrityEdit(oldRecord, newRecord, googleSheetsInstance, auth, spreadsheetId, range);
+
     if(check == false){
         console.log('Wrong type');
         res.status(400).json({ message: `Error in editing record: wrong type` });
+    }
+    else if(check2 == true){
+        console.log('Key already exists');
+        res.status(400).json({ message: `Error in editing record: key already exists for record` });
     }
     else{
         const response = await googleSheetsInstance.spreadsheets.get({
@@ -441,5 +457,65 @@ router.post("/setActions", async(req, res) => {
 		res.status(400).json({ message: `Error in setting up role for ${viewId}` });
 	}
 })
+
+router.post("/test", async(req, res) => {
+    const { record, viewId, tableId } = req.body;
+
+    const authClientObject = await auth.getClient();
+	const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+    const table = await dataSourceModel.findById( { _id: tableId });
+
+    const regex = /\/d\/(.*?)\/edit/;
+    const match = table.url.match(regex);
+    const spreadsheetId = match[1]; // this will give you the characters between /d/ and /edit/
+    let range = table.sheetName;
+    let sheetName = table.sheetName;
+
+    // console.log(spreadsheetId);
+    res.send(await keyIntegrity(record, googleSheetsInstance, auth, spreadsheetId, range));
+});
+
+async function keyIntegrity(record, googleSheetsInstance, auth, spreadsheetId, range){
+    const readData = await googleSheetsInstance.spreadsheets.values.get({
+        auth, //auth object
+        spreadsheetId, // spreadsheet id
+        range, //range of cells to read from.
+    });
+    // console.log(readData.data.values[1][1]);
+    for(let i = 1; i < readData.data.values.length; i++){
+        for(let j = 0; j < readData.data.values[i].length; j++){
+            // console.log(readData.data.values[i][j]);
+            // console.log(record[j]);
+            if(readData.data.values[i][j] == record[j]){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+async function keyIntegrityEdit(oldRecord, newRecord, googleSheetsInstance, auth, spreadsheetId, range){
+    const readData = await googleSheetsInstance.spreadsheets.values.get({
+        auth, //auth object
+        spreadsheetId, // spreadsheet id
+        range, //range of cells to read from.
+    });
+    // console.log(readData.data.values[1][1]);
+    for(let i = 1; i < readData.data.values.length; i++){
+        for(let j = 0; j < readData.data.values[i].length; j++){
+            // console.log(readData.data.values[i][j]);
+            // console.log(record[j]);
+            if(readData.data.values[i][j] != oldRecord[j]){
+                if(readData.data.values[i][j] == newRecord[j]){
+                    return true;
+                }
+            }
+            // if(readData.data.values[i][j] == record[j]){
+            //     return true;
+            // }
+        }
+    }
+    return false;
+}
 
 module.exports = router;
