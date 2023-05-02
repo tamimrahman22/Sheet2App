@@ -56,10 +56,12 @@ router.post('/add', async (req, res) => {
             {new: true}
         );
 
+        await logFile(appId, "Added " + viewType + " view for app " + currentApp.name);
         res.send(updatedApp);
     }
     catch(err) {
         console.error('Error: ', err);
+        await logFile(appId, "Error adding " + viewType + " view for app " + currentApp.name);
 		res.status(400).json({ message: `Error in view creation for app` });
     }
 
@@ -137,10 +139,12 @@ router.post('/delete', async(req, res) => {
             { views: app.views },
             { new: true },
         );
+        await logFile(appId, "Deleted view for app " + app.name);
         res.send(update);
     }
     catch (err) {
         console.error('Error: ', err);
+        await logFile(appId, "Error in deleting view for app " + app.name);
         res.status(400).json({ message: `Error in view deletion for view ${viewId}` });
     }
 })
@@ -215,6 +219,8 @@ router.post('/addRecord', async (req, res) => {
                 { table: tableId },
                 { updatedAt: Date.now() },
             );
+            const app = await getApp(tableId);
+            await logFile(app, "Added record for app " + app);
             res.status(200).json({ tableId: tableId });
         }
         catch (err){
@@ -329,7 +335,8 @@ router.post('/editRecord', async (req, res) => {
                 });
             }
         }
-
+        const app = await getApp(tableId);
+        await logFile(app, "Edited record for app ");
         res.status(200).json({ tableId: tableId });
     }
 
@@ -375,13 +382,15 @@ router.post("/deleteRecord", async (req, res) => {
         console.log(`Deleted rows with values: ${record}`);
 
         // Find specific view and remove detail view if necessary
-        const view = await viewsModel.findById({ _id: viewId });
-        const details = view.details.filter(v => !compareArrays(v, record));
+        // const view = await viewsModel.findById({ _id: viewId });
+        // if(typeof view.details !== 'undefined'){
+        //     const details = view.details.filter(v => !compareArrays(v, record));
+        // }
 
         // Update that view with removed detail view
         await viewsModel.findByIdAndUpdate(
             { _id: viewId },
-            { details: details },
+            // { details: details },
         )
 
         // Update all views that use the data source
@@ -389,6 +398,11 @@ router.post("/deleteRecord", async (req, res) => {
             { table: tableId },
             { updatedAt: Date.now() },
         );
+        const app = await getApp(tableId);
+        // console.log(app);
+        // console.log(app.id);
+        // console.log(app.name);        
+        await logFile(app, "Deleted record for app ");
         res.status(200).json({ tableId: tableId });
     }
     catch(err) {
@@ -516,6 +530,56 @@ async function keyIntegrityEdit(oldRecord, newRecord, googleSheetsInstance, auth
         }
     }
     return false;
+}
+
+async function logFile(appId, content){
+	const folderPath = './log-files';
+	const filePath = `${folderPath}/${appId}.txt`;
+	content = new Date() + ": " + content + '\n';
+	
+	try {
+	  // Check if the folder exists
+	  if (!fs.existsSync(folderPath)) {
+		// If it doesn't exist, create it
+		await fs.mkdirSync(folderPath);
+	  }
+  
+	  // Check if the file exists
+	  if (!fs.existsSync(filePath)) {
+		// If it doesn't exist, create it and write the content
+		await fs.writeFileSync(filePath, content);
+	  } else {
+		// If it exists, append the content
+		await fs.appendFileSync(filePath, content);
+	  }
+	  console.log('Log File updated successfully.');
+	} catch (err) {
+	  console.error(err);
+	}
+}
+
+router.post("/test2", async(req, res) => {
+    const { tableId } = req.body;
+    res.send(await getApp(tableId));
+})
+
+async function getApp(tableId){
+    const list = await appModel.find({  });
+    const table = await dataSourceModel.find( list[1].dataSources[1] );
+
+    for(let i = 0; i < list.length; i++){
+        console.log(list[i].dataSources)
+        for(let j = 0; j < list[i].dataSources.length; j++){
+            const table = await dataSourceModel.find( list[i].dataSources[j] );
+            console.log(table);
+            if(table[0].id == tableId){
+                console.log(list[i].id);
+                return list[i].id;
+            }
+
+        }
+    }
+    return 0;
 }
 
 module.exports = router;
