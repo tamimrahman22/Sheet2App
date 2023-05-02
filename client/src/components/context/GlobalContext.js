@@ -316,7 +316,11 @@ export function GlobalContextProvider({children}){
                 dataSourceRefValue: dsRefValue
             }
             console.log('[STORE] Sending request to update the data source reference of a column of a data source... ', payload)
-            const response = await api.setDataSourceRef(payload);
+            try{
+                const response = await api.setDataSourceRef(payload);
+            }catch(e){
+                console.log(e.response.data)
+            }
             console.log('[STORE] Reloading data sources list for current application' )
             const res = await api.getDataSourcesByAppId(currentApp._id);
             setAppDataSources(res.data)
@@ -333,10 +337,15 @@ export function GlobalContextProvider({children}){
                 columnRefValue: colRefValue
             }
             console.log('[STORE] Sending request to update the column reference of a column of a data source... ', payload)
-            const response = await api.setColumnRef(payload);
+            try{
+                const response = await api.setColumnRef(payload);
+            } catch(e){
+                console.log(e.response.data)
+            }
             console.log('[STORE] Reloading data sources list for current application' )
             const res = await api.getDataSourcesByAppId(currentApp._id);
             setAppDataSources(res.data)
+            navigate("/editor/data");
         }
         setColumnReference(dsID, colID, colRefValue);
     }

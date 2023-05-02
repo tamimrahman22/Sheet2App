@@ -333,7 +333,7 @@ export default function DataSource() {
                                                                 <FormControl
                                                                     // FORM CONTROL FOR SELECTING THE DATA SOURCE WE ARE REFERENCING 
                                                                     style={{width: '150px'}}
-                                                                    disabled={(!col.label) || (ds.length <= 1)}
+                                                                    disabled={(ds.length <= 1)}
                                                                 >
                                                                         <InputLabel>Data Source?</InputLabel>
                                                                         <Select
