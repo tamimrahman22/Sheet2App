@@ -468,7 +468,7 @@ router.post("/setLabel", async (req, res) => {
 router.post("/setDataSourceRef", async (req, res) => {
 	// Destructure the payload that was sent
 	const { appID, dataSourceID, columnID, dataSourceRefValue } = req.body;
-
+  
 	try {
 	  // Find the data source object by ID
 	  const dataSource = await dataSourceModel.findById(dataSourceID);
@@ -476,14 +476,14 @@ router.post("/setDataSourceRef", async (req, res) => {
 	  console.log("The Data Source we're working with is: ", dataSource);
 	  // Find the index of the column with the given ID in the columns array
 	  const columnIndex = dataSource.columns.findIndex(column => column._id.toString() === columnID);
-    
+		
 	  // Handle the case when the user changes the referenced data source
-	  if (dataSource.columns[columnIndex].dataSourceReference && dataSource.columns[columnIndex].dataSourceReference.toString() !== dataSourceRefValue.toString()) {
+	  if (dataSource.columns[columnIndex].dataSourceReference && dataSourceRefValue !== null && dataSource.columns[columnIndex].dataSourceReference.toString() !== dataSourceRefValue.toString()) {
 		console.log('Handling the case when the user changes the referenced data source');
 		// Find the old data source and column that was previously being referenced
 		const oldDataSourceRef = await dataSourceModel.findById(dataSource.columns[columnIndex].dataSourceReference);
 		const oldColumnID = dataSource.columns[columnIndex].columnReference;
-
+  
 		if (oldColumnID) {
 		  const oldColumnIndex = oldDataSourceRef.columns.findIndex(column => column._id.toString() === oldColumnID.toString());
 		  if (oldColumnIndex !== -1) {
@@ -494,19 +494,22 @@ router.post("/setDataSourceRef", async (req, res) => {
 		  }
 		}
 	  }
-  
+	  
 	  // Update the data source reference value of the column at the specified index
 	  dataSource.columns[columnIndex].dataSourceReference = dataSourceRefValue;
-	  dataSource.columns[columnIndex].columnReference = null;
-  
+	  if (dataSourceRefValue === null) {
+		// Set the column reference value to null if the data source reference value is null
+		dataSource.columns[columnIndex].columnReference = null;
+	  }
+	
 	  // Save the updated data source object
 	  const updatedDataSource = await dataSource.save();
-  
+	
 	  // Write to the log file
 	  console.log('Writing to the log file');
 	  const logMessage = `Data source reference updated for column with ID ${columnID} in data source with ID ${dataSourceID}`;
 	  await logFile(appID, logMessage);
-  
+	
 	  // Send the updated data source object as the response
 	  console.log('Sending the updated data source object as the response');
 	  res.status(200).json(updatedDataSource);
@@ -515,74 +518,80 @@ router.post("/setDataSourceRef", async (req, res) => {
 	  console.log('Error updating data source reference');
 	  const logMessage = `Error updating data source reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`;
 	  await logFile(appID, logMessage);
-  
+	
 	  // Send an error response if an error occurred
 	  console.log('Sending an error response if an error occurred');
 	  res.status(500).send(logMessage);
 	}
 });
-
+  
 router.post("/setColumnRef", async (req, res) => {
 	// Extract the request body parameters
 	const { appID, dataSourceID, columnID, columnRefValue } = req.body;
-  
+	
 	try {
 	  // Find the data source object by ID
 	  const dataSource = await dataSourceModel.findById(dataSourceID);
-  
+	
 	  // Find the index of the column with the given ID in the columns array
 	  const columnIndex = dataSource.columns.findIndex(
 		(column) => column._id.toString() === columnID
 	  );
-  
+	
 	  // Get the old column reference
 	  const oldColumnRef = dataSource.columns[columnIndex].columnReference;
-  
+	
 	  // If the old column reference exists
 	  if (oldColumnRef) {
 		// Find the data source containing the old column reference
 		const oldDataSource = await dataSourceModel.findOne({ "columns._id": oldColumnRef });
-  
+	
 		// Find the index of the old column reference in the old data source
 		const oldColumnIndex = oldDataSource.columns.findIndex((column) => column._id.toString() === oldColumnRef.toString());
-  
+	
 		// Unset the label attribute for the old reference column
 		oldDataSource.columns[oldColumnIndex].label = false;
 		await oldDataSource.save();
 	  }
-  
+	
 	  // Update the columnReference value of the column at the specified index
 	  dataSource.columns[columnIndex].columnReference = columnRefValue;
-  
+	
 	  // If the new column reference value is provided
 	  if (columnRefValue) {
 		// Find the data source containing the new column reference
 		const newDataSource = await dataSourceModel.findOne({ "columns._id": columnRefValue });
-  
+	
 		// Find the index of the new column reference in the new data source
 		const newColumnIndex = newDataSource.columns.findIndex((column) => column._id.toString() === columnRefValue.toString());
-  
+	
 		// Set the label attribute of the new reference column to true
 		newDataSource.columns[newColumnIndex].label = true;
 		await newDataSource.save();
 	  }
-  
+	
 	  // Save the updated data source object
 	  const updatedDataSource = await dataSource.save();
-  
+	
+	  // If the new column reference value is null
+	  if (columnRefValue === null) {
+		// Set the column reference value to null
+		dataSource.columns[columnIndex].columnReference = null;
+	  }
+	
 	  // Write to the log file
 	  const logMessage = `Data source reference of column with ID ${columnID} in data source with ID ${dataSourceID} updated to ${columnRefValue}`;
 	  await logFile(appID, logMessage);
-  
+	
 	  // Send the updated data source object as the response
 	  res.status(200).json(updatedDataSource);
 	} catch (error) {
 	  console.log("Error in /setColumnRef route:", error);
-  
+	
 	  // Write to the log file
 	  const logMessage = `Error updating data source reference of column with ID ${columnID} in data source with ID ${dataSourceID}: ${error.message}`;
 	  await logFile(appID, logMessage);
-  
+	
 	  // Send an error response if an error occurred
 	  res.status(500).send(logMessage);
 	}

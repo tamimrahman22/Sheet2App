@@ -108,20 +108,26 @@ export default function DataSource() {
         store.updateLabel(dsID, colID, value);
     }
 
-    // Function to handle a change in the value of the data source reference for a column of the current data source
     function handleDataSourceReferenceChange(dsID, colID, dsRefValue){
         // dsID --> the ID of the data source we are going to update that specified column's dataSourceReference value to
         // colID --> the ID of column with the data source that we're going to update the dataSourceReference value to
         // dsRefValue --> the ID of the data source we are referencing 
+        if (dsRefValue === "None") {
+            dsRefValue = null;
+        }
         store.updateDataSourceReference(dsID, colID, dsRefValue);
     }
-
+    
     function handleColumnReferenceChange(dsID, colID, colRefValue){
         // dsID --> the ID of the data source we are going to update that specified column's columnReference value to
         // colID --> the ID of column with the data source that we're going to update the columnReference value to
         // colRefValue --> the ID of the column of the data source we are referencing
+        if (colRefValue === "None") {
+            colRefValue = null;
+        }
         store.updateColumnReference(dsID, colID, colRefValue)
     }
+    
 
     function handleAddDataSource(){
         console.log('[DATA SOURCE] CURRENT APP: ', store.currentApp._id)
@@ -331,58 +337,53 @@ export default function DataSource() {
                                                             </TableCell>
                                                             <TableCell>
                                                                 <FormControl
-                                                                    // FORM CONTROL FOR SELECTING THE DATA SOURCE WE ARE REFERENCING 
-                                                                    style={{width: '150px'}}
-                                                                    disabled={(ds.length <= 1)}
+                                                                    style={{ width: "150px" }}
+                                                                    disabled={ds.length <= 1}
                                                                 >
-                                                                        <InputLabel>Data Source?</InputLabel>
-                                                                        <Select
-                                                                            value={col.dataSourceReference || ""}
-                                                                            label="Data Source?"
-                                                                            onChange={(e) =>
-                                                                                handleDataSourceReferenceChange(
-                                                                                  ds._id,
-                                                                                  col._id,
-                                                                                  e.target.value
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            {store.appDataSources
-                                                                            .filter((d) => d._id !== ds._id)
-                                                                            .map((d) => (
-                                                                                <MenuItem key={d._id} value={d._id}>
-                                                                                    {d.dataSourceName}
-                                                                                </MenuItem>
-                                                                            ))}
-                                                                        </Select>
+                                                                    <InputLabel>Data Source?</InputLabel>
+                                                                    <Select
+                                                                    value={col.dataSourceReference || "None"}
+                                                                    label="Data Source?"
+                                                                    onChange={(e) =>
+                                                                        handleDataSourceReferenceChange(
+                                                                        ds._id,
+                                                                        col._id,
+                                                                        e.target.value
+                                                                        )
+                                                                    }
+                                                                    >
+                                                                    <MenuItem value="None">None</MenuItem>
+                                                                    {store.appDataSources
+                                                                        .filter((d) => d._id !== ds._id)
+                                                                        .map((d) => (
+                                                                        <MenuItem key={d._id} value={d._id}>
+                                                                            {d.dataSourceName}
+                                                                        </MenuItem>
+                                                                        ))}
+                                                                    </Select>
                                                                 </FormControl>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <FormControl 
-                                                                    style={{ width: '150px' }} 
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                <FormControl
+                                                                    style={{ width: "150px" }}
                                                                     disabled={!col.dataSourceReference}
                                                                 >
                                                                     <InputLabel>Column?</InputLabel>
-                                                                    <Select 
-                                                                        label="Column?" 
-                                                                        value={col.columnReference || ""}
-                                                                        onChange={(e) => {
-                                                                            handleColumnReferenceChange(
-                                                                                ds._id,
-                                                                                col._id,
-                                                                                e.target.value
-                                                                            )
-                                                                        }}
+                                                                    <Select
+                                                                    label="Column?"
+                                                                    value={col.columnReference || "None"}
+                                                                    onChange={(e) => {
+                                                                        handleColumnReferenceChange(ds._id, col._id, e.target.value);
+                                                                    }}
                                                                     >
+                                                                    <MenuItem value="None">None</MenuItem>
                                                                     {store.appDataSources
-                                                                        .find(ds => ds._id === col.dataSourceReference)
-                                                                        ?.columns
-                                                                        ?.map(column => (
+                                                                        .find((ds) => ds._id === col.dataSourceReference)
+                                                                        ?.columns?.map((column) => (
                                                                         <MenuItem key={column._id} value={column._id}>
                                                                             {column.name}
                                                                         </MenuItem>
-                                                                        ))
-                                                                    }
+                                                                        ))}
                                                                     </Select>
                                                                 </FormControl>
                                                             </TableCell>
