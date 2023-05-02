@@ -31,7 +31,7 @@ function DeveloperView(props) {
             if (!sessionStorage.getItem(url)) {
                 let payload = {
                     url: response.data.url,
-                    name: "Sheet1"  // DEFAULTING TO SHEET1``
+                    name: response.data.sheetIndex,
                 }
                 response = await api.getRows(payload);
                 console.log(response.data);
