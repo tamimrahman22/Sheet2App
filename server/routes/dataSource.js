@@ -194,7 +194,7 @@ router.post('/getColumns', async (req, res) => {
 });
 
 router.post('/getRows', async (req, res) => {
-	const { url, name } = req.body;
+	const { url, index } = req.body;
 	// const name = "Sheet1";
 
 	const authClientObject = await auth.getClient();
@@ -210,6 +210,17 @@ router.post('/getRows', async (req, res) => {
 			spreadsheetId,
 			auth,
 		});
+
+		let name = "";
+		for (let i = 0; i < response.data.sheets.length; i++) {
+			const sheet = response.data.sheets[i];
+			console.log(sheet.properties.index);
+			console.log(index);
+			if (sheet.properties.index === index) {
+				name = sheet.properties.title;
+				break;
+			}
+		}
 
 		const readData = await googleSheetsInstance.spreadsheets.values.get({
 			auth, //auth object

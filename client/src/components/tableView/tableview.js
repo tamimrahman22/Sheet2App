@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, Fragment } from 'react';
 import { useSnackbar } from 'notistack';
 import Paper from '@mui/material/Paper';
-import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, } from '@mui/material';
+import { Typography, Card, CardContent, LinearProgress, Stack, Box, TableContainer, Table, TableHead, TableBody, TableCell, TableRow, Collapse, Grid, TextField, Button, IconButton, Link} from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import EditIcon from '@mui/icons-material/Edit';
@@ -37,7 +37,7 @@ function TableView(props) {
             if (!sessionStorage.getItem(url)) {
                 let payload = {
                     url: response.data.url,
-                    name: "Sheet1"  // DEFAULTING TO SHEET1``
+                    index: response.data.sheetIndex,
                 }
                 response = await api.getRows(payload);
                 console.log(response.data);
@@ -121,6 +121,11 @@ function TableView(props) {
                 {
                     row.map((cell, index) => {
                         if (indices.includes(index)) {
+                            if (tableColumns[index].type === "url") {
+                                return (
+                                    <TableCell key={"cell-value-" + cell}><Link href={cell} target="_blank">{cell}</Link></TableCell>
+                                )
+                            }
                             return (
                                 <TableCell key={"cell-value-" + cell}>{cell}</TableCell>
                             )
@@ -194,6 +199,11 @@ function TableView(props) {
                     {
                         row.map((cell, index) => {
                             if (indices.includes(index)) {
+                                if (tableColumns[index].type === "url") {
+                                    return (
+                                        <TableCell key={"cell-value-" + cell}><Link href={cell} target="_blank">{cell}</Link></TableCell>
+                                    )
+                                }
                                 return (
                                     <TableCell key={"cell-value-" + cell}>{cell}</TableCell>
                                 )
