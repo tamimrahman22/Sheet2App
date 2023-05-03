@@ -2,7 +2,7 @@
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
-import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack, IconButton, FormControl, InputLabel, Select, MenuItem} from '@mui/material';
+import { Button, Typography, Link, Modal, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Stack, IconButton, FormControl, InputLabel, Select, MenuItem, Alert} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -268,7 +268,7 @@ export default function DataSource() {
                             <DeleteIcon />
                         </IconButton>
                     </Stack>
-                    <TableContainer component={Paper} style={{ overflow: 'auto', height: '50vh' }}>   
+                    <TableContainer component={Paper} style={{ overflow: 'auto'}} fullWidth>   
                         <Table aria-label="simple table">
                             <TableHead>
                                 <TableRow>
@@ -290,7 +290,7 @@ export default function DataSource() {
                                         <TableCell>{ds.sheetIndex + 1}</TableCell>
                                         <TableCell>
                                             <TableContainer 
-                                                style={{ overflow: 'auto', height: '35vh', width: '40vw'}}
+                                                style={{ overflow: 'auto', height: '35vh', width: '55vw'}}
                                             >
                                                 <Table size="small">
                                                     <TableHead>
@@ -418,6 +418,25 @@ export default function DataSource() {
                             }
                         </Table>
                     </TableContainer>
+                    <Box>
+                        {ds.keys === "" ? 
+                            <Alert
+                                severity="error"
+                            >
+                                No key column set for this data source!
+                            </Alert> 
+                            : 
+                            null
+                        }
+                        {ds.columns.some(
+                            (column) =>
+                            column.dataSourceReference !== null && column.columnReference === null
+                        ) ? (
+                            <Alert severity="error">
+                            Column reference not selected for a column with data source reference!
+                            </Alert>
+                        ) : null}
+                    </Box>
                 </Box>
             ))
         }
