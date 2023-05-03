@@ -87,3 +87,17 @@ describe('POST /dataSource/getRows', () => {
     });
 });
 
+describe(`POST /dataSource/delete ${tempAppId}`, () => {
+    it("should delete a data soource with given id", async () => {
+        const response = await request(baseURL).post("/dataSource/delete").send({ "appId": tempAppId });
+        expect(response.statusCode).toBe(200);
+        expect(response.body.acknowledged).toBe(true);
+        expect(response.body.deletedCount).toBe(1);
+    });
+    it("should leave the database empty", async () => {
+        response = await request(baseURL).get("/dataSource/list");
+        expect(response.statusCode).toBe(200);
+        expect(response.body.length).toBe(0);
+    });
+});
+

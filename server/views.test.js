@@ -46,3 +46,17 @@ describe("POST /views/create", () => {
         expect(app.body[0].views.length).toBe(1);
     })
 });
+
+describe(`POST /views/delete ${tempAppId}`, () => {
+    it("should delete a view with given id", async () => {
+        const response = await request(baseURL).post("/views/delete").send({ "appId": tempAppId });
+        expect(response.statusCode).toBe(200);
+        expect(response.body.acknowledged).toBe(true);
+        expect(response.body.deletedCount).toBe(1);
+    });
+    it("should leave the database empty", async () => {
+        response = await request(baseURL).get("/views/list");
+        expect(response.statusCode).toBe(200);
+        expect(response.body.length).toBe(0);
+    });
+});
