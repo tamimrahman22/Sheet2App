@@ -178,24 +178,30 @@ export function GlobalContextProvider({children}){
                 keys:keys 
             };
             console.log('[STORE] Sending request to create data source... : ',payload)
-            const response = await api.addDataSource(payload)
-            console.log('[STORE] Created data source...', response)
-            // Set the current app list to be the one that was update with the data source!
-            setApp(response.data);
-            navigate("/editor/data");
-            
-            // Update the list of application with the latest information
-            async function getLists() {    
-                let payload = {
-                    user: auth.user.email,
-                }
-                const response = await api.getAppList(payload);
-                console.log('[STORE] Response: ', response);
-                console.log('[STORE] Data: ',  response.data);
-                // Set the app list with the new lists that were found! 
-                setAppList(response.data);
+            try{
+                const response = await api.addDataSource(payload)
+                console.log('[STORE] Created data source...', response)
+                // Set the current app list to be the one that was update with the data source!
+                setApp(response.data);
+                navigate("/editor/data");
+                // Update the list of application with the latest information
+                async function getLists() {    
+                    let payload = {
+                        user: auth.user.email,
+                    }
+                    const response = await api.getAppList(payload);
+                    console.log('[STORE] Response: ', response);
+                    console.log('[STORE] Data: ',  response.data);
+                    // Set the app list with the new lists that were found! 
+                    setAppList(response.data);
             }
             getLists();
+            }catch (e) {
+                console.error('[STORE] Error adding data source', e);
+                // handle the error here, e.g. show a snackbar or toast message
+                const message = 'Error adding data source: ' + (e.response ? e.response.data.message : e.message);
+                enqueueSnackbar(message, { variant: 'error' });
+            }  
         }
         addDataSource(appID, dataSourceName, sheetURL, sheetIndex, keys); 
         // Verify we got the input we need!
